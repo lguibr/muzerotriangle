@@ -1,4 +1,5 @@
 # File: muzerotriangle/utils/types.py
+# File: muzerotriangle/utils/types.py
 from collections import deque
 from collections.abc import Mapping
 
@@ -33,6 +34,7 @@ class TrajectoryStep(TypedDict):
     reward: float  # Actual reward r_{t+1} received from environment
     policy_target: PolicyTargetMapping  # MCTS policy target pi_t at step t
     value_target: float  # MCTS value target z_t (e.g., root value) at step t
+    n_step_reward_target: float  # N-step discounted reward target R_t^{(N)}
     hidden_state: (
         np.ndarray | None
     )  # Optional: Store hidden state s_t from NN for debugging/analysis
@@ -48,6 +50,16 @@ Trajectory = list[TrajectoryStep]
 SampledSequence = list[TrajectoryStep]
 SampledBatch = list[SampledSequence]  # Batch of sequences
 
+
+# --- Prioritized Experience Replay (PER) ---
+class SampledBatchPER(TypedDict):
+    """Data structure for samples from PER buffer."""
+
+    sequences: SampledBatch  # The batch of sampled sequences
+    indices: np.ndarray  # Indices in the SumTree for priority updates
+    weights: np.ndarray  # Importance sampling weights
+
+
 # --- Statistics ---
 
 
@@ -61,9 +73,3 @@ class StepInfo(TypedDict, total=False):
 
 
 StatsCollectorData = dict[str, deque[tuple[StepInfo, float]]]
-
-# --- REMOVED: PER Types (temporarily disabled) ---
-# class PERBatchSample(TypedDict):
-#    batch: ExperienceBatch # This would need changing to SampledBatch
-#    indices: np.ndarray
-#    weights: np.ndarray

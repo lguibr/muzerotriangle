@@ -2,7 +2,7 @@
 import logging
 import sys
 from collections.abc import Mapping
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import torch
@@ -180,10 +180,18 @@ class NeuralNetwork:
                    Reward logits are dummy here as they come from dynamics.
         """
         self.model.eval()
-        grid_tensor = torch.from_numpy(observation["grid"]).unsqueeze(0).to(self.device)
-        other_features_tensor = (
-            torch.from_numpy(observation["other_features"]).unsqueeze(0).to(self.device)
+        grid_tensor = torch.as_tensor(
+            observation["grid"], dtype=torch.float32, device=self.device
         )
+        other_features_tensor = torch.as_tensor(
+            observation["other_features"], dtype=torch.float32, device=self.device
+        )
+
+        # Add batch dimension if necessary
+        if grid_tensor.dim() == 3:
+            grid_tensor = grid_tensor.unsqueeze(0)
+        if other_features_tensor.dim() == 1:
+            other_features_tensor = other_features_tensor.unsqueeze(0)
 
         policy_logits, value_logits, initial_hidden_state = self.model(
             grid_tensor, other_features_tensor
@@ -206,13 +214,46 @@ class NeuralNetwork:
         g(s_{k-1}, a_k) -> s_k, r_k
         f(s_k) -> p_k, v_k
         Args:
-            hidden_state: The previous hidden state (s_{k-1}).
-            action: The action taken (a_k).
+            hidden_state: The previous hidden state (s_{k-1}). Shape [B, H] or [H].
+            action: The action taken (a_k). Can be int or Tensor.
         Returns:
             Tuple: (policy_logits, value_logits, reward_logits, next_hidden_state)
+                   All tensors will have a batch dimension.
         """
         self.model.eval()
-        next_hidden_state, reward_logits = self.model.dynamics(hidden_state, action)
+        # Ensure hidden_state has a batch dimension
+        if hidden_state.dim() == 1:
+            hidden_state = hidden_state.unsqueeze(0)
+
+        # Ensure action is a tensor with a batch dimension
+        if isinstance(action, int):
+            action_tensor = torch.tensor([action], dtype=torch.long, device=self.device)
+        elif isinstance(action, torch.Tensor):
+            if action.dim() == 0:  # Scalar tensor
+                action_tensor = action.unsqueeze(0).to(self.device)
+            elif action.dim() == 1:  # Already a batch of actions
+                action_tensor = action.to(self.device)
+            else:
+                raise ValueError(f"Unsupported action tensor shape: {action.shape}")
+        else:
+            raise TypeError(f"Unsupported action type: {type(action)}")
+
+        # Ensure action_tensor has the same batch size as hidden_state
+        if action_tensor.shape[0] != hidden_state.shape[0]:
+            if hidden_state.shape[0] == 1 and action_tensor.shape[0] > 1:
+                # Repeat hidden state if it's a single state for a batch of actions
+                hidden_state = hidden_state.expand(action_tensor.shape[0], -1)
+            elif action_tensor.shape[0] == 1 and hidden_state.shape[0] > 1:
+                # Repeat action if it's a single action for a batch of states
+                action_tensor = action_tensor.expand(hidden_state.shape[0])
+            else:
+                raise ValueError(
+                    f"Batch size mismatch between hidden_state ({hidden_state.shape[0]}) and action ({action_tensor.shape[0]})"
+                )
+
+        next_hidden_state, reward_logits = self.model.dynamics(
+            hidden_state, action_tensor
+        )
         policy_logits, value_logits = self.model.predict(next_hidden_state)
         return policy_logits, value_logits, reward_logits, next_hidden_state
 
@@ -334,7 +375,7 @@ class NeuralNetwork:
             weights_on_device = {k: v.to(self.device) for k, v in weights.items()}
             model_to_load = getattr(self.model, "_orig_mod", self.model)
             model_to_load.load_state_dict(weights_on_device)
-            self.model.eval()
+            self.model.eval()  # Ensure model is in eval mode after loading weights
             logger.debug("NN weights set successfully.")
         except Exception as e:
             logger.error(f"Error setting weights on NN instance: {e}", exc_info=True)

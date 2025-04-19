@@ -39,7 +39,7 @@ pytestdebug.log
 .ruff_cache/
 
 # Data / MLflow / Logs (Keep user-generated data out of git)
-.alphatriangle_data/
+.muzerotriangle_data/
 .resumed.txt
 # Optional: If generated files are expected
 # *.pkl

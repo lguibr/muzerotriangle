@@ -1,7 +1,7 @@
 # File: muzerotriangle/nn/model.py
 import logging
 import math
-from typing import cast
+from typing import cast  # Keep cast
 
 import torch
 import torch.nn as nn
@@ -12,7 +12,7 @@ from ..config import EnvConfig, ModelConfig
 logger = logging.getLogger(__name__)
 
 
-# --- conv_block, PositionalEncoding remain the same ---
+# --- conv_block, ResidualBlock, PositionalEncoding remain the same ---
 def conv_block(
     in_channels, out_channels, kernel_size, stride, padding, use_batch_norm, activation
 ):
@@ -30,6 +30,24 @@ def conv_block(
         layers.append(nn.BatchNorm2d(out_channels))
     layers.append(activation())
     return nn.Sequential(*layers)
+
+
+class ResidualBlock(nn.Module):
+    def __init__(self, channels, use_batch_norm, activation):
+        super().__init__()
+        self.conv1 = conv_block(channels, channels, 3, 1, 1, use_batch_norm, activation)
+        self.conv2 = nn.Conv2d(channels, channels, 3, 1, 1, bias=not use_batch_norm)
+        self.bn2 = nn.BatchNorm2d(channels) if use_batch_norm else nn.Identity()
+        self.activation = activation()
+
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        residual: torch.Tensor = x
+        out: torch.Tensor = self.conv1(x)
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out_sum: torch.Tensor = out + residual
+        out_activated: torch.Tensor = self.activation(out_sum)
+        return out_activated
 
 
 class PositionalEncoding(nn.Module):
@@ -51,38 +69,11 @@ class PositionalEncoding(nn.Module):
         pe_buffer = self.pe
         assert isinstance(pe_buffer, torch.Tensor)
         if x.shape[0] > pe_buffer.shape[0]:
-            raise ValueError(
-                f"Input seq len {x.shape[0]} > max_len {pe_buffer.shape[0]}"
-            )
+            raise ValueError(f"Seq len {x.shape[0]} > max_len {pe_buffer.shape[0]}")
         if x.shape[2] != pe_buffer.shape[2]:
-            raise ValueError(f"Input dim {x.shape[2]} != PE dim {pe_buffer.shape[2]}")
+            raise ValueError(f"Dim {x.shape[2]} != PE dim {pe_buffer.shape[2]}")
         x = x + pe_buffer[: x.size(0)]
         return cast("torch.Tensor", self.dropout(x))
-
-
-# --- ResidualBlock ---
-class ResidualBlock(nn.Module):
-    """Standard Residual Block."""
-
-    def __init__(
-        self, channels: int, use_batch_norm: bool, activation: type[nn.Module]
-    ):
-        super().__init__()
-        self.conv1 = conv_block(channels, channels, 3, 1, 1, use_batch_norm, activation)
-        self.conv2 = nn.Conv2d(channels, channels, 3, 1, 1, bias=not use_batch_norm)
-        self.bn2 = nn.BatchNorm2d(channels) if use_batch_norm else nn.Identity()
-        self.activation = activation()
-
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
-        residual: torch.Tensor = x  # Hint residual type
-        out: torch.Tensor = self.conv1(x)
-        out = self.conv2(out)
-        out = self.bn2(out)
-        # --- Explicitly type hint the result of addition ---
-        out_sum: torch.Tensor = out + residual
-        out_activated: torch.Tensor = self.activation(out_sum)
-        # ---
-        return out_activated
 
 
 # --- MuZeroNet Implementation ---
@@ -113,33 +104,28 @@ class RepresentationEncoderWrapper(nn.Module):
         self.flatten = nn.Flatten(start_dim=1)
 
     def forward(self, grid_state: torch.Tensor) -> torch.Tensor:
-        encoded: torch.Tensor = self.cnn_tf_layers(grid_state)  # Hint type
-        encoded_flat: torch.Tensor  # Declare type
-        if len(encoded.shape) > 2:
-            encoded_flat = self.flatten(encoded)
-        else:
-            encoded_flat = encoded
-        # --- Ensure return type matches annotation ---
+        encoded: torch.Tensor = self.cnn_tf_layers(grid_state)
+        encoded_flat: torch.Tensor = (
+            self.flatten(encoded) if len(encoded.shape) > 2 else encoded
+        )
         return encoded_flat
 
 
 class MuZeroNet(nn.Module):
     """MuZero Network Implementation."""
 
-    # ... (init remains the same, including _build_representation_cnn_tf_encoder which now returns RepresentationEncoderWrapper) ...
     def __init__(self, model_config: ModelConfig, env_config: EnvConfig):
         super().__init__()
         self.model_config = model_config
         self.env_config = env_config
         self.action_dim = int(env_config.ACTION_DIM)
-        self.hidden_dim = model_config.HIDDEN_STATE_DIM  # type: ignore[call-overload]
+        self.hidden_dim = model_config.HIDDEN_STATE_DIM
         self.activation_cls: type[nn.Module] = getattr(
             nn, model_config.ACTIVATION_FUNCTION
         )
         dummy_input_grid = torch.zeros(
             1, model_config.GRID_INPUT_CHANNELS, env_config.ROWS, env_config.COLS
         )
-        dummy_other = torch.zeros(1, model_config.OTHER_NN_INPUT_FEATURES_DIM)
         self.representation_encoder = self._build_representation_cnn_tf_encoder()
         with torch.no_grad():
             encoded_output = self.representation_encoder(dummy_input_grid)
@@ -151,7 +137,7 @@ class MuZeroNet(nn.Module):
         in_features = rep_projector_input_dim
         for hidden_dim_fc in model_config.REP_FC_DIMS_AFTER_ENCODER:
             rep_fc_layers.append(nn.Linear(in_features, hidden_dim_fc))
-            in_features = hidden_dim_fc  # Simplified line
+            in_features = hidden_dim_fc
         rep_fc_layers.append(nn.Linear(in_features, self.hidden_dim))
         self.representation_projector = nn.Sequential(*rep_fc_layers)
         self.action_encoder = nn.Linear(
@@ -166,12 +152,12 @@ class MuZeroNet(nn.Module):
             dynamics_layers.extend(
                 [nn.Linear(self.hidden_dim, self.hidden_dim), self.activation_cls()]
             )
-            self.dynamics_core = nn.Sequential(*dynamics_layers)
+        self.dynamics_core = nn.Sequential(*dynamics_layers)
         reward_head_layers: list[nn.Module] = []
         reward_in = self.hidden_dim
         for hidden_dim_fc in model_config.REWARD_HEAD_DIMS:
             reward_head_layers.append(nn.Linear(reward_in, hidden_dim_fc))
-            reward_in = hidden_dim_fc  # Simplified line
+            reward_in = hidden_dim_fc
         reward_head_layers.append(
             nn.Linear(reward_in, model_config.REWARD_SUPPORT_SIZE)
         )
@@ -183,28 +169,25 @@ class MuZeroNet(nn.Module):
                 [nn.Linear(pred_in, self.hidden_dim), self.activation_cls()]
             )
             pred_in = self.hidden_dim
-            self.prediction_core = nn.Sequential(*prediction_layers)
+        self.prediction_core = nn.Sequential(*prediction_layers)
         policy_head_layers: list[nn.Module] = []
         policy_in = self.hidden_dim
         for hidden_dim_fc in model_config.POLICY_HEAD_DIMS:
             policy_head_layers.append(nn.Linear(policy_in, hidden_dim_fc))
-            policy_in = hidden_dim_fc  # Simplified line
+            policy_in = hidden_dim_fc
         policy_head_layers.append(nn.Linear(policy_in, self.action_dim))
         self.policy_head = nn.Sequential(*policy_head_layers)
         value_head_layers: list[nn.Module] = []
         value_in = self.hidden_dim
         for hidden_dim_fc in model_config.VALUE_HEAD_DIMS:
             value_head_layers.append(nn.Linear(value_in, hidden_dim_fc))
-            value_in = hidden_dim_fc  # Simplified line
+            value_in = hidden_dim_fc
         value_head_layers.append(nn.Linear(value_in, model_config.NUM_VALUE_ATOMS))
         self.value_head = nn.Sequential(*value_head_layers)
 
-    def _build_representation_cnn_tf_encoder(
-        self,
-    ) -> RepresentationEncoderWrapper:  # Return the wrapper type
+    def _build_representation_cnn_tf_encoder(self) -> RepresentationEncoderWrapper:
         layers: list[nn.Module] = []
         in_channels = self.model_config.GRID_INPUT_CHANNELS
-        # CNN Body
         for i, out_channels in enumerate(self.model_config.CONV_FILTERS):
             layers.append(
                 conv_block(
@@ -218,7 +201,6 @@ class MuZeroNet(nn.Module):
                 )
             )
             in_channels = out_channels
-        # Residual Body
         if self.model_config.NUM_RESIDUAL_BLOCKS > 0:
             res_channels = self.model_config.RESIDUAL_BLOCK_FILTERS
             if in_channels != res_channels:
@@ -242,7 +224,6 @@ class MuZeroNet(nn.Module):
                         self.activation_cls,
                     )
                 )
-        # Transformer (Optional)
         if (
             self.model_config.USE_TRANSFORMER_IN_REP
             and self.model_config.REP_TRANSFORMER_LAYERS > 0
@@ -284,13 +265,16 @@ class MuZeroNet(nn.Module):
         encoded_grid_flat = self.representation_encoder(grid_state)
         combined_features = torch.cat([encoded_grid_flat, other_features], dim=1)
         hidden_state = self.representation_projector(combined_features)
-        return hidden_state
+        # Explicitly cast the output to satisfy MyPy
+        return cast("torch.Tensor", hidden_state)
 
     def dynamics(self, hidden_state, action) -> tuple[torch.Tensor, torch.Tensor]:
         if isinstance(action, int) or (
             isinstance(action, torch.Tensor) and action.numel() == 1
         ):
-            action_tensor = torch.tensor([action], device=hidden_state.device)
+            action_tensor = cast(
+                "torch.Tensor", torch.tensor([action], device=hidden_state.device)
+            )
             action_one_hot = F.one_hot(
                 action_tensor, num_classes=self.action_dim
             ).float()
@@ -323,8 +307,4 @@ class MuZeroNet(nn.Module):
     ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor]:
         initial_hidden_state = self.represent(grid_state, other_features)
         policy_logits, value_logits = self.predict(initial_hidden_state)
-        dummy_reward_logits = torch.zeros(
-            (initial_hidden_state.shape[0], self.model_config.REWARD_SUPPORT_SIZE),
-            device=initial_hidden_state.device,
-        )
         return policy_logits, value_logits, initial_hidden_state

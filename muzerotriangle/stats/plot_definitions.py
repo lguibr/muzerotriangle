@@ -2,7 +2,7 @@
 from typing import Literal, NamedTuple
 
 # Define type for x-axis data source
-PlotXAxisType = Literal["index", "global_step", "buffer_size"]
+PlotXAxisType = Literal["index", "global_step", "buffer_size", "game_step_index"]
 
 # Define metric key constant for weight updates
 WEIGHT_UPDATE_METRIC_KEY = "Internal/Weight_Update_Step"
@@ -30,24 +30,30 @@ class PlotDefinitions:
         # Define the layout and properties of each plot
         self._definitions: list[PlotDefinition] = [
             # Row 1
-            # --- CHANGED: x_axis_type to "index" ---
-            PlotDefinition("RL/Current_Score", "Score", False, "index"),
+            # --- CHANGED: x_axis_type to "game_step_index" for Score ---
+            PlotDefinition("RL/Current_Score", "Score", False, "game_step_index"),
+            # --- END CHANGED ---
             PlotDefinition(
                 "Rate/Episodes_Per_Sec", "Episodes/sec", False, "buffer_size"
             ),
             PlotDefinition("Loss/Total", "Total Loss", True, "global_step"),
             # Row 2
-            PlotDefinition("RL/Step_Reward", "Step Reward", False, "index"),
+            # --- CHANGED: x_axis_type to "game_step_index" for Step Reward ---
+            PlotDefinition("RL/Step_Reward", "Step Reward", False, "game_step_index"),
+            # --- END CHANGED ---
             PlotDefinition(
                 "Rate/Simulations_Per_Sec", "Sims/sec", False, "buffer_size"
             ),
             PlotDefinition("Loss/Policy", "Policy Loss", True, "global_step"),
             # Row 3
-            PlotDefinition("MCTS/Step_Visits", "MCTS Visits", False, "index"),
+            # --- CHANGED: x_axis_type to "game_step_index" for MCTS Visits ---
+            PlotDefinition("MCTS/Step_Visits", "MCTS Visits", False, "game_step_index"),
+            # --- END CHANGED ---
             PlotDefinition("Buffer/Size", "Buffer Size", False, "buffer_size"),
             PlotDefinition("Loss/Value", "Value Loss", True, "global_step"),
             # Row 4
-            PlotDefinition("MCTS/Step_Depth", "MCTS Depth", False, "index"),
+            # --- CHANGED: x_axis_type to "game_step_index" for MCTS Depth ---
+            PlotDefinition("MCTS/Step_Depth", "MCTS Depth", False, "game_step_index"),
             # --- END CHANGED ---
             PlotDefinition("Rate/Steps_Per_Sec", "Steps/sec", False, "global_step"),
             PlotDefinition("LearningRate", "Learn Rate", True, "global_step"),

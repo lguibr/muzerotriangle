@@ -7,7 +7,7 @@ import time
 import traceback
 from collections import deque
 from pathlib import Path
-from typing import Any
+from typing import Any, Optional
 
 import mlflow
 import pygame
@@ -16,7 +16,9 @@ import ray
 from .. import config, environment, visualization
 from ..config import APP_NAME, PersistenceConfig, TrainConfig
 
-# from ..utils.sumtree import SumTree # REMOVED: PER disabled
+# Import Trajectory type
+from ..utils.sumtree import SumTree  # Import SumTree for re-initialization
+from ..utils.types import Trajectory
 from .components import TrainingComponents
 from .logging_utils import (
     Tee,
@@ -28,7 +30,9 @@ from .loop import TrainingLoop
 from .setup import count_parameters, setup_training_components
 
 logger = logging.getLogger(__name__)
-visual_state_queue: queue.Queue[dict[int, Any] | None] = queue.Queue(maxsize=5)
+
+# Queue for communication between training thread and visualization thread
+visual_state_queue: queue.Queue[Optional[dict[int, Any]]] = queue.Queue(maxsize=5)
 
 
 def _initialize_mlflow(persist_config: PersistenceConfig, run_name: str) -> bool:
@@ -57,6 +61,7 @@ def _initialize_mlflow(persist_config: PersistenceConfig, run_name: str) -> bool
 def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoop:
     """Loads initial state (checkpoint, MuZero buffer) and applies it."""
     loaded_state = components.data_manager.load_initial_state()
+    # Pass the visual queue to the TrainingLoop
     training_loop = TrainingLoop(components, visual_state_queue=visual_state_queue)
 
     # --- Apply Checkpoint Data (No change needed here) ---
@@ -101,13 +106,26 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     # --- Apply MuZero Buffer Data ---
     if loaded_state.buffer_data:
         logger.info("Loading MuZero buffer data...")
-        # --- CHANGED: Rebuild buffer with trajectories ---
-        components.buffer.buffer = deque(loaded_state.buffer_data.trajectories)
-        components.buffer.total_steps = loaded_state.buffer_data.total_steps
+        reconstructed_buffer_data: list[tuple[int, Trajectory]] = []
+        # Ensure buffer_idx mapping is rebuilt correctly
+        components.buffer.buffer.clear()
+        components.buffer.tree_idx_to_buffer_idx.clear()
+        components.buffer.buffer_idx_to_tree_idx.clear()
+        components.buffer.total_steps = 0
+        components.buffer.next_buffer_idx = 0
+        if components.buffer.use_per and components.buffer.sum_tree:
+            components.buffer.sum_tree.reset()  # Reset sumtree
+
+        for i, traj in enumerate(loaded_state.buffer_data.trajectories):
+            # Re-add trajectories to ensure buffer and sumtree are consistent
+            components.buffer.add(traj)
+
+        # Verify counts after loading
         logger.info(
-            f"MuZero buffer loaded. Trajectories: {len(components.buffer.buffer)}, Total Steps: {len(components.buffer)}"
+            f"MuZero Buffer loaded. Trajectories in deque: {len(components.buffer.buffer)}, "
+            f"Total Steps: {components.buffer.total_steps}, "
+            f"SumTree Entries: {components.buffer.sum_tree.n_entries if components.buffer.sum_tree else 'N/A'}"
         )
-        # --- END CHANGED ---
         if training_loop.buffer_fill_progress:
             training_loop.buffer_fill_progress.set_current_steps(len(components.buffer))
     else:
@@ -139,25 +157,26 @@ def _save_final_state(training_loop: TrainingLoop):
         logger.error(f"Failed to save final training state: {e_save}", exc_info=True)
 
 
+# --- ADDED: Define _training_loop_thread_func ---
 def _training_loop_thread_func(training_loop: TrainingLoop):
-    """Function to run the training loop in a separate thread."""
-    # (No changes needed here)
-    logger_thread = logging.getLogger(__name__)
+    """Target function for the training loop thread."""
     try:
-        logger_thread.info("Training loop thread started.")
         training_loop.initialize_workers()
         training_loop.run()
-        logger_thread.info("Training loop thread finished.")
     except Exception as e:
-        logger_thread.critical(f"Error in training loop thread: {e}", exc_info=True)
-        training_loop.training_exception = e
+        logger.critical(f"Exception in training loop thread: {e}", exc_info=True)
+        training_loop.training_exception = e  # Store exception
     finally:
-        try:
-            while not visual_state_queue.empty():
-                visual_state_queue.get_nowait()
-            visual_state_queue.put(None, timeout=1.0)
-        except Exception as e_q:
-            logger_thread.error(f"Error putting None signal into visual queue: {e_q}")
+        # Signal visualization thread to exit by putting None in the queue
+        if training_loop.visual_state_queue:
+            try:
+                training_loop.visual_state_queue.put_nowait(None)
+            except queue.Full:
+                logger.warning("Visual queue full when trying to send exit signal.")
+        logger.info("Training loop thread finished.")
+
+
+# --- END ADDED ---
 
 
 def run_training_visual_mode(
@@ -165,8 +184,7 @@ def run_training_visual_mode(
     train_config_override: TrainConfig,
     persist_config_override: PersistenceConfig,
 ) -> int:
-    """Runs the training pipeline in visual mode."""
-    # (Rest of the function remains largely the same, setup/cleanup/viz logic is independent of buffer format)
+    """Runs the training pipeline with visualization."""
     main_thread_exception = None
     train_thread = None
     training_loop: TrainingLoop | None = None
@@ -188,8 +206,10 @@ def run_training_visual_mode(
         )
         log_level = logging.getLevelName(log_level_str.upper())
         logger.info(
-            f"Logging {logging.getLevelName(log_level)} and higher messages to: {log_file_path}"
+            f"Logging {logging.getLevelName(log_level)} and higher messages to console and: {log_file_path}"
         )
+
+        # Redirect stdout/stderr to also go to the log file
         root_logger = get_root_logger()
         file_handler = next(
             (h for h in root_logger.handlers if isinstance(h, logging.FileHandler)),
@@ -237,12 +257,14 @@ def run_training_visual_mode(
 
         training_loop = _load_and_apply_initial_state(components)
 
+        # Start the training loop in a separate thread
         train_thread = threading.Thread(
             target=_training_loop_thread_func, args=(training_loop,), daemon=True
         )
         train_thread.start()
         logger.info("Training loop thread launched.")
 
+        # Initialize Pygame and the DashboardRenderer
         vis_config = config.VisConfig()
         pygame.init()
         pygame.font.init()
@@ -250,7 +272,7 @@ def run_training_visual_mode(
             (vis_config.SCREEN_WIDTH, vis_config.SCREEN_HEIGHT), pygame.RESIZABLE
         )
         pygame.display.set_caption(
-            f"{config.APP_NAME} - Training Visual Mode ({components.train_config.RUN_NAME})"
+            f"{config.APP_NAME} - Training ({components.train_config.RUN_NAME})"
         )
         clock = pygame.time.Clock()
         fonts = visualization.load_fonts()
@@ -265,11 +287,12 @@ def run_training_visual_mode(
             trainable_params=trainable_params,
         )
 
+        # Main visualization loop
+        running = True
+        # --- ADDED: Initialize loop variables ---
         current_worker_states: dict[int, environment.GameState] = {}
         current_global_stats: dict[str, Any] = {}
-        has_received_data = False
-        running = True
-
+        # --- END ADDED ---
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -278,128 +301,102 @@ def run_training_visual_mode(
                     running = False
                 if event.type == pygame.VIDEORESIZE:
                     try:
-                        w, h = max(640, event.w), max(480, event.h)
+                        w, h = max(640, event.w), max(240, event.h)
                         screen = pygame.display.set_mode((w, h), pygame.RESIZABLE)
                         dashboard_renderer.screen = screen
-                        dashboard_renderer.layout_rects = None
+                        dashboard_renderer.layout_rects = None  # Force recalculation
                     except pygame.error as e:
                         logger.error(f"Error resizing window: {e}")
 
-            try:
-                visual_data = visual_state_queue.get(timeout=0.05)
-                if visual_data is None:
-                    if train_thread and not train_thread.is_alive():
-                        running = False
-                        logger.info("Received exit signal from training thread.")
-                elif isinstance(visual_data, dict):
-                    has_received_data = True
-                    global_stats_update = visual_data.pop(-1, {})
-                    if isinstance(global_stats_update, dict):
-                        if not isinstance(current_global_stats, dict):
-                            current_global_stats = {}
-                        current_global_stats.update(global_stats_update)
-                    else:
-                        logger.warning(
-                            f"Received non-dict global stats update: {type(global_stats_update)}"
-                        )
-                    current_worker_states = {
-                        k: v
-                        for k, v in visual_data.items()
-                        if isinstance(k, int)
-                        and k >= 0
-                        and isinstance(v, environment.GameState)
-                    }
-                else:
-                    logger.warning(
-                        f"Received unexpected item from visual queue: {type(visual_data)}"
-                    )
-            except queue.Empty:
-                pass
-            except Exception as q_get_err:
-                logger.error(f"Error getting from visual queue: {q_get_err}")
-                time.sleep(0.1)
-
-            screen.fill(visualization.colors.DARK_GRAY)
-            if has_received_data:
-                try:
-                    dashboard_renderer.render(
-                        current_worker_states, current_global_stats
-                    )
-                except Exception as render_err:
-                    logger.error(f"Error during rendering: {render_err}", exc_info=True)
-                    err_font = fonts.get("help")
-                    if err_font:
-                        err_surf = err_font.render(
-                            f"Render Error: {render_err}",
-                            True,
-                            visualization.colors.RED,
-                        )
-                        screen.blit(err_surf, (10, screen.get_height() // 2))
-            else:
-                help_font = fonts.get("help")
-                if help_font:
-                    wait_surf = help_font.render(
-                        "Waiting for first data from training...",
-                        True,
-                        visualization.colors.LIGHT_GRAY,
-                    )
-                    wait_rect = wait_surf.get_rect(
-                        center=(screen.get_width() // 2, screen.get_height() // 2)
-                    )
-                    screen.blit(wait_surf, wait_rect)
-
-            pygame.display.flip()
-
-            if train_thread and not train_thread.is_alive() and running:
-                logger.warning("Training loop thread terminated unexpectedly.")
+            # Check if the training thread is still alive
+            if train_thread and not train_thread.is_alive():
+                logger.warning("Training loop thread terminated.")
+                running = False
                 if training_loop and training_loop.training_exception:
                     logger.error(
                         f"Training thread terminated due to exception: {training_loop.training_exception}"
                     )
                     main_thread_exception = training_loop.training_exception
-                running = False
 
+            # Get data from the queue (non-blocking)
+            try:
+                visual_data = visual_state_queue.get_nowait()
+                if visual_data is None:  # Signal to exit
+                    running = False
+                    logger.info("Received exit signal from training thread.")
+                    continue
+                # Update local copies for rendering
+                current_global_stats = visual_data.pop(-1, {})
+                current_worker_states = visual_data
+            except queue.Empty:
+                # No new data, just redraw with existing data
+                pass
+            except Exception as e:
+                logger.error(f"Error getting data from visual queue: {e}")
+                time.sleep(0.1)  # Avoid busy-waiting on error
+                continue
+
+            # Render the dashboard
+            screen.fill(visualization.colors.DARK_GRAY)
+            dashboard_renderer.render(current_worker_states, current_global_stats)
+            pygame.display.flip()
             clock.tick(vis_config.FPS)
 
-    except Exception as e:
-        logger.critical(
-            f"An unhandled error occurred in visual training script (main thread): {e}"
-        )
-        traceback.print_exc()
-        main_thread_exception = e
-        if mlflow_run_active:
-            try:
-                mlflow.log_param("training_status", "VIS_FAILED")
-                mlflow.log_param("error_message", f"MainThread: {str(e)}")
-            except Exception as mlf_err:
-                logger.error(f"Failed to log main thread error to MLflow: {mlf_err}")
-
-    finally:
-        if tee_stdout:
-            sys.stdout = original_stdout
-        if tee_stderr:
-            sys.stderr = original_stderr
-        print("--- Restored stdout/stderr ---")
-
-        logger.info("Initiating shutdown sequence...")
+        # Signal the training loop to stop if it hasn't already
         if training_loop and not training_loop.stop_requested.is_set():
             training_loop.request_stop()
+
+        # Wait for the training thread to finish
         if train_thread and train_thread.is_alive():
-            logger.info("Waiting for training loop thread to join...")
-            train_thread.join(timeout=15.0)
+            logger.info("Waiting for training thread to finish...")
+            train_thread.join(timeout=10)  # Wait up to 10 seconds
             if train_thread.is_alive():
-                logger.error("Training loop thread did not exit gracefully.")
+                logger.warning("Training thread did not terminate gracefully.")
+
+        # Determine exit code based on exceptions
+        if main_thread_exception:
+            exit_code = 1
+        elif training_loop and training_loop.training_exception:
+            exit_code = 1
+        elif training_loop and training_loop.training_complete:
+            exit_code = 0
+        else:
+            exit_code = 1  # Interrupted or other issue
+
+    except Exception as e:
+        logger.critical(f"An unhandled error occurred in visual training script: {e}")
+        traceback.print_exc()
+        if mlflow_run_active:
+            try:
+                mlflow.log_param("training_status", "SETUP_FAILED")
+                mlflow.log_param("error_message", str(e))
+            except Exception as mlf_err:
+                logger.error(f"Failed to log setup error status to MLflow: {mlf_err}")
+        exit_code = 1
+
+    finally:
+        # Restore stdout/stderr
+        sys.stdout = original_stdout
+        sys.stderr = original_stderr
 
         final_status = "UNKNOWN"
         error_msg = ""
         if training_loop:
-            _save_final_state(training_loop)
-            training_loop.cleanup_actors()
-            if main_thread_exception or training_loop.training_exception:
-                final_status = "FAILED"
-                error_msg = str(
-                    main_thread_exception or training_loop.training_exception
-                )
+            # Ensure final state is saved even if visualization loop crashed
+            if (
+                not training_loop.training_complete
+                and not training_loop.training_exception
+            ):
+                _save_final_state(training_loop)
+
+            training_loop.cleanup_actors()  # Ensure actors are cleaned up
+
+            if main_thread_exception:
+                final_status = "VIS_FAILED"
+                error_msg = str(main_thread_exception)
+            elif training_loop.training_exception:
+                final_status = "TRAIN_FAILED"
+                error_msg = str(training_loop.training_exception)
             elif training_loop.training_complete:
                 final_status = "COMPLETED"
             else:
@@ -417,14 +414,15 @@ def run_training_visual_mode(
             except Exception as mlf_end_err:
                 logger.error(f"Error ending MLflow run: {mlf_end_err}")
 
-        pygame.quit()
-        logger.info("Pygame quit.")
         if ray_initialized_by_setup and ray.is_initialized():
             try:
                 ray.shutdown()
                 logger.info("Ray shut down by visual runner.")
             except Exception as e:
                 logger.error(f"Error shutting down Ray: {e}", exc_info=True)
+
+        pygame.quit()
+
         if file_handler:
             try:
                 file_handler.flush()

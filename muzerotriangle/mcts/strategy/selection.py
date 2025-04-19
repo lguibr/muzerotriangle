@@ -1,11 +1,16 @@
 # File: muzerotriangle/mcts/strategy/selection.py
 import logging
 import math
+import random
+from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 
 from ...config import MCTSConfig
 from ..core.node import Node
+
+if TYPE_CHECKING:
+    from ...utils.types import ActionType
 
 logger = logging.getLogger(__name__)
 rng = np.random.default_rng()
@@ -38,6 +43,7 @@ def calculate_puct_score(
     child_visits = child_node.visit_count
 
     # Exploration bonus U(s, a)
+    # Use max(1, parent_visits) to avoid math domain error if parent_visits is 0 (though it shouldn't be if we're selecting a child)
     exploration_term = (
         config.puct_coefficient
         * prior
@@ -86,14 +92,17 @@ def add_dirichlet_noise(node: Node, config: MCTSConfig):
             f"Re-normalizing priors after Dirichlet noise (Sum={noisy_priors_sum:.6f})"
         )
         norm_factor = noisy_priors_sum if noisy_priors_sum > 1e-9 else 1.0
-        for action in actions:
-            if norm_factor > 1e-9:
+        if norm_factor > 1e-9:
+            for action in actions:
                 node.children[action].prior_probability /= norm_factor
-            else:
-                logger.warning(
-                    "Sum of priors after noise is near zero. Cannot normalize."
-                )
-                node.children[action].prior_probability = 0.0
+        else:
+            # If sum is zero (e.g., all priors were zero), distribute uniformly
+            logger.warning(
+                "Sum of priors after noise is near zero. Resetting to uniform."
+            )
+            uniform_prob = 1.0 / len(actions)
+            for action in actions:
+                node.children[action].prior_probability = uniform_prob
 
     logger.debug(
         f"[Noise] Added Dirichlet noise (alpha={config.dirichlet_alpha}, eps={eps}) to {len(actions)} root node priors."
@@ -109,8 +118,7 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
         raise SelectionError(f"Cannot select child from node {node} with no children.")
 
     best_score = -float("inf")
-    best_child: Node | None = None
-    child_scores_log = []
+    best_children: list[Node] = []  # Use a list for tie-breaking
 
     if logger.isEnabledFor(logging.DEBUG):
         # Check if root node to display step correctly
@@ -132,7 +140,7 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
                 f"    Act={action}, Score={score:.4f} "
                 f"(Q={q:.3f}, P={child.prior_probability:.4f}, N={child.visit_count}, Exp={exp_term:.4f})"
             )
-            child_scores_log.append(log_entry)
+            logger.debug(log_entry)  # Log each child's score
 
         if not np.isfinite(score):
             logger.warning(
@@ -142,27 +150,12 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
 
         if score > best_score:
             best_score = score
-            best_child = child
+            best_children = [child]  # Start a new list with this best child
+        # Tie-breaking: if scores are equal, add to the list
+        elif abs(score - best_score) < 1e-9:  # Use tolerance for float comparison
+            best_children.append(child)
 
-    if logger.isEnabledFor(logging.DEBUG) and child_scores_log:
-        # Sort and log logic remains the same
-        try:
-
-            def get_score_from_log(log_str):
-                parts = log_str.split(",")
-                for part in parts:
-                    if "Score=" in part:
-                        return float(part.split("=")[1].split(" ")[0])
-                return -float("inf")
-
-            child_scores_log.sort(key=get_score_from_log, reverse=True)
-        except Exception as sort_err:
-            logger.warning(f"Could not sort child score logs: {sort_err}")
-        logger.debug("    [Select] All Child Scores Considered (Top 5):")
-        for log_line in child_scores_log[:5]:
-            logger.debug(f"      {log_line}")
-
-    if best_child is None:
+    if not best_children:  # Changed from checking best_child is None
         child_details = [
             f"Act={a}, N={c.visit_count}, P={c.prior_probability:.4f}, Q={c.value_estimate:.3f}"
             for a, c in node.children.items()
@@ -175,14 +168,28 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
         logger.error(
             f"Could not select best child for {state_info}. Child details: {child_details}"
         )
-        raise SelectionError(
-            f"Could not select best child for {state_info}. Check scores and children."
+        # Fallback: if all scores are non-finite or no children found, pick a random child
+        if not node.children:
+            raise SelectionError(
+                f"Cannot select child from node {node} with no children (should have been caught earlier)."
+            )
+        logger.warning(
+            f"All child scores were non-finite or no children found. Selecting a random child for node {state_info}."
         )
+        # Ensure we actually have children before choosing randomly
+        if not node.children:
+            raise SelectionError(
+                f"Node {state_info} has no children to select from, even randomly."
+            )
+        selected_child = random.choice(list(node.children.values()))
+    else:
+        # If there are ties, select randomly among the best
+        selected_child = random.choice(best_children)
 
     logger.debug(
-        f"  [Select] --> Selected Child: Action {best_child.action_taken}, Score {best_score:.4f}, Q-value {best_child.value_estimate:.3f}"
+        f"  [Select] --> Selected Child: Action {selected_child.action_taken}, Score {best_score:.4f}, Q-value {selected_child.value_estimate:.3f}"
     )
-    return best_child
+    return selected_child
 
 
 def traverse_to_leaf(root_node: Node, config: MCTSConfig) -> tuple[Node, int]:

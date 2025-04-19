@@ -3,26 +3,25 @@
 
 ## Purpose and Architecture
 
-This module implements the Monte Carlo Tree Search algorithm, a core component of the AlphaZero-style reinforcement learning agent. MCTS is used during self-play to explore the game tree and determine the next best move and generate training targets for the neural network.
+This module implements the Monte Carlo Tree Search algorithm, adapted for the MuZero framework. MCTS is used during self-play to explore the game tree, generate improved policies, and estimate state values, providing training targets for the neural network.
 
 -   **Core Components ([`core/README.md`](core/README.md)):**
-    -   `Node`: Represents a state in the search tree, storing visit counts, value estimates, prior probabilities, and child nodes. Holds a `GameState` object.
-    -   `search`: Contains the main `run_mcts_simulations` function orchestrating the selection, expansion, and backpropagation phases. **This version uses batched neural network evaluation (`evaluate_batch`) for potentially improved performance.** It collects multiple leaf nodes before calling the network.
-    -   `config`: Defines the `MCTSConfig` class holding hyperparameters like the number of simulations, PUCT coefficient, temperature settings, and Dirichlet noise parameters.
-    -   `types`: Defines necessary type hints and protocols, notably `ActionPolicyValueEvaluator` which specifies the interface required for the neural network evaluator used by MCTS.
+    -   `Node`: Represents a state in the search tree. In MuZero, nodes store the *hidden state* (`s_k`) predicted by the dynamics function, the predicted *reward* (`r_k`) to reach that state, and MCTS statistics (visit counts, value sum, prior probability). The root node holds the initial `GameState` and its corresponding initial hidden state (`s_0`) after the first inference.
+    -   `search`: Contains the main `run_mcts_simulations` function orchestrating the selection, expansion, and backpropagation phases. It uses the `NeuralNetwork` interface for initial inference (`h+f`) and recurrent inference (`g+f`). **It handles potential gradient issues by detaching tensors before converting to NumPy.**
+    -   `config`: Defines the `MCTSConfig` class holding hyperparameters like the number of simulations, PUCT coefficient, temperature settings, Dirichlet noise parameters, and the discount factor (`gamma`).
+    -   `types`: Defines necessary type hints and protocols, notably `ActionPolicyValueEvaluator` (though the `NeuralNetwork` interface is now used directly) and `ActionPolicyMapping`.
 -   **Strategy Components ([`strategy/README.md`](strategy/README.md)):**
     -   `selection`: Implements the tree traversal logic (PUCT calculation, Dirichlet noise addition, leaf selection).
-    -   `expansion`: Handles expanding leaf nodes **using pre-computed policy priors** obtained from batched network evaluation.
-    -   `backpropagation`: Implements the process of updating node statistics back up the tree after a simulation.
+    -   `expansion`: Handles expanding leaf nodes using policy predictions from the network's prediction function (`f`).
+    -   `backpropagation`: Implements the process of updating node statistics back up the tree, incorporating predicted rewards and the discount factor.
     -   `policy`: Provides functions to select the final action based on visit counts (`select_action_based_on_visits`) and to generate the policy target vector for training (`get_policy_target`).
 
 ## Exposed Interfaces
 
 -   **Core:**
-    -   `Node`: The tree node class.
+    -   `Node`: The tree node class (MuZero version).
     -   `MCTSConfig`: Configuration class (defined in [`muzerotriangle.config`](../config/README.md)).
-    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network_evaluator: ActionPolicyValueEvaluator)`: The main function to run MCTS (uses batched evaluation).
-    -   `ActionPolicyValueEvaluator`: Protocol defining the NN evaluation interface.
+    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network: NeuralNetwork, valid_actions_from_state: List[ActionType]) -> int`: The main function to run MCTS.
     -   `ActionPolicyMapping`: Type alias for the policy dictionary.
     -   `MCTSExecutionError`: Custom exception for MCTS failures.
 -   **Strategy:**
@@ -32,18 +31,22 @@ This module implements the Monte Carlo Tree Search algorithm, a core component o
 ## Dependencies
 
 -   **[`muzerotriangle.environment`](../environment/README.md)**:
-    -   `GameState`: Represents the state within each `Node`. MCTS interacts heavily with `GameState` methods like `copy()`, `step()`, `is_over()`, `get_outcome()`, `valid_actions()`.
+    -   `GameState`: Represents the state within the root `Node`. MCTS interacts with `GameState` methods like `is_over()`, `valid_actions()`, `copy()`.
     -   `EnvConfig`: Accessed via `GameState`.
 -   **[`muzerotriangle.nn`](../nn/README.md)**:
-    -   `NeuralNetwork`: An instance conforming to the `ActionPolicyValueEvaluator` protocol is required by `run_mcts_simulations` and `expansion` to evaluate states (specifically `evaluate_batch`).
+    -   `NeuralNetwork`: The interface used by `run_mcts_simulations` and `expansion` to perform initial inference (`h+f`) and recurrent inference (`g+f`).
 -   **[`muzerotriangle.config`](../config/README.md)**:
     -   `MCTSConfig`: Provides hyperparameters.
+-   **[`muzerotriangle.features`](../features/README.md)**:
+    -   `extract_state_features`: Used by `run_mcts_simulations` for the initial root inference.
 -   **[`muzerotriangle.utils`](../utils/README.md)**:
-    -   `ActionType`, `PolicyValueOutput`: Used for actions and NN return types.
+    -   `ActionType`, `StateType`, `PolicyTargetMapping`: Used for actions, state representation, and policy targets.
 -   **`numpy`**:
-    -   Used for Dirichlet noise generation and potentially in policy calculations.
--   **Standard Libraries:** `typing`, `math`, `logging`, `numpy`, `time`, `concurrent.futures`.
+    -   Used for Dirichlet noise generation and policy calculations. **Requires careful handling (e.g., `.detach()`) when converting from `torch.Tensor`.**
+-   **`torch`**:
+    -   Used for hidden states within `Node`.
+-   **Standard Libraries:** `typing`, `math`, `logging`, `numpy`, `time`.
 
 ---
 
-**Note:** Please keep this README updated when changing the MCTS algorithm phases (selection, expansion, backpropagation), the node structure, configuration options, or the interaction with the environment or neural network, especially regarding the batched evaluation. Accurate documentation is crucial for maintainability.
+**Note:** Please keep this README updated when changing the MCTS algorithm phases (selection, expansion, backpropagation), the node structure, configuration options, or the interaction with the environment or neural network. Accurate documentation is crucial for maintainability.

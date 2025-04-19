@@ -2,16 +2,21 @@
 import logging
 from typing import TYPE_CHECKING, cast
 
+import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
 
 from ...utils.types import (
     SampledBatch,
+    SampledBatchPER,  # Import PER batch type
 )
 
 if TYPE_CHECKING:
     from torch.optim.lr_scheduler import _LRScheduler
+
+    from ...config import EnvConfig, TrainConfig
+    from ...nn import NeuralNetwork
 
 logger = logging.getLogger(__name__)
 
@@ -19,8 +24,12 @@ logger = logging.getLogger(__name__)
 class Trainer:
     """MuZero Trainer."""
 
-    # ... (init, _create_optimizer, _create_scheduler remain the same) ...
-    def __init__(self, nn_interface, train_config, env_config):
+    def __init__(
+        self,
+        nn_interface: "NeuralNetwork",
+        train_config: "TrainConfig",
+        env_config: "EnvConfig",
+    ):
         self.nn = nn_interface
         self.model = nn_interface.model
         self.train_config = train_config
@@ -82,10 +91,10 @@ class Trainer:
             raise ValueError(f"Unsupported scheduler type: {scheduler_type_config}")
 
     def _prepare_batch(self, batch_sequences: SampledBatch) -> dict[str, torch.Tensor]:
-        # (No changes needed here)
+        """Prepares batch tensors from sampled sequences."""
         batch_size = len(batch_sequences)
         seq_len = self.unroll_steps + 1
-        action_dim = int(self.env_config.ACTION_DIM)  # type: ignore[call-overload]
+        action_dim = int(self.env_config.ACTION_DIM)
         batch_grids = torch.zeros(
             (
                 batch_size,
@@ -105,7 +114,7 @@ class Trainer:
         batch_actions = torch.zeros(
             (batch_size, seq_len), dtype=torch.long, device=self.device
         )
-        batch_rewards = torch.zeros(
+        batch_n_step_rewards = torch.zeros(
             (batch_size, seq_len), dtype=torch.float32, device=self.device
         )
         batch_policy_targets = torch.zeros(
@@ -122,7 +131,7 @@ class Trainer:
                 batch_grids[b_idx, s_idx] = torch.from_numpy(obs["grid"])
                 batch_others[b_idx, s_idx] = torch.from_numpy(obs["other_features"])
                 batch_actions[b_idx, s_idx] = step_data["action"]
-                batch_rewards[b_idx, s_idx] = step_data["reward"]
+                batch_n_step_rewards[b_idx, s_idx] = step_data["n_step_reward_target"]
                 policy_map = step_data["policy_target"]
                 for action, prob in policy_map.items():
                     if 0 <= action < action_dim:
@@ -137,7 +146,7 @@ class Trainer:
             "grids": batch_grids,
             "others": batch_others,
             "actions": batch_actions,
-            "rewards": batch_rewards,
+            "n_step_rewards": batch_n_step_rewards,
             "policy_targets": batch_policy_targets,
             "value_targets": batch_value_targets,
         }
@@ -146,19 +155,14 @@ class Trainer:
         self, target_scalars: torch.Tensor, support: torch.Tensor
     ) -> torch.Tensor:
         """Projects scalar targets onto the fixed support atoms (z or r)."""
-        target_shape = target_scalars.shape  # (B, T) or (B, K)
+        target_shape = target_scalars.shape
         num_atoms = support.size(0)
         v_min = support[0]
         v_max = support[-1]
         delta = (v_max - v_min) / (num_atoms - 1) if num_atoms > 1 else 0.0
 
-        # Flatten targets for easier processing: (B*T) or (B*K)
-        target_scalars_flat = (
-            target_scalars.flatten()
-        )  # Shape (N,) where N = B*T or B*K
-
+        target_scalars_flat = target_scalars.flatten()
         target_scalars_flat = target_scalars_flat.clamp(v_min, v_max)
-        # Add type hints for clarity
         b: torch.Tensor = (
             (target_scalars_flat - v_min) / delta
             if delta > 0
@@ -167,75 +171,123 @@ class Trainer:
         lower_idx: torch.Tensor = b.floor().long()
         upper_idx: torch.Tensor = b.ceil().long()
 
-        # Handle cases where target hits an atom exactly (l==u)
-        # Ensure indices are within bounds
         lower_idx = torch.max(
             torch.tensor(0, device=self.device, dtype=torch.long), lower_idx
         )
         upper_idx = torch.min(
             torch.tensor(num_atoms - 1, device=self.device, dtype=torch.long), upper_idx
         )
+        lower_eq_upper = lower_idx == upper_idx
+        lower_idx[lower_eq_upper & (lower_idx > 0)] -= 1
+        upper_idx[lower_eq_upper & (upper_idx < num_atoms - 1)] += 1
 
-        # Calculate weights
-        m_lower: torch.Tensor = upper_idx.float() - b
-        m_upper: torch.Tensor = b - lower_idx.float()
+        m_lower: torch.Tensor = (upper_idx.float() - b).clamp(min=0.0, max=1.0)
+        m_upper: torch.Tensor = (b - lower_idx.float()).clamp(min=0.0, max=1.0)
 
-        # Distribute probability mass
-        m = torch.zeros(
-            target_scalars_flat.size(0), num_atoms, device=self.device
-        )  # Shape (N, num_atoms)
-        # Explicitly type batch_indices
-        batch_indices: torch.Tensor = torch.arange(
+        m = torch.zeros(target_scalars_flat.size(0), num_atoms, device=self.device)
+        # Create index tensor explicitly
+        batch_indices = torch.arange(
             target_scalars_flat.size(0), device=self.device, dtype=torch.long
         )
 
-        # Use advanced indexing (this should be correct)
-        m[batch_indices, lower_idx] += m_lower
-        m[batch_indices, upper_idx] += m_upper
+        # Use index_put_ for sparse updates (more robust than index_add_)
+        m.index_put_((batch_indices, lower_idx), m_lower, accumulate=True)
+        m.index_put_((batch_indices, upper_idx), m_upper, accumulate=True)
 
-        # Reshape back to original batch/sequence shape + atoms dim
-        m = m.view(*target_shape, num_atoms)  # (B, T, num_atoms) or (B, K, num_atoms)
+        m = m.view(*target_shape, num_atoms)
         return m
 
     def _calculate_loss(
-        self, policy_logits, value_logits, reward_logits, target_data
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-        # (No changes needed here, relies on _calculate_target_distribution)
+        self,
+        policy_logits,
+        value_logits,
+        reward_logits,
+        target_data,
+        is_weights,  # Add IS weights
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        """Calculates MuZero losses, applying IS weights."""
         pi_target = target_data["policy_targets"]
         z_target = target_data["value_targets"]
-        r_target = target_data["rewards"]
-        action_dim = pi_target.shape[-1]  # Get action dim from target
+        r_target_n_step = target_data["n_step_rewards"]
+        batch_size, seq_len, action_dim = pi_target.shape
+
+        # --- Expand IS weights ---
+        # is_weights has shape [batch_size, 1]
+        # Expand to match the shape of per-step losses [batch_size, seq_len]
+        is_weights_expanded = is_weights.expand(-1, seq_len).reshape(-1)
+        # For reward loss, we only need weights for steps 1 to K (unroll_steps)
+        is_weights_reward = is_weights.expand(-1, self.unroll_steps).reshape(-1)
+        # --- END Expand IS weights ---
+
+        # --- Policy Loss ---
         policy_logits_flat = policy_logits.view(-1, action_dim)
         pi_target_flat = pi_target.view(-1, action_dim)
         log_pred_p = F.log_softmax(policy_logits_flat, dim=1)
-        policy_loss = -torch.sum(pi_target_flat * log_pred_p, dim=1).mean()
+        policy_loss_per_sample = -torch.sum(pi_target_flat * log_pred_p, dim=1)
+        policy_loss = (is_weights_expanded * policy_loss_per_sample).mean()
+
+        # --- Value Loss ---
         value_target_dist = self._calculate_target_distribution(
             z_target, self.value_support
         )
         value_logits_flat = value_logits.view(-1, self.num_value_atoms)
         value_target_dist_flat = value_target_dist.view(-1, self.num_value_atoms)
         log_pred_v = F.log_softmax(value_logits_flat, dim=1)
-        value_loss = -torch.sum(value_target_dist_flat * log_pred_v, dim=1).mean()
-        r_target_k = r_target[:, : self.unroll_steps]  # Rewards r_1 to r_K
+        value_loss_per_sample = -torch.sum(value_target_dist_flat * log_pred_v, dim=1)
+        value_loss = (is_weights_expanded * value_loss_per_sample).mean()
+
+        # --- Reward Loss ---
+        # Target rewards are for steps k=1 to K (n_step_reward_target[t] is target for r_{t+1})
+        r_target_k = r_target_n_step[:, 1 : self.unroll_steps + 1]
         reward_target_dist = self._calculate_target_distribution(
             r_target_k, self.reward_support
         )
-        reward_logits_flat = reward_logits.view(-1, self.num_reward_atoms)
-        reward_target_dist_flat = reward_target_dist.view(-1, self.num_reward_atoms)
+        # reward_logits are for steps k=1 to K (output of dynamics for action a_k)
+        reward_logits_flat = reward_logits.reshape(-1, self.num_reward_atoms)
+        reward_target_dist_flat = reward_target_dist.reshape(-1, self.num_reward_atoms)
         log_pred_r = F.log_softmax(reward_logits_flat, dim=1)
-        reward_loss = -torch.sum(reward_target_dist_flat * log_pred_r, dim=1).mean()
+        reward_loss_per_sample = -torch.sum(reward_target_dist_flat * log_pred_r, dim=1)
+        reward_loss = (is_weights_reward * reward_loss_per_sample).mean()
+
+        # --- Total Loss ---
         total_loss = (
             self.train_config.POLICY_LOSS_WEIGHT * policy_loss
             + self.train_config.VALUE_LOSS_WEIGHT * value_loss
             + self.train_config.REWARD_LOSS_WEIGHT * reward_loss
         )
-        return total_loss, policy_loss, value_loss, reward_loss
 
-    def train_step(self, batch_sequences: SampledBatch) -> dict[str, float] | None:
-        # (No changes needed in main logic flow)
+        # --- Calculate TD Errors for PER Update ---
+        # Use the value prediction for the initial state (k=0) vs its target
+        value_pred_scalar_0 = self.nn._logits_to_scalar(
+            value_logits[:, 0, :], self.value_support
+        )
+        value_target_scalar_0 = z_target[:, 0]
+        td_errors_tensor = (value_target_scalar_0 - value_pred_scalar_0).detach()
+
+        return total_loss, policy_loss, value_loss, reward_loss, td_errors_tensor
+
+    def train_step(
+        self, batch_sample: SampledBatchPER | SampledBatch
+    ) -> tuple[dict[str, float], np.ndarray] | None:
+        """Performs one training step, handling PER if enabled."""
+        if not batch_sample:
+            return None
+
+        self.model.train()
+
+        # --- Unpack batch sample ---
+        if isinstance(batch_sample, dict) and "sequences" in batch_sample:
+            batch_sequences = batch_sample["sequences"]
+            is_weights_np = batch_sample["weights"]
+            is_weights = torch.from_numpy(is_weights_np).to(self.device).unsqueeze(-1)
+        else:
+            batch_sequences = batch_sample
+            batch_size = len(batch_sequences)
+            is_weights = torch.ones((batch_size, 1), device=self.device)
+
         if not batch_sequences:
             return None
-        self.model.train()
+
         try:
             target_data = self._prepare_batch(batch_sequences)
         except Exception as e:
@@ -245,29 +297,48 @@ class Trainer:
         self.optimizer.zero_grad()
         obs_grid_0 = target_data["grids"][:, 0].contiguous()
         obs_other_0 = target_data["others"][:, 0].contiguous()
+
+        # Initial inference (h + f)
         policy_logits_0, value_logits_0, initial_hidden_state = self.model(
             obs_grid_0, obs_other_0
         )
+
         policy_logits_list = [policy_logits_0]
         value_logits_list = [value_logits_0]
         reward_logits_list = []
         hidden_state = initial_hidden_state
 
+        # Unroll dynamics and prediction (g + f)
         for k in range(self.unroll_steps):
-            action_k_plus_1 = target_data["actions"][:, k]
-            policy_logits_k, value_logits_k, reward_logits_k, hidden_state = (
-                self.model.recurrent_inference(hidden_state, action_k_plus_1)
+            action_k = target_data["actions"][:, k + 1]  # Action a_{k+1}
+            hidden_state, reward_logits_k_plus_1 = self.model.dynamics(
+                hidden_state, action_k
             )
-            policy_logits_list.append(policy_logits_k)
-            value_logits_list.append(value_logits_k)
-            reward_logits_list.append(reward_logits_k)
+            policy_logits_k_plus_1, value_logits_k_plus_1 = self.model.predict(
+                hidden_state
+            )
 
+            policy_logits_list.append(policy_logits_k_plus_1)
+            value_logits_list.append(value_logits_k_plus_1)
+            reward_logits_list.append(reward_logits_k_plus_1)
+
+        # Stack predictions
         policy_logits_all = torch.stack(policy_logits_list, dim=1)
         value_logits_all = torch.stack(value_logits_list, dim=1)
         reward_logits_k = torch.stack(reward_logits_list, dim=1)
-        total_loss, policy_loss, value_loss, reward_loss = self._calculate_loss(
-            policy_logits_all, value_logits_all, reward_logits_k, target_data
+
+        # Calculate loss
+        total_loss, policy_loss, value_loss, reward_loss, td_errors_tensor = (
+            self._calculate_loss(
+                policy_logits_all,
+                value_logits_all,
+                reward_logits_k,
+                target_data,
+                is_weights,
+            )
         )
+
+        # Backpropagate
         total_loss.backward()
         if self.train_config.GRADIENT_CLIP_VALUE is not None:
             torch.nn.utils.clip_grad_norm_(
@@ -277,6 +348,7 @@ class Trainer:
         if self.scheduler:
             self.scheduler.step()
 
+        # Calculate entropy (optional logging)
         with torch.no_grad():
             policy_probs = F.softmax(policy_logits_all, dim=-1)
             entropy = (
@@ -284,17 +356,20 @@ class Trainer:
                 .mean()
                 .item()
             )
+
         loss_info = {
-            "total_loss": total_loss.item(),
-            "policy_loss": policy_loss.item(),
-            "value_loss": value_loss.item(),
-            "reward_loss": reward_loss.item(),
-            "entropy": entropy,
+            "total_loss": float(total_loss.detach().item()),
+            "policy_loss": float(policy_loss.detach().item()),
+            "value_loss": float(value_loss.detach().item()),
+            "reward_loss": float(reward_loss.detach().item()),
+            "entropy": float(entropy),
         }
-        return loss_info
+
+        td_errors_np = td_errors_tensor.cpu().numpy()
+
+        return loss_info, td_errors_np
 
     def get_current_lr(self) -> float:
-        # (No changes needed here)
         try:
             return float(self.optimizer.param_groups[0]["lr"])
         except Exception:
@@ -302,7 +377,6 @@ class Trainer:
             return 0.0
 
     def load_optimizer_state(self, state_dict: dict):
-        # (No changes needed here)
         try:
             self.optimizer.load_state_dict(state_dict)
             for state in self.optimizer.state.values():

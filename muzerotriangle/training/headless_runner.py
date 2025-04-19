@@ -4,13 +4,16 @@ import sys
 import traceback
 from collections import deque
 from pathlib import Path
+from typing import TYPE_CHECKING, Any
 
 import mlflow
 import ray
 
 from ..config import APP_NAME, PersistenceConfig, TrainConfig
 
-# from ..utils.sumtree import SumTree # REMOVED: PER disabled
+# Import Trajectory type
+from ..utils.sumtree import SumTree  # Import SumTree for re-initialization
+from ..utils.types import Trajectory  # Import Trajectory
 from .components import TrainingComponents
 from .logging_utils import (
     get_root_logger,
@@ -19,6 +22,10 @@ from .logging_utils import (
 )
 from .loop import TrainingLoop
 from .setup import count_parameters, setup_training_components
+
+if TYPE_CHECKING:
+    from ..utils.types import Trajectory
+
 
 logger = logging.getLogger(__name__)
 
@@ -94,13 +101,26 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     # --- Apply MuZero Buffer Data ---
     if loaded_state.buffer_data:
         logger.info("Loading MuZero buffer data...")
-        # --- CHANGED: Rebuild buffer with trajectories ---
-        components.buffer.buffer = deque(loaded_state.buffer_data.trajectories)
-        components.buffer.total_steps = loaded_state.buffer_data.total_steps
+        reconstructed_buffer_data: list[tuple[int, Trajectory]] = []
+        # Ensure buffer_idx mapping is rebuilt correctly
+        components.buffer.buffer.clear()
+        components.buffer.tree_idx_to_buffer_idx.clear()
+        components.buffer.buffer_idx_to_tree_idx.clear()
+        components.buffer.total_steps = 0
+        components.buffer.next_buffer_idx = 0
+        if components.buffer.use_per and components.buffer.sum_tree:
+            components.buffer.sum_tree.reset()  # Reset sumtree
+
+        for i, traj in enumerate(loaded_state.buffer_data.trajectories):
+            # Re-add trajectories to ensure buffer and sumtree are consistent
+            components.buffer.add(traj)
+
+        # Verify counts after loading
         logger.info(
-            f"MuZero buffer loaded. Trajectories: {len(components.buffer.buffer)}, Total Steps: {len(components.buffer)}"
+            f"MuZero Buffer loaded. Trajectories in deque: {len(components.buffer.buffer)}, "
+            f"Total Steps: {components.buffer.total_steps}, "
+            f"SumTree Entries: {components.buffer.sum_tree.n_entries if components.buffer.sum_tree else 'N/A'}"
         )
-        # --- END CHANGED ---
         if training_loop.buffer_fill_progress:
             training_loop.buffer_fill_progress.set_current_steps(len(components.buffer))
     else:
@@ -110,9 +130,9 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     return training_loop
 
 
+# --- ADDED: Define _save_final_state ---
 def _save_final_state(training_loop: TrainingLoop):
     """Saves the final training state."""
-    # (No changes needed here, uses DataManager)
     if not training_loop:
         return
     components = training_loop.components
@@ -132,13 +152,16 @@ def _save_final_state(training_loop: TrainingLoop):
         logger.error(f"Failed to save final training state: {e_save}", exc_info=True)
 
 
+# --- END ADDED ---
+
+
 def run_training_headless_mode(
     log_level_str: str,
     train_config_override: TrainConfig,
     persist_config_override: PersistenceConfig,
 ) -> int:
     """Runs the training pipeline in headless mode."""
-    # (Rest of the function remains largely the same, setup/cleanup logic is independent of buffer format)
+    # (Rest of the function remains largely the same)
     training_loop: TrainingLoop | None = None
     components: TrainingComponents | None = None
     exit_code = 1
@@ -185,7 +208,7 @@ def run_training_headless_mode(
         elif training_loop.training_exception:
             exit_code = 1
         else:
-            exit_code = 1
+            exit_code = 1  # Consider interrupted as non-zero exit
 
     except Exception as e:
         logger.critical(
@@ -204,7 +227,7 @@ def run_training_headless_mode(
         final_status = "UNKNOWN"
         error_msg = ""
         if training_loop:
-            _save_final_state(training_loop)
+            _save_final_state(training_loop)  # Call the defined function
             training_loop.cleanup_actors()
             if training_loop.training_exception:
                 final_status = "FAILED"
@@ -212,9 +235,9 @@ def run_training_headless_mode(
             elif training_loop.training_complete:
                 final_status = "COMPLETED"
             else:
-                final_status = "INTERRUPTED"
-        else:
-            final_status = "SETUP_FAILED"
+                final_status = (
+                    "INTERRUPTED"  # Or maybe CANCELLED if stop_requested was set
+                )
 
         if mlflow_run_active:
             try:
@@ -234,10 +257,6 @@ def run_training_headless_mode(
                 logger.error(f"Error shutting down Ray: {e}", exc_info=True)
 
         root_logger = get_root_logger()
-        file_handler = next(
-            (h for h in root_logger.handlers if isinstance(h, logging.FileHandler)),
-            None,
-        )
         if file_handler:
             try:
                 file_handler.flush()

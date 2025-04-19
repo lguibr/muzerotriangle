@@ -1,4 +1,5 @@
 # File: muzerotriangle/config/train_config.py
+# File: muzerotriangle/config/train_config.py
 import logging
 import time
 from typing import Literal
@@ -17,7 +18,7 @@ class TrainConfig(BaseModel):
         default_factory=lambda: f"train_muzero_{time.strftime('%Y%m%d_%H%M%S')}"
     )
     LOAD_CHECKPOINT_PATH: str | None = Field(default=None)
-    LOAD_BUFFER_PATH: str | None = Field(default=None)  # Note: Buffer format changed
+    LOAD_BUFFER_PATH: str | None = Field(default=None)
     AUTO_RESUME_LATEST: bool = Field(default=True)
     DEVICE: Literal["auto", "cuda", "cpu", "mps"] = Field(default="auto")
     RANDOM_SEED: int = Field(default=42)
@@ -29,7 +30,6 @@ class TrainConfig(BaseModel):
     NUM_SELF_PLAY_WORKERS: int = Field(default=8, ge=1)
     WORKER_DEVICE: Literal["auto", "cuda", "cpu", "mps"] = Field(default="cpu")
     BATCH_SIZE: int = Field(default=64, ge=1)  # Batches of sequences
-    # Buffer capacity now likely in terms of total steps or trajectories
     BUFFER_CAPACITY: int = Field(
         default=100_000, ge=1
     )  # Total steps across trajectories
@@ -45,10 +45,20 @@ class TrainConfig(BaseModel):
         ge=0,
         description="Number of steps to unroll the dynamics model during training.",
     )
+    N_STEP_RETURNS: int = Field(
+        default=10,
+        ge=1,
+        description="Number of steps for calculating N-step reward targets.",
+    )
     POLICY_LOSS_WEIGHT: float = Field(default=1.0, ge=0)
     VALUE_LOSS_WEIGHT: float = Field(default=0.25, ge=0)  # Often lower than policy
     REWARD_LOSS_WEIGHT: float = Field(default=1.0, ge=0)
-    # GAMMA: float = Field(default=0.99, gt=0, le=1.0) # Discount now applied *during* MCTS/target calculation
+    DISCOUNT: float = Field(
+        default=0.99,
+        gt=0,
+        le=1.0,
+        description="Discount factor (gamma) used for N-step returns and MCTS.",
+    )
 
     # --- Optimizer ---
     OPTIMIZER_TYPE: Literal["Adam", "AdamW", "SGD"] = Field(default="AdamW")
@@ -69,8 +79,8 @@ class TrainConfig(BaseModel):
     CHECKPOINT_SAVE_FREQ_STEPS: int = Field(default=2500, ge=1)
 
     # --- Prioritized Experience Replay (PER) ---
-    # --- DISABLED BY DEFAULT FOR INITIAL MUZERO IMPLEMENTATION ---
-    USE_PER: bool = Field(default=False)
+    # --- RE-ENABLED ---
+    USE_PER: bool = Field(default=True)
     PER_ALPHA: float = Field(default=0.6, ge=0)
     PER_BETA_INITIAL: float = Field(default=0.4, ge=0, le=1.0)
     PER_BETA_FINAL: float = Field(default=1.0, ge=0, le=1.0)
@@ -86,9 +96,6 @@ class TrainConfig(BaseModel):
             raise ValueError(
                 "MIN_BUFFER_SIZE_TO_TRAIN cannot be greater than BUFFER_CAPACITY."
             )
-        # Batch size represents sequences, buffer size is total steps - comparison less direct
-        # if self.BATCH_SIZE > self.BUFFER_CAPACITY:
-        #     raise ValueError("BATCH_SIZE cannot be greater than BUFFER_CAPACITY.")
         return self
 
     @model_validator(mode="after")
@@ -145,7 +152,6 @@ class TrainConfig(BaseModel):
             raise ValueError("GRADIENT_CLIP_VALUE must be positive if set.")
         return v
 
-    # Validation for PER Beta final vs initial remains the same
     @field_validator("PER_BETA_FINAL")
     @classmethod
     def check_per_beta_final(cls, v: float, info) -> float:

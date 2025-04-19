@@ -1,4 +1,5 @@
 # File: muzerotriangle/training/loop.py
+# File: muzerotriangle/training/loop.py
 import logging
 import queue
 import threading
@@ -11,7 +12,6 @@ from .loop_helpers import LoopHelpers
 from .worker_manager import WorkerManager
 
 if TYPE_CHECKING:
-    from ..utils.types import SampledBatch
     from ..visualization.ui import ProgressBar
     from .components import TrainingComponents
 
@@ -23,13 +23,15 @@ class TrainingLoop:
     Manages the core asynchronous MuZero training loop logic.
     Coordinates worker tasks (trajectory generation), buffer (trajectory storage),
     trainer (sequence-based training), and visualization.
+    Handles PER sampling and priority updates.
     """
 
     def __init__(
         self,
         components: "TrainingComponents",
-        visual_state_queue: queue.Queue[dict[int, Any] | None]
-        | None = None,  # Make optional
+        visual_state_queue: (
+            queue.Queue[dict[int, Any] | None] | None
+        ) = None,  # Make optional
     ):
         self.components = components
         self.visual_state_queue = visual_state_queue
@@ -65,7 +67,6 @@ class TrainingLoop:
             "episodes_played": self.episodes_played,
             "total_simulations_run": self.total_simulations_run,
             "worker_weight_updates": self.worker_weight_updates_count,
-            # Use buffer's __len__ which returns total_steps
             "buffer_size": len(self.buffer),
             "buffer_capacity": self.buffer.capacity,
             "num_active_workers": self.worker_manager.get_num_active_workers(),
@@ -80,7 +81,6 @@ class TrainingLoop:
         self, global_step: int, episodes_played: int, total_simulations: int
     ):
         """Sets the initial state counters after loading."""
-        # (Logic remains the same, but buffer size interpretation changes)
         self.global_step = global_step
         self.episodes_played = episodes_played
         self.total_simulations_run = total_simulations
@@ -91,7 +91,7 @@ class TrainingLoop:
             self.loop_helpers.initialize_progress_bars(
                 global_step,
                 len(self.buffer),
-                self.start_time,  # len(buffer) is now total_steps
+                self.start_time,
             )
         )
         self.loop_helpers.reset_rate_counters(
@@ -126,11 +126,8 @@ class TrainingLoop:
             )
             return
 
-        # Validation can happen within SelfPlayResult or here
-        # For now, assume result.trajectory is valid list of TrajectoryStep dicts
-
         try:
-            self.buffer.add(result.trajectory)  # Add the whole trajectory
+            self.buffer.add(result.trajectory)
             logger.debug(
                 f"Added trajectory (len {len(result.trajectory)}) from worker {worker_id} to buffer. "
                 f"Buffer total steps: {len(self.buffer)}"
@@ -140,7 +137,7 @@ class TrainingLoop:
                 f"Error adding trajectory to buffer from worker {worker_id}: {e}",
                 exc_info=True,
             )
-            return  # Don't update counters if add failed
+            return
 
         if self.buffer_fill_progress:
             self.buffer_fill_progress.set_current_steps(len(self.buffer))
@@ -152,27 +149,39 @@ class TrainingLoop:
         if not self.buffer.is_ready():
             return False
 
-        # --- Sample Sequences ---
-        sampled_batch: SampledBatch | None = self.buffer.sample(
-            self.train_config.BATCH_SIZE
-            # No current_step needed for uniform sampling
+        # --- Sample Sequences (Handles PER internally) ---
+        sampled_batch_data = self.buffer.sample(
+            self.train_config.BATCH_SIZE,
+            current_train_step=self.global_step,  # Pass step for PER beta
         )
-        if not sampled_batch:
-            # logger.debug("Buffer sample returned None, likely not ready or contains only short trajectories.")
+        if not sampled_batch_data:
             return False
 
         # --- Train on Sequences ---
-        loss_info: dict[str, float] | None = self.trainer.train_step(sampled_batch)
+        # Trainer handles PER weights internally if batch_sample is SampledBatchPER
+        train_result = self.trainer.train_step(sampled_batch_data)
 
-        if loss_info:
+        if train_result:
+            loss_info, td_errors = train_result
             self.global_step += 1
             if self.train_step_progress:
                 self.train_step_progress.set_current_steps(self.global_step)
 
-            # --- REMOVED: PER update ---
-            # if self.train_config.USE_PER: ...
+            # --- Update PER Priorities ---
+            if (
+                self.train_config.USE_PER
+                and isinstance(sampled_batch_data, dict)
+                and "indices" in sampled_batch_data
+            ):
+                tree_indices = sampled_batch_data["indices"]
+                if len(tree_indices) == len(td_errors):
+                    self.buffer.update_priorities(tree_indices, td_errors)
+                else:
+                    logger.error(
+                        f"PER Update Error: Mismatch between tree indices ({len(tree_indices)}) and TD errors ({len(td_errors)})"
+                    )
 
-            # Log results (LoopHelpers handles StepInfo)
+            # Log results
             self.loop_helpers.log_training_results_async(
                 loss_info, self.global_step, self.total_simulations_run
             )
@@ -186,7 +195,7 @@ class TrainingLoop:
                 except Exception as update_err:
                     logger.error(f"Failed to update worker networks: {update_err}")
 
-            if self.global_step % 100 == 0:  # Log losses periodically
+            if self.global_step % 100 == 0:
                 logger.info(
                     f"Step {self.global_step}: "
                     f"Loss(T={loss_info['total_loss']:.3f} P={loss_info['policy_loss']:.3f} "
@@ -232,16 +241,13 @@ class TrainingLoop:
                 if self.buffer.is_ready():
                     training_happened = self._run_training_step()
                 else:
-                    # Wait longer if buffer isn't ready
                     time.sleep(0.1)
 
                 if self.stop_requested.is_set():
                     break
 
                 # Handle Completed Worker Tasks
-                wait_timeout = (
-                    0.01 if training_happened else 0.2
-                )  # Wait less if training happened
+                wait_timeout = 0.01 if training_happened else 0.2
                 completed_tasks = self.worker_manager.get_completed_tasks(wait_timeout)
 
                 for worker_id, result_or_error in completed_tasks:
@@ -260,7 +266,6 @@ class TrainingLoop:
                         logger.error(
                             f"Unexpected item from worker {worker_id}: {type(result_or_error)}"
                         )
-                    # Resubmit task regardless of result (worker might recover)
                     self.worker_manager.submit_task(worker_id)
 
                 if self.stop_requested.is_set():
@@ -291,7 +296,6 @@ class TrainingLoop:
                     )
                     last_save_time = current_time
 
-                # Brief sleep if nothing happened
                 if not completed_tasks and not training_happened:
                     time.sleep(0.02)
 
@@ -301,10 +305,10 @@ class TrainingLoop:
             logger.critical(f"Unhandled exception in TrainingLoop: {e}", exc_info=True)
             self.training_exception = e
         finally:
-            self.request_stop()  # Ensure stop is requested on exit
+            self.request_stop()
             self.training_complete = (
                 self.training_complete and self.training_exception is None
-            )  # Mark incomplete if exception occurred
+            )
             logger.info(
                 f"TrainingLoop finished. Complete: {self.training_complete}, Exception: {self.training_exception is not None}"
             )

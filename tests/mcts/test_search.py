@@ -42,10 +42,8 @@ def test_run_mcts_simulations_on_terminal_state(
     root = root_node_real_state
     if root.initial_game_state is None:
         pytest.skip("Root node needs game state")
-    # --- Use public attribute ---
     root.initial_game_state.game_over = True
-    # ---
-    valid_actions = root.initial_game_state.valid_actions()  # Likely empty now
+    valid_actions = root.initial_game_state.valid_actions()
     max_depth = run_mcts_simulations(
         root_node=root,
         config=mock_mcts_config,
@@ -57,30 +55,39 @@ def test_run_mcts_simulations_on_terminal_state(
     assert not root.is_expanded
 
 
-@pytest.mark.skip(
-    reason="Difficult to guarantee no valid actions in real GameState setup for testing"
-)
 def test_run_mcts_simulations_no_valid_actions(
-    root_node_real_state: Node,
+    root_node_no_valid_actions: Node,
     mock_mcts_config: MCTSConfig,
     mock_muzero_network: Any,
 ):
     """Test running MCTS when the root state has no valid actions."""
-    # This test is skipped because setting valid_actions=[] directly on GameState isn't feasible.
-    # We'd need to construct a specific game board state (e.g., completely full)
-    # where game.valid_actions() returns [].
-    root = root_node_real_state
+    root = root_node_no_valid_actions
     if root.initial_game_state is None:
         pytest.skip("Root node needs game state")
-    # Setup a game state where valid_actions() returns [] (e.g., fill grid)
-    # ... (complex setup required) ...
-    valid_actions: list[int] = []  # Assuming setup leads to this
+
+    valid_actions = root.initial_game_state.valid_actions()
+    assert not valid_actions
+
+    # Run simulations - it should perform initial inference but fail expansion
     max_depth = run_mcts_simulations(
         root_node=root,
         config=mock_mcts_config,
         network=mock_muzero_network,
         valid_actions_from_state=valid_actions,
     )
-    assert root.visit_count == 1
-    assert not root.is_expanded
-    assert max_depth >= 0
+
+    # Check state after running simulations
+    # Initial inference happens, value is backpropagated once.
+    # Simulation loop runs, but expansion fails each time. Backprop happens each time.
+    expected_visits = 1 + mock_mcts_config.num_simulations
+    assert (
+        root.visit_count == expected_visits
+    ), f"Root visit count should be 1 + num_simulations ({expected_visits})"
+    # --- ADJUSTED ASSERTION ---
+    # The root node's hidden_state and predicted_value are set during initial inference.
+    # expand_node is called, but should return early without adding children if valid_actions is empty.
+    assert not root.children, "Root should have no children when no valid actions exist"
+    # is_expanded checks if self.children is non-empty.
+    assert not root.is_expanded, "Root should not be expanded (no children added)"
+    # --- END ADJUSTED ASSERTION ---
+    assert max_depth >= 0  # Depth reflects initial inference/backprop

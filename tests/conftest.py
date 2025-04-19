@@ -1,4 +1,5 @@
 # File: tests/conftest.py
+# File: tests/conftest.py
 import random
 from typing import cast
 
@@ -66,11 +67,14 @@ def mock_model_config(mock_env_config: EnvConfig) -> ModelConfig:
 
 @pytest.fixture(scope="session")
 def mock_train_config() -> TrainConfig:
+    # Use MuZero defaults for the base mock config
     return TrainConfig(
         BATCH_SIZE=4,
         BUFFER_CAPACITY=100,
         MIN_BUFFER_SIZE_TO_TRAIN=10,
-        USE_PER=False,
+        USE_PER=True,  # Enable PER for testing
+        PER_ALPHA=0.6,
+        PER_BETA_INITIAL=0.4,
         DEVICE="cpu",
         RANDOM_SEED=42,
         NUM_SELF_PLAY_WORKERS=1,
@@ -79,7 +83,10 @@ def mock_train_config() -> TrainConfig:
         OPTIMIZER_TYPE="Adam",
         LEARNING_RATE=1e-3,
         MAX_TRAINING_STEPS=200,
-    )  # Removed MuZero params for base mock
+        MUZERO_UNROLL_STEPS=3,
+        N_STEP_RETURNS=5,
+        DISCOUNT=0.99,
+    )
 
 
 @pytest.fixture(scope="session")
@@ -95,7 +102,7 @@ def mock_mcts_config() -> MCTSConfig:
         dirichlet_epsilon=0.25,
         max_search_depth=10,
         discount=0.99,
-    )  # Added discount
+    )
 
 
 @pytest.fixture(scope="session")
@@ -114,24 +121,22 @@ def mock_state_type(
     }
 
 
-# --- REMOVED mock_experience ---
-
-
 # --- ADD MuZero Data Fixtures ---
 @pytest.fixture(scope="session")
 def mock_trajectory_step_global(
     mock_state_type: StateType, mock_env_config: EnvConfig
 ) -> TrajectoryStep:
     """Creates a single mock TrajectoryStep (session scoped)."""
-    action_dim = int(mock_env_config.ACTION_DIM)  # type: ignore[call-overload]
+    action_dim = int(mock_env_config.ACTION_DIM)
     return {
         "observation": mock_state_type,
         "action": random.randint(0, action_dim - 1) if action_dim > 0 else 0,
         "reward": random.uniform(-1, 1),
-        "policy_target": dict.fromkeys(range(action_dim), 1.0 / action_dim)
-        if action_dim > 0
-        else {},
+        "policy_target": (
+            dict.fromkeys(range(action_dim), 1.0 / action_dim) if action_dim > 0 else {}
+        ),
         "value_target": random.uniform(-1, 1),
+        "n_step_reward_target": random.uniform(-1, 1),  # Add n-step target
         "hidden_state": None,
     }
 
@@ -139,8 +144,7 @@ def mock_trajectory_step_global(
 @pytest.fixture(scope="session")
 def mock_trajectory_global(mock_trajectory_step_global: TrajectoryStep) -> Trajectory:
     """Creates a mock Trajectory (session scoped)."""
-    # Use a fixed length relevant for training (e.g., unroll_steps + N)
-    return [mock_trajectory_step_global.copy() for _ in range(10)]  # Example length 10
+    return [mock_trajectory_step_global.copy() for _ in range(10)]
 
 
 # --- END ADD MuZero Data Fixtures ---
@@ -181,7 +185,6 @@ def filled_mock_buffer(
     mock_experience_buffer: ExperienceBuffer, mock_trajectory_global: Trajectory
 ) -> ExperienceBuffer:
     """Provides a buffer filled with mock trajectories."""
-    # Fill based on total steps
     while mock_experience_buffer.total_steps < mock_experience_buffer.min_size_to_train:
-        mock_experience_buffer.add(mock_trajectory_global[:])  # Add copy of trajectory
+        mock_experience_buffer.add(mock_trajectory_global[:])
     return mock_experience_buffer

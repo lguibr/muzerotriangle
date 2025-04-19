@@ -9,16 +9,16 @@ This submodule focuses specifically on generating game episodes through self-pla
     -   Each `SelfPlayWorker` actor runs independently, typically on a separate CPU core.
     -   It initializes its own `GameState` environment and `NeuralNetwork` instance (usually on the CPU).
     -   It receives configuration objects (`EnvConfig`, `MCTSConfig`, `ModelConfig`, `TrainConfig`) during initialization.
-    -   It has a `set_weights` method allowing the `TrainingLoop` to periodically update its local neural network with the latest trained weights from the central model. **It also has `set_current_trainer_step` to store the global step associated with the current weights, called by the `WorkerManager`.**
+    -   It has a `set_weights` method allowing the `TrainingLoop` to periodically update its local neural network with the latest trained weights from the central model. It also has `set_current_trainer_step` to store the global step associated with the current weights.
     -   Its main method, `run_episode`, simulates a complete game episode:
-        -   Uses its local `NeuralNetwork` evaluator and `MCTSConfig` to run MCTS ([`muzerotriangle.mcts.run_mcts_simulations`](../../mcts/core/search.py)), **reusing the search tree between moves**.
+        -   Uses its local `NeuralNetwork` evaluator and `MCTSConfig` to run MCTS ([`muzerotriangle.mcts.run_mcts_simulations`](../../mcts/core/search.py)).
         -   Selects actions based on MCTS results ([`muzerotriangle.mcts.strategy.policy.select_action_based_on_visits`](../../mcts/strategy/policy.py)).
         -   Generates policy targets ([`muzerotriangle.mcts.strategy.policy.get_policy_target`](../../mcts/strategy/policy.py)).
-        -   Stores `(StateType, policy_target, n_step_return)` tuples (using extracted features and calculated n-step returns).
+        -   Stores `TrajectoryStep` dictionaries containing `observation`, `action`, `reward`, `policy_target`, `value_target`, and optionally the `hidden_state`.
         -   Steps its local game environment (`GameState.step`).
-        -   Returns the collected `Experience` list, final score, episode length, and MCTS statistics via a `SelfPlayResult` object.
-        -   **Asynchronously logs per-step statistics (score, reward, MCTS visits/depth) to the `StatsCollectorActor`, providing a `StepInfo` dictionary containing the `game_step_index` and the `current_trainer_step` (global step of its current network weights).**
-        -   **Asynchronously reports its current `GameState` to the `StatsCollectorActor` for visualization.**
+        -   **After the episode concludes, it iterates backwards through the collected steps to calculate and store the N-step discounted reward target (`n_step_reward_target`) for each step.**
+        -   Returns the completed `Trajectory` list, final score, episode length, and MCTS statistics via a `SelfPlayResult` object.
+        -   Asynchronously logs per-step statistics and reports its current `GameState` to the `StatsCollectorActor`.
 
 ## Exposed Interfaces
 
@@ -33,31 +33,19 @@ This submodule focuses specifically on generating game episodes through self-pla
 
 ## Dependencies
 
--   **[`muzerotriangle.config`](../../config/README.md)**:
-    -   `EnvConfig`, `MCTSConfig`, `ModelConfig`, `TrainConfig`.
--   **[`muzerotriangle.nn`](../../nn/README.md)**:
-    -   `NeuralNetwork`: Instantiated locally within the actor.
--   **[`muzerotriangle.mcts`](../../mcts/README.md)**:
-    -   Core MCTS functions and types. **MCTS uses batched evaluation.**
--   **[`muzerotriangle.environment`](../../environment/README.md)**:
-    -   `GameState`, `EnvConfig`: Used to instantiate and step through the game simulation locally.
--   **[`muzerotriangle.features`](../../features/README.md)**:
-    -   `extract_state_features`: Used to generate `StateType` for experiences.
--   **[`muzerotriangle.utils`](../../utils/README.md)**:
-    -   `types`: `Experience`, `ActionType`, `PolicyTargetMapping`, `StateType`, `StepInfo`.
-    -   `helpers`: `get_device`, `set_random_seeds`.
--   **[`muzerotriangle.rl.types`](../types.py)**:
-    -   `SelfPlayResult`: Return type.
--   **[`muzerotriangle.stats`](../../stats/README.md)**:
-    -   `StatsCollectorActor`: Handle passed for logging.
--   **`numpy`**:
-    -   Used by MCTS strategies.
--   **`ray`**:
-    -   The `@ray.remote` decorator makes this a Ray actor.
--   **`torch`**:
-    -   Used by the local `NeuralNetwork`.
+-   **[`muzerotriangle.config`](../../config/README.md)**: `EnvConfig`, `MCTSConfig`, `ModelConfig`, `TrainConfig`.
+-   **[`muzerotriangle.nn`](../../nn/README.md)**: `NeuralNetwork`.
+-   **[`muzerotriangle.mcts`](../../mcts/README.md)**: Core MCTS functions and types.
+-   **[`muzerotriangle.environment`](../../environment/README.md)**: `GameState`.
+-   **[`muzerotriangle.features`](../../features/README.md)**: `extract_state_features`.
+-   **[`muzerotriangle.utils`](../../utils/README.md)**: `types` (including `Trajectory`, `TrajectoryStep`, `n_step_reward_target`).
+-   **[`muzerotriangle.rl.types`](../types.py)**: `SelfPlayResult`.
+-   **[`muzerotriangle.stats`](../../stats/README.md)**: `StatsCollectorActor`.
+-   **`numpy`**: Used by MCTS strategies and for storing hidden states.
+-   **`ray`**: The `@ray.remote` decorator makes this a Ray actor.
+-   **`torch`**: Used by the local `NeuralNetwork` and for hidden states.
 -   **Standard Libraries:** `typing`, `logging`, `random`, `time`, `collections.deque`.
 
 ---
 
-**Note:** Please keep this README updated when changing the self-play episode generation logic, the data collected, the interaction with MCTS/environment, or the asynchronous logging behavior, especially regarding the inclusion of `current_trainer_step` in `StepInfo`. Accurate documentation is crucial for maintainability.
+**Note:** Please keep this README updated when changing the self-play episode generation logic, the data collected (especially `TrajectoryStep` and N-step targets), or the asynchronous logging behavior.

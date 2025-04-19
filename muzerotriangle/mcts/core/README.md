@@ -3,36 +3,43 @@
 
 ## Purpose and Architecture
 
-This submodule defines the fundamental building blocks and interfaces for the Monte Carlo Tree Search implementation.
+This submodule defines the fundamental building blocks and interfaces for the MuZero Monte Carlo Tree Search implementation.
 
--   **[`Node`](node.py):** The `Node` class is the cornerstone, representing a single state within the search tree. It stores the associated `GameState`, parent/child relationships, the action that led to it, and crucial MCTS statistics (visit count, total action value, prior probability). It provides properties like `value_estimate` (Q-value) and `is_expanded`.
--   **[`search`](search.py):** The `search.py` module contains the high-level `run_mcts_simulations` function. This function orchestrates the core MCTS loop for a given root node: repeatedly selecting leaves, batch-evaluating them using the network, expanding them, and backpropagating the results, using helper functions from the [`muzerotriangle.mcts.strategy`](../strategy/README.md) submodule. **It uses a `ThreadPoolExecutor` for parallel traversals and batches network evaluations.**
--   **[`types`](types.py):** The `types.py` module defines essential type hints and protocols for the MCTS module. Most importantly, it defines the `ActionPolicyValueEvaluator` protocol, which specifies the `evaluate` and `evaluate_batch` methods that any neural network interface must implement to be usable by the MCTS expansion phase. It also defines `ActionPolicyMapping`.
+-   **[`Node`](node.py):** The `Node` class is the cornerstone, representing a single state within the search tree. It stores the associated *hidden state* (`torch.Tensor`), the predicted *reward* to reach this state, parent/child relationships, the action that led to it, and crucial MCTS statistics (visit count, value sum, prior probability). The root node additionally holds the initial `GameState`. It provides properties like `value_estimate` (Q-value) and `is_expanded`.
+-   **[`search`](search.py):** The `search.py` module contains the high-level `run_mcts_simulations` function. This function orchestrates the core MCTS loop for a given root node: performing initial inference, then repeatedly selecting leaves, expanding them using the network's dynamics and prediction functions, and backpropagating the results. It uses helper functions from the [`muzerotriangle.mcts.strategy`](../strategy/README.md) submodule. It handles potential gradient issues by detaching tensors before converting to NumPy.
+-   **[`types`](types.py):** The `types.py` module defines essential type hints and protocols for the MCTS module, such as `ActionPolicyMapping`. The `ActionPolicyValueEvaluator` protocol is less relevant now as the `NeuralNetwork` interface is used directly.
 
 ## Exposed Interfaces
 
 -   **Classes:**
-    -   `Node`: Represents a node in the search tree.
+    -   `Node`: The tree node class (MuZero version).
     -   `MCTSExecutionError`: Custom exception for MCTS failures.
 -   **Functions:**
-    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network_evaluator: ActionPolicyValueEvaluator)`: Orchestrates the MCTS process using batched evaluation and parallel traversals.
--   **Protocols/Types:**
-    -   `ActionPolicyValueEvaluator`: Defines the interface for the NN evaluator.
+    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network: NeuralNetwork, valid_actions_from_state: List[ActionType]) -> int`: Orchestrates the MCTS process.
+-   **Types:**
     -   `ActionPolicyMapping`: Type alias for the policy dictionary (mapping action index to probability).
+    -   `ActionPolicyValueEvaluator`: Protocol defining the evaluation interface (though `NeuralNetwork` is used directly).
 
 ## Dependencies
 
 -   **[`muzerotriangle.environment`](../../environment/README.md)**:
-    -   `GameState`: Used within `Node` to represent the state. Methods like `is_over`, `get_outcome`, `valid_actions`, `copy`, `step` are used during the MCTS process (selection, expansion).
+    -   `GameState`: Represents the state within the root `Node`. MCTS interacts with `GameState` methods like `is_over`, `valid_actions`, `copy`.
 -   **[`muzerotriangle.mcts.strategy`](../strategy/README.md)**:
     -   `selection`, `expansion`, `backpropagation`: The `run_mcts_simulations` function delegates the core algorithm phases to functions within this submodule.
 -   **[`muzerotriangle.config`](../../config/README.md)**:
     -   `MCTSConfig`: Provides hyperparameters.
+-   **[`muzerotriangle.nn`](../../nn/README.md)**:
+    -   `NeuralNetwork`: Used by `run_mcts_simulations` and `expansion`.
+-   **[`muzerotriangle.features`](../../features/README.md)**:
+    -   `extract_state_features`: Used by `run_mcts_simulations`.
 -   **[`muzerotriangle.utils`](../../utils/README.md)**:
-    -   `ActionType`, `PolicyValueOutput`: Used in type hints and protocols.
--   **Standard Libraries:** `typing`, `math`, `logging`, `concurrent.futures`, `time`.
--   **`numpy`**: Used for validation checks.
+    -   `ActionType`, `StateType`, `PolicyTargetMapping`.
+-   **`torch`**:
+    -   Used for hidden states.
+-   **`numpy`**:
+    -   Used for Dirichlet noise and policy calculations. Requires careful handling (e.g., `.detach()`) when converting from `torch.Tensor`.
+-   **Standard Libraries:** `typing`, `math`, `logging`.
 
 ---
 
-**Note:** Please keep this README updated when modifying the `Node` structure, the `run_mcts_simulations` logic (especially parallelism and batching), or the `ActionPolicyValueEvaluator` interface definition. Accurate documentation is crucial for maintainability.
+**Note:** Please keep this README updated when modifying the `Node` structure, the `run_mcts_simulations` logic, or the interfaces used. Accurate documentation is crucial for maintainability.

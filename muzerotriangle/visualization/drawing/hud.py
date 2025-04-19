@@ -1,94 +1,93 @@
 # File: muzerotriangle/visualization/drawing/hud.py
-from typing import Any
+from typing import Any, Dict, Optional
 
 import pygame
 
 from ..core import colors
-from ..ui import ProgressBar
 
 
 def render_hud(
     surface: pygame.Surface,
     mode: str,
-    fonts: dict[str, pygame.font.Font | None],
-    display_stats: dict[str, Any] | None = None,
+    fonts: Dict[str, Optional[pygame.font.Font]],
+    display_stats: Optional[Dict[str, Any]] = None,
 ) -> None:
     """
-    Renders global information (like step count, worker status) at the bottom.
-    Individual game scores are not shown here anymore.
-    Help text is skipped in training_visual mode.
+    Renders the Heads-Up Display (HUD) at the bottom of the screen.
+
+    Args:
+        surface: The Pygame surface to draw on.
+        mode: The current mode ('play', 'debug', 'training_visual').
+        fonts: A dictionary containing loaded Pygame fonts.
+        display_stats: Optional dictionary containing stats to display (used in training mode).
     """
-    screen_w, screen_h = surface.get_size()
-    help_font = fonts.get("help")
-    stats_font = fonts.get("help")  # Use same font for stats line
-    step_font = fonts.get("ui") or help_font  # Use UI font for step, fallback to help
+    screen_width, screen_height = surface.get_size()
+    hud_height = 40  # Define HUD height or get from config if available
+    hud_rect = pygame.Rect(0, screen_height - hud_height, screen_width, hud_height)
+    pygame.draw.rect(surface, colors.GRAY, hud_rect)  # Draw HUD background
 
-    bottom_y = screen_h - 10  # Position from bottom
+    font = fonts.get("help")
+    if not font:
+        return  # Cannot render text without font
 
-    stats_rect = None
-    step_rect = None
+    # Common text for all modes
+    common_text = "[ESC] Quit"
 
-    # --- Render Global Step as "Weight Updates" ---
-    if step_font and display_stats:
-        train_progress = display_stats.get("train_progress")
-        global_step = (
-            train_progress.current_steps
-            if isinstance(train_progress, ProgressBar)  # Check type
-            else display_stats.get("global_step", "?")
-        )
-        step_text = f"Weight Updates: {global_step}"
-        step_surf = step_font.render(step_text, True, colors.YELLOW)
-        step_rect = step_surf.get_rect(bottomleft=(15, bottom_y))
-        surface.blit(step_surf, step_rect)
+    # Mode-specific text
+    if mode == "play":
+        mode_text = " | [Click] Select/Place Shape"
+    elif mode == "debug":
+        mode_text = " | [Click] Toggle Cell"
+    elif mode == "training_visual":
+        mode_text = " | Training Mode"  # Keep it simple for training view
+    else:
+        mode_text = ""
 
-    # Render other global training stats if available, positioned after the step count
-    if stats_font and display_stats and step_rect:
-        stats_items = []
-        episodes = display_stats.get("total_episodes", "?")
-        sims = display_stats.get("total_simulations", "?")
-        num_workers = display_stats.get("num_workers", "?")
-        pending_tasks = display_stats.get("pending_tasks", "?")
+    full_text = common_text + mode_text
 
-        stats_items.append(f"Episodes: {episodes}")
-        if isinstance(sims, int | float):
+    # Render and blit the text
+    text_surface = font.render(full_text, True, colors.WHITE)
+    text_rect = text_surface.get_rect(center=hud_rect.center)
+    surface.blit(text_surface, text_rect)
+
+    # Display additional stats in training mode if provided
+    if mode == "training_visual" and display_stats:
+        stats_font = fonts.get("help") or font  # Use help font or fallback
+        stats_text_parts = []
+
+        # Example stats to display (customize as needed)
+        if "global_step" in display_stats:
+            stats_text_parts.append(f"Step: {display_stats['global_step']:,}")
+        if "episodes_played" in display_stats:
+            stats_text_parts.append(f"Eps: {display_stats['episodes_played']:,}")
+        if "total_simulations_run" in display_stats:
+            sims = display_stats["total_simulations_run"]
             sims_str = (
-                f"{sims / 1e6:.2f}M"
+                f"{sims / 1e6:.1f}M"
                 if sims >= 1e6
-                else (f"{sims / 1e3:.1f}k" if sims >= 1000 else str(int(sims)))
+                else (f"{sims / 1e3:.0f}k" if sims >= 1000 else str(int(sims)))
             )
-            stats_items.append(f"Sims: {sims_str}")
-        else:
-            stats_items.append(f"Sims: {sims}")
+            stats_text_parts.append(f"Sims: {sims_str}")
+        if "buffer_size" in display_stats and "buffer_capacity" in display_stats:
+            stats_text_parts.append(
+                f"Buffer: {display_stats['buffer_size']:,}/{display_stats['buffer_capacity']:,}"
+            )
+        if "num_active_workers" in display_stats and "num_workers" in display_stats:
+            stats_text_parts.append(
+                f"Workers: {display_stats['num_active_workers']}/{display_stats['num_workers']}"
+            )
 
-        stats_items.append(f"Workers: {pending_tasks}/{num_workers} busy")
-
-        stats_text = " | ".join(stats_items)
-        stats_surf = stats_font.render(stats_text, True, colors.CYAN)
-        stats_rect = stats_surf.get_rect(bottomleft=(step_rect.right + 20, bottom_y))
-        surface.blit(stats_surf, stats_rect)
-
-    # --- CHANGED: Skip help text in training visual mode ---
-    if help_font and mode != "training_visual":
-        help_text = "[ESC] Quit"
-        if mode == "play":
-            help_text += " | [Click] Select/Place Shape"
-        elif mode == "debug":
-            help_text += " | [Click] Toggle Cell"
-        # No need for training_visual case here anymore
-
-        help_surf = help_font.render(help_text, True, colors.LIGHT_GRAY)
-        help_rect = help_surf.get_rect(bottomright=(screen_w - 15, bottom_y))
-
-        combined_left_width = (
-            stats_rect.right if stats_rect else (step_rect.right if step_rect else 0)
-        )
-        if combined_left_width > help_rect.left - 20:
-            help_rect.bottom = (
-                stats_rect.top
-                if stats_rect
-                else (step_rect.top if step_rect else bottom_y)
-            ) - 5
-            help_rect.right = screen_w - 15
-
-        surface.blit(help_surf, help_rect)
-    # --- END CHANGED ---
+        stats_text = " | ".join(stats_text_parts)
+        if stats_text:
+            stats_surf = stats_font.render(stats_text, True, colors.YELLOW)
+            # Position stats text to the left of the help text if space allows, otherwise below
+            stats_rect = stats_surf.get_rect(
+                midleft=(hud_rect.left + 10, hud_rect.centery)
+            )
+            if stats_rect.right > text_rect.left - 10:  # Check for overlap
+                stats_rect.topleft = (
+                    hud_rect.left + 10,
+                    hud_rect.top + 2,
+                )  # Position above if overlapping
+                text_rect.topleft = (hud_rect.left + 10, stats_rect.bottom + 2)
+            surface.blit(stats_surf, stats_rect)

@@ -20,8 +20,8 @@ This module defines and manages the neural network used by the MuZeroTriangle ag
     -   It handles device placement (`torch.device`).
     -   It **optionally compiles** the underlying model using `torch.compile()` based on `TrainConfig.COMPILE_MODEL`.
     -   Key methods:
-        -   `initial_inference(observation: StateType)`: Runs `h` and `f` to get `s_0`, `p_0`, `v_0`. Returns logits and hidden state.
-        -   `recurrent_inference(hidden_state: Tensor, action: ActionType | Tensor)`: Runs `g` and `f` to get `s_k`, `r_k`, `p_k`, `v_k`. Returns logits and next hidden state.
+        -   `initial_inference(observation: StateType)`: Runs `h` and `f` to get `s_0`, `p_0`, `v_0`. Returns logits and hidden state. **Ensures tensors are detached before returning numpy arrays.**
+        -   `recurrent_inference(hidden_state: Tensor, action: ActionType | Tensor)`: Runs `g` and `f` to get `s_k`, `r_k`, `p_k`, `v_k`. Returns logits and next hidden state. **Ensures tensors are detached before returning numpy arrays.**
         -   `evaluate(state: GameState)` / `evaluate_batch(states: List[GameState])`: Convenience methods performing initial inference and returning processed policy/value outputs (expected scalar value) for potential use by components still expecting the old interface (like initial MCTS root evaluation).
         -   `get_weights()` / `set_weights()`: Standard weight management.
     -   Provides access to value and reward support tensors (`support`, `reward_support`).

@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field, computed_field
 class PersistenceConfig(BaseModel):
     """Configuration for saving/loading artifacts (Pydantic model)."""
 
-    ROOT_DATA_DIR: str = Field(default=".alphatriangle_data")
+    ROOT_DATA_DIR: str = Field(default=".muzerotriangle_data")
     RUNS_DIR_NAME: str = Field(default="runs")
     MLFLOW_DIR_NAME: str = Field(default="mlruns")
 

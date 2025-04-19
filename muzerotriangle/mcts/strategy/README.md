@@ -11,9 +11,9 @@ This submodule implements the specific algorithms and heuristics used within the
     -   `select_child_node`: Chooses the child with the highest PUCT score.
     -   `traverse_to_leaf`: Repeatedly applies `select_child_node` to navigate down the tree.
 -   **[`expansion`](expansion.py):** Handles the expansion of a selected leaf node.
-    -   `expand_node_with_policy`: Takes a node and a *pre-computed* policy dictionary (obtained from batched network evaluation) and creates child `Node` objects for all valid actions, initializing them with the corresponding prior probabilities.
+    -   `expand_node`: Takes a node, a policy prediction (from the network's `f` function), the network itself (for the `g` function), and optionally a list of valid actions. It creates child `Node` objects by applying the dynamics function (`g`) for each action, storing the resulting hidden state (`s_{k+1}`) and predicted reward (`r_{k+1}`). **It handles potential gradient issues by detaching tensors before storing them in the node.**
 -   **[`backpropagation`](backpropagation.py):** Implements the update step after a simulation.
-    -   `backpropagate_value`: Traverses from the expanded leaf node back up to the root, incrementing the `visit_count` and adding the simulation's resulting `value` to the `total_action_value` of each node along the path.
+    -   `backpropagate_value`: Traverses from the expanded leaf node back up to the root, incrementing the `visit_count` and adding the simulation's resulting `value` (calculated using the network's value prediction and discounted rewards) to the `value_sum` of each node along the path.
 -   **[`policy`](policy.py):** Provides functions related to action selection and policy target generation after MCTS has run.
     -   `select_action_based_on_visits`: Selects the final action to be played in the game based on the visit counts of the root's children, using a temperature parameter to control exploration vs. exploitation.
     -   `get_policy_target`: Generates the policy target vector (a probability distribution over actions) based on the visit counts, which is used as a training target for the neural network's policy head.
@@ -27,9 +27,9 @@ This submodule implements the specific algorithms and heuristics used within the
     -   `calculate_puct_score(...) -> Tuple[float, float, float]` (Primarily internal use)
     -   `SelectionError`: Custom exception.
 -   **Expansion:**
-    -   `expand_node_with_policy(node: Node, action_policy: ActionPolicyMapping)`
+    -   `expand_node(node_to_expand: Node, policy_prediction: ActionPolicyMapping, network: NeuralNetwork, valid_actions: Optional[List[ActionType]] = None)`
 -   **Backpropagation:**
-    -   `backpropagate_value(leaf_node: Node, value: float) -> int`: Returns depth.
+    -   `backpropagate_value(leaf_node: Node, value: float, discount: float) -> int`: Returns depth.
 -   **Policy:**
     -   `select_action_based_on_visits(root_node: Node, temperature: float) -> ActionType`: Selects the final move.
     -   `get_policy_target(root_node: Node, temperature: float = 1.0) -> ActionPolicyMapping`: Generates the training policy target.
@@ -42,12 +42,14 @@ This submodule implements the specific algorithms and heuristics used within the
     -   `ActionPolicyMapping`: Used in `expansion` and `policy`.
 -   **[`muzerotriangle.config`](../../config/README.md)**:
     -   `MCTSConfig`: Provides hyperparameters (PUCT coeff, noise params, etc.).
--   **[`muzerotriangle.environment`](../../environment/README.md)**:
-    -   `GameState`: Accessed via `Node.state` for methods like `is_over`, `get_outcome`, `valid_actions`, `step`.
+-   **[`muzerotriangle.nn`](../../nn/README.md)**:
+    -   `NeuralNetwork`: Used by `expansion`.
 -   **[`muzerotriangle.utils`](../../utils/README.md)**:
     -   `ActionType`: Used for representing actions.
 -   **`numpy`**:
     -   Used for Dirichlet noise and policy/selection calculations.
+-   **`torch`**:
+    -   Used for hidden states.
 -   **Standard Libraries:** `typing`, `math`, `logging`, `numpy`, `random`.
 
 ---

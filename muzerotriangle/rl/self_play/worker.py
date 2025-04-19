@@ -1,4 +1,5 @@
 # File: muzerotriangle/rl/self_play/worker.py
+# File: muzerotriangle/rl/self_play/worker.py
 import logging
 import random
 from typing import TYPE_CHECKING
@@ -20,9 +21,14 @@ from ...utils import get_device, set_random_seeds
 from ..types import SelfPlayResult
 
 if TYPE_CHECKING:
+    # import torch # Already imported above
+
     import torch
 
     from ...utils.types import (
+        ActionType,  # Import ActionType
+        PolicyTargetMapping,  # Import PolicyTargetMapping
+        StateType,  # Import StateType
         StepInfo,
         Trajectory,
         TrajectoryStep,
@@ -35,7 +41,6 @@ logger = logging.getLogger(__name__)
 class SelfPlayWorker:
     """MuZero self-play worker."""
 
-    # ... (init, set_weights, set_current_trainer_step, _report_current_state, _log_step_stats_async remain the same) ...
     def __init__(
         self,
         actor_id,
@@ -96,7 +101,7 @@ class SelfPlayWorker:
                 state_copy = game_state.copy()
                 self.stats_collector_actor.update_worker_game_state.remote(
                     self.actor_id, state_copy
-                )  # type: ignore
+                )
             except Exception as e:
                 logger.error(f"W{self.actor_id}: Failed report state: {e}")
 
@@ -112,16 +117,60 @@ class SelfPlayWorker:
                     "MCTS/Step_Depth": (float(mcts_depth), step_info),
                     "RL/Step_Reward": (step_reward, step_info),
                 }
-                self.stats_collector_actor.log_batch.remote(step_stats)  # type: ignore
+                self.stats_collector_actor.log_batch.remote(step_stats)
             except Exception as e:
                 logger.error(f"W{self.actor_id}: Failed log step stats: {e}")
+
+    def _calculate_n_step_targets(self, trajectory_raw: list[dict]):
+        """Calculates N-step reward targets and returns a completed Trajectory."""
+        n_steps = self.train_config.N_STEP_RETURNS
+        discount = self.train_config.DISCOUNT
+        traj_len = len(trajectory_raw)
+        completed_trajectory: Trajectory = []
+
+        for t in range(traj_len):
+            n_step_reward_target = 0.0
+            for i in range(n_steps):
+                step_index = t + i
+                if step_index < traj_len:
+                    n_step_reward_target += (
+                        discount**i * trajectory_raw[step_index]["reward"]
+                    )
+                else:
+                    if traj_len > 0:
+                        last_step_value = trajectory_raw[-1]["value_target"]
+                        n_step_reward_target += discount**i * last_step_value
+                    break
+
+            bootstrap_index = t + n_steps
+            if bootstrap_index < traj_len:
+                n_step_reward_target += (
+                    discount**n_steps * trajectory_raw[bootstrap_index]["value_target"]
+                )
+            elif bootstrap_index == traj_len and traj_len > 0:
+                last_step_value = trajectory_raw[-1]["value_target"]
+                n_step_reward_target += discount**n_steps * last_step_value
+
+            # Create the final TrajectoryStep dict
+            step_data: TrajectoryStep = {
+                "observation": trajectory_raw[t]["observation"],
+                "action": trajectory_raw[t]["action"],
+                "reward": trajectory_raw[t]["reward"],
+                "policy_target": trajectory_raw[t]["policy_target"],
+                "value_target": trajectory_raw[t]["value_target"],
+                "n_step_reward_target": n_step_reward_target,  # Add the calculated target
+                "hidden_state": trajectory_raw[t]["hidden_state"],
+            }
+            completed_trajectory.append(step_data)
+
+        return completed_trajectory
 
     def run_episode(self) -> SelfPlayResult:
         """Runs a single MuZero self-play episode."""
         self.nn_evaluator.model.eval()
         episode_seed = self.seed + random.randint(0, 1000)
         game = GameState(self.env_config, initial_seed=episode_seed)
-        trajectory: Trajectory = []
+        trajectory_raw: list[dict] = []  # Store raw data before adding n-step target
         step_root_visits: list[int] = []
         step_tree_depths: list[int] = []
         step_simulations: list[int] = []
@@ -133,7 +182,7 @@ class SelfPlayWorker:
         while not game.is_over():
             game_step = game.current_step
             try:
-                observation = extract_state_features(game, self.model_config)
+                observation: StateType = extract_state_features(game, self.model_config)
                 valid_actions = game.valid_actions()
                 if not valid_actions:
                     logger.warning(
@@ -180,9 +229,13 @@ class SelfPlayWorker:
                     if game_step < self.mcts_config.temperature_anneal_steps
                     else self.mcts_config.temperature_final
                 )
-                action = select_action_based_on_visits(root_node, temperature=temp)
-                policy_target = get_policy_target(root_node, temperature=1.0)
-                value_target = root_node.value_estimate
+                action: ActionType = select_action_based_on_visits(
+                    root_node, temperature=temp
+                )
+                policy_target: PolicyTargetMapping = get_policy_target(
+                    root_node, temperature=1.0
+                )
+                value_target: float = root_node.value_estimate
             except Exception as policy_err:
                 logger.error(
                     f"W{self.actor_id} Step {game_step}: Policy/Action failed: {policy_err}",
@@ -190,34 +243,34 @@ class SelfPlayWorker:
                 )
                 break
 
-            step_data_partial = {
-                "observation": observation,
-                "action": action,
-                "policy_target": policy_target,
-                "value_target": value_target,
-            }
             real_reward, done = game.step(action)
 
-            step_data_complete: TrajectoryStep = {
-                **step_data_partial,
+            # Store raw step data (n_step_reward_target will be added later)
+            step_data_raw: dict = {
+                "observation": observation,
+                "action": action,
                 "reward": real_reward,
-                "hidden_state": current_hidden_state.cpu().numpy()
-                if current_hidden_state is not None
-                else None,
-            }  # type: ignore
-            trajectory.append(step_data_complete)
+                "policy_target": policy_target,
+                "value_target": value_target,
+                "hidden_state": (
+                    current_hidden_state.detach().cpu().numpy()
+                    if current_hidden_state is not None
+                    else None
+                ),
+            }
+            trajectory_raw.append(step_data_raw)
 
             if not done:
                 try:
                     if current_hidden_state is not None:
-                        # --- Call dynamics via underlying model ---
+                        hs_batch = current_hidden_state.to(self.device).unsqueeze(0)
                         next_hidden_state_tensor, _ = self.nn_evaluator.model.dynamics(
-                            current_hidden_state.unsqueeze(0), action
+                            hs_batch, action
                         )
                         current_hidden_state = next_hidden_state_tensor.squeeze(0)
                     else:
                         logger.error(
-                            f"W{self.actor_id} Step {game_step}: hidden_state is None"
+                            f"W{self.actor_id} Step {game_step}: hidden_state is None before dynamics call"
                         )
                         break
                 except Exception as dyn_err:
@@ -235,17 +288,24 @@ class SelfPlayWorker:
             )
             if done:
                 break
+
         # --- Episode End ---
         final_score = game.game_score
         total_steps_episode = game.current_step
         logger.info(
             f"W{self.actor_id}: Episode finished. Score: {final_score:.2f}, Steps: {total_steps_episode}"
         )
+
+        # --- Calculate N-step targets and create final Trajectory ---
+        trajectory: Trajectory = self._calculate_n_step_targets(trajectory_raw)
+        # ---
+
         total_sims = sum(step_simulations)
         avg_visits = np.mean(step_root_visits) if step_root_visits else 0.0
         avg_depth = np.mean(step_tree_depths) if step_tree_depths else 0.0
         if not trajectory:
             logger.warning(f"W{self.actor_id}: Episode finished empty trajectory.")
+
         return SelfPlayResult(
             trajectory=trajectory,
             final_score=final_score,
