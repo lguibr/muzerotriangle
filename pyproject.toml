@@ -1,0 +1,101 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "muzerotriangle"
+version = "0.4.0"
+authors = [{ name="Luis Guilherme P. M.", email="lgpelin92@gmail.com" }]
+description = "AlphaZero implementation for a triangle puzzle game."
+readme = "README.md"
+license = { file="LICENSE" }
+requires-python = ">=3.10"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Games/Entertainment :: Puzzle Games",
+    "Development Status :: 3 - Alpha",
+]
+dependencies = [
+    "pygame>=2.1.0",
+    "numpy>=1.20.0",
+    "torch>=2.0.0",
+    "torchvision>=0.11.0",
+    "cloudpickle>=2.0.0",
+    "numba>=0.55.0",
+    "mlflow>=1.20.0",
+    "matplotlib>=3.5.0",
+    "ray>=2.8.0",
+    "pydantic>=2.0.0",
+    "typing_extensions>=4.0.0",
+    "typer[all]>=0.9.0", # Added typer for CLI
+]
+
+[project.urls]
+"Homepage" = "https://github.com/lguibr/muzerotriangle"
+"Bug Tracker" = "https://github.com/lguibr/muzerotriangle/issues"
+
+[project.scripts]
+muzerotriangle = "muzerotriangle.cli:app"
+
+[tool.setuptools.packages.find]
+# No 'where' needed, find searches from the project root by default
+# It will find the 'muzerotriangle' directory now.
+
+
+[tool.setuptools.package-data]
+"*" = ["*.txt", "*.md", "*.json"] # Include non-code files
+
+# --- Tool Configurations (Optional but Recommended) ---
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "UP", "B", "C4", "ARG", "SIM", "TCH", "PTH", "NPY"]
+ignore = ["E501"] # Ignore line length errors if needed selectively
+
+[tool.ruff.format]
+quote-style = "double"
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true # Start with true, gradually reduce
+# Add specific module ignores if necessary
+# [[tool.mypy.overrides]]
+# module = "some_missing_types_module.*"
+# ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=muzerotriangle --cov-report=term-missing" # Point coverage to the new package dir
+testpaths = [
+    "tests",
+]
+
+[tool.coverage.run]
+omit = [
+    "muzerotriangle/cli.py", # Exclude CLI from coverage for now
+    "muzerotriangle/visualization/*", # Exclude visualization for now
+    "muzerotriangle/app.py",
+    "run_*.py",
+    "muzerotriangle/training/logging_utils.py", # Logging utils can be hard to cover fully
+    "muzerotriangle/config/*", # Config models are mostly declarative
+    "muzerotriangle/data/schemas.py",
+    "muzerotriangle/structs/*",
+    "muzerotriangle/utils/types.py",
+    "muzerotriangle/mcts/core/types.py",
+    "muzerotriangle/rl/types.py",
+    "*/__init__.py",
+    "*/README.md",
+]
+
+[tool.coverage.report]
+fail_under = 28 # Set a reasonable initial coverage target
+show_missing = true
