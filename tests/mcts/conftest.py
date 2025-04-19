@@ -222,16 +222,18 @@ def deep_expanded_node_mock_state(
 
     # --- Make selection deterministic: Boost one child's Q-value ---
     child_to_expand = None
-    boost = 10000.0 # Significantly increased boost
+    boost = 10000.0  # Significantly increased boost
     first_child_action = next(iter(root.children.keys()), None)
     if first_child_action is None:
-         pytest.skip("Cannot create deep tree, root has no children keys.")
+        pytest.skip("Cannot create deep tree, root has no children keys.")
 
     for action, child in root.children.items():
         # Give a large boost to the first child found
         current_boost = boost if action == first_child_action else 0.0
         child.value_sum += current_boost
-        child.visit_count += 1 # Add a visit to avoid infinite exploration bonus initially
+        child.visit_count += (
+            1  # Add a visit to avoid infinite exploration bonus initially
+        )
         if current_boost > 0:
             child_to_expand = child
 
@@ -301,7 +303,7 @@ def root_node_no_valid_actions(mock_env_config: EnvConfig) -> Node:
 
     # Provide only UP shapes
     up_shape_1 = Shape([(0, 0, True)], (0, 255, 0))
-    up_shape_2_adj = Shape([(0, 1, True)], (0, 0, 255)) # Example different UP shape
+    up_shape_2_adj = Shape([(0, 1, True)], (0, 0, 255))  # Example different UP shape
 
     gs.shapes = [None] * gs.env_config.NUM_SHAPE_SLOTS
     gs.shapes[0] = up_shape_1

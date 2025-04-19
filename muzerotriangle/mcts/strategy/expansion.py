@@ -1,6 +1,6 @@
 # File: muzerotriangle/mcts/strategy/expansion.py
 import logging
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 import torch  # Import torch for tensor check
 
@@ -20,7 +20,7 @@ def expand_node(
     node_to_expand: "Node",  # Node containing s_k
     policy_prediction: ActionPolicyMapping,  # Policy p_k from f(s_k)
     network: "NeuralNetwork",  # Network interface to call dynamics (g)
-    valid_actions: Optional[List["ActionType"]] = None,  # Pass valid actions explicitly
+    valid_actions: list["ActionType"] | None = None,  # Pass valid actions explicitly
 ):
     """
     Expands a leaf node in the MuZero search tree.

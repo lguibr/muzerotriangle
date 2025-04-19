@@ -2,15 +2,11 @@
 import logging
 import math
 import random
-from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 
 from ...config import MCTSConfig
 from ..core.node import Node
-
-if TYPE_CHECKING:
-    from ...utils.types import ActionType
 
 logger = logging.getLogger(__name__)
 rng = np.random.default_rng()

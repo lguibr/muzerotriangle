@@ -1,9 +1,6 @@
 # File: muzerotriangle/mcts/core/search.py
 import logging
-from typing import TYPE_CHECKING, List
-
-import torch
-import numpy as np  # Ensure numpy is imported
+from typing import TYPE_CHECKING
 
 from ...config import MCTSConfig
 from ...features import extract_state_features  # Import feature extractor
@@ -25,7 +22,7 @@ def run_mcts_simulations(
     root_node: Node,
     config: MCTSConfig,
     network: "NeuralNetwork",
-    valid_actions_from_state: List[ActionType],
+    valid_actions_from_state: list[ActionType],
 ) -> int:
     """Runs MuZero MCTS simulations."""
     if root_node.initial_game_state is None:
@@ -124,13 +121,15 @@ def run_mcts_simulations(
             # --- ADDED CHECK: Don't expand if leaf represents a terminal state ---
             # We can only reliably check this for the root node in MuZero MCTS
             is_terminal_leaf = False
-            if leaf_node.is_root and leaf_node.initial_game_state is not None:
-                # Check if the game state has no valid actions
-                if not leaf_node.initial_game_state.valid_actions():
-                    is_terminal_leaf = True
-                    logger.debug(
-                        f"Leaf node (root) has no valid actions. Treating as terminal."
-                    )
+            if (
+                leaf_node.is_root
+                and leaf_node.initial_game_state is not None
+                and not leaf_node.initial_game_state.valid_actions()
+            ):
+                is_terminal_leaf = True
+                logger.debug(
+                    "Leaf node (root) has no valid actions. Treating as terminal."
+                )
             # --- END ADDED CHECK ---
 
             # Expansion & Prediction

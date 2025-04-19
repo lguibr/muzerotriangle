@@ -5,9 +5,8 @@ import sys
 import threading
 import time
 import traceback
-from collections import deque
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import mlflow
 import pygame
@@ -17,8 +16,6 @@ from .. import config, environment, visualization
 from ..config import APP_NAME, PersistenceConfig, TrainConfig
 
 # Import Trajectory type
-from ..utils.sumtree import SumTree  # Import SumTree for re-initialization
-from ..utils.types import Trajectory
 from .components import TrainingComponents
 from .logging_utils import (
     Tee,
@@ -32,7 +29,7 @@ from .setup import count_parameters, setup_training_components
 logger = logging.getLogger(__name__)
 
 # Queue for communication between training thread and visualization thread
-visual_state_queue: queue.Queue[Optional[dict[int, Any]]] = queue.Queue(maxsize=5)
+visual_state_queue: queue.Queue[dict[int, Any] | None] = queue.Queue(maxsize=5)
 
 
 def _initialize_mlflow(persist_config: PersistenceConfig, run_name: str) -> bool:
@@ -106,7 +103,6 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     # --- Apply MuZero Buffer Data ---
     if loaded_state.buffer_data:
         logger.info("Loading MuZero buffer data...")
-        reconstructed_buffer_data: list[tuple[int, Trajectory]] = []
         # Ensure buffer_idx mapping is rebuilt correctly
         components.buffer.buffer.clear()
         components.buffer.tree_idx_to_buffer_idx.clear()
@@ -116,7 +112,7 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
         if components.buffer.use_per and components.buffer.sum_tree:
             components.buffer.sum_tree.reset()  # Reset sumtree
 
-        for i, traj in enumerate(loaded_state.buffer_data.trajectories):
+        for _i, traj in enumerate(loaded_state.buffer_data.trajectories):
             # Re-add trajectories to ensure buffer and sumtree are consistent
             components.buffer.add(traj)
 
@@ -354,9 +350,7 @@ def run_training_visual_mode(
                 logger.warning("Training thread did not terminate gracefully.")
 
         # Determine exit code based on exceptions
-        if main_thread_exception:
-            exit_code = 1
-        elif training_loop and training_loop.training_exception:
+        if main_thread_exception or training_loop and training_loop.training_exception:
             exit_code = 1
         elif training_loop and training_loop.training_complete:
             exit_code = 0

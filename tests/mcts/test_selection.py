@@ -1,4 +1,5 @@
 # File: tests/mcts/test_selection.py
+# File: tests/mcts/test_selection.py
 import math
 
 import pytest
@@ -209,11 +210,15 @@ def test_traverse_to_leaf_deeper_muzero(
     assert expanded_child is not None, "Fixture error: No expanded child found"
     assert expanded_child.children, "Fixture error: Expanded child has no children"
 
-    # Find an expected leaf (grandchild)
-    expected_leaf = next(iter(expanded_child.children.values()), None)
-    assert expected_leaf is not None, "Fixture error: No grandchild found"
+    # Find an expected leaf (grandchild) - Removed as selection isn't guaranteed
+    # expected_leaf = next(iter(expanded_child.children.values()), None)
+    # assert expected_leaf is not None, "Fixture error: No grandchild found"
 
     # Traverse and check
     leaf, depth = selection.traverse_to_leaf(root, config_copy)
-    assert leaf is expected_leaf
+    # --- FIXED ASSERTION ---
+    assert leaf in expanded_child.children.values(), (
+        "Returned leaf is not one of the expected grandchildren"
+    )
+    # --- END FIXED ASSERTION ---
     assert depth == 2

@@ -1,5 +1,5 @@
 # File: muzerotriangle/visualization/drawing/hud.py
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pygame
 
@@ -9,8 +9,8 @@ from ..core import colors
 def render_hud(
     surface: pygame.Surface,
     mode: str,
-    fonts: Dict[str, Optional[pygame.font.Font]],
-    display_stats: Optional[Dict[str, Any]] = None,
+    fonts: dict[str, pygame.font.Font | None],
+    display_stats: dict[str, Any] | None = None,
 ) -> None:
     """
     Renders the Heads-Up Display (HUD) at the bottom of the screen.

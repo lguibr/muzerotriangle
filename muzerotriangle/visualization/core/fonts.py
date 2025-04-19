@@ -1,12 +1,11 @@
 # File: muzerotriangle/visualization/core/fonts.py
 import logging
-from typing import Optional  # Import Optional
 
 import pygame
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_FONT_NAME: Optional[str] = None  # Add type hint
+DEFAULT_FONT_NAME: str | None = None  # Add type hint
 FALLBACK_FONT_NAME = "arial,freesans"
 
 

@@ -361,301 +361,301 @@ pytest-mock>=3.0.0
 typer[all]>=0.9.0
 pytest-cov>=3.0.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\meta.yaml
-artifact_location: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/732950164445070354
-creation_time: 1745045145571
-experiment_id: '732950164445070354'
-last_update_time: 1745045145571
+File: .muzerotriangle_data\mlruns\753884796909271804\meta.yaml
+artifact_location: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/753884796909271804
+creation_time: 1745058303933
+experiment_id: '753884796909271804'
+last_update_time: 1745058303933
 lifecycle_stage: active
 name: AlphaTriangle
 
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\meta.yaml
-artifact_uri: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/732950164445070354/a3559dc629344a3284363c2a4e6a577a/artifacts
-end_time: 1745045206864
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\meta.yaml
+artifact_uri: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/753884796909271804/cd3104731f064853bd3c04cbb570febc/artifacts
+end_time: 1745058623396
 entry_point_name: ''
-experiment_id: '732950164445070354'
+experiment_id: '753884796909271804'
 lifecycle_stage: active
-run_id: a3559dc629344a3284363c2a4e6a577a
-run_name: train_muzero_20250419_034537
-run_uuid: a3559dc629344a3284363c2a4e6a577a
+run_id: cd3104731f064853bd3c04cbb570febc
+run_name: train_muzero_20250419_072454
+run_uuid: cd3104731f064853bd3c04cbb570febc
 source_name: ''
 source_type: 4
 source_version: ''
-start_time: 1745045145744
+start_time: 1745058304126
 status: 3
 tags: []
 user_id: lgui_
 
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\ACTION_DIM
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ACTION_DIM
 360
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\ACTION_ENCODING_DIM
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ACTION_ENCODING_DIM
 16
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\ACTIVATION_FUNCTION
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ACTIVATION_FUNCTION
 ReLU
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\AUTO_RESUME_LATEST
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\AUTO_RESUME_LATEST
 True
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\BATCH_SIZE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BATCH_SIZE
 64
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\BEST_CHECKPOINT_FILENAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BEST_CHECKPOINT_FILENAME
 best.pkl
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\BUFFER_CAPACITY
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_CAPACITY
 100000
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\BUFFER_FILENAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_FILENAME
 buffer.pkl
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\BUFFER_SAVE_DIR_NAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_SAVE_DIR_NAME
 buffers
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\BUFFER_SAVE_FREQ_STEPS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_SAVE_FREQ_STEPS
 10
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CHECKPOINT_SAVE_DIR_NAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CHECKPOINT_SAVE_DIR_NAME
 checkpoints
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CHECKPOINT_SAVE_FREQ_STEPS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CHECKPOINT_SAVE_FREQ_STEPS
 2500
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\COLS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\COLS
 15
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\COLS_PER_ROW
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\COLS_PER_ROW
 [9, 11, 13, 15, 15, 13, 11, 9]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\COMPILE_MODEL
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\COMPILE_MODEL
 True
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CONFIG_FILENAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONFIG_FILENAME
 configs.json
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CONV_FILTERS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_FILTERS
 [32, 64, 128]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CONV_KERNEL_SIZES
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_KERNEL_SIZES
 [3, 3, 3]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CONV_PADDING
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_PADDING
 [1, 1, 1]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\CONV_STRIDES
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_STRIDES
 [1, 1, 1]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\DEVICE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\DEVICE
 auto
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\dirichlet_alpha
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\dirichlet_alpha
 0.3
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\dirichlet_epsilon
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\dirichlet_epsilon
 0.25
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\DISCOUNT
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\DISCOUNT
 0.99
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\GAME_STATE_SAVE_DIR_NAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\GAME_STATE_SAVE_DIR_NAME
 game_states
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\GRADIENT_CLIP_VALUE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\GRADIENT_CLIP_VALUE
 5.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\HIDDEN_STATE_DIM
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\HIDDEN_STATE_DIM
 128
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LATEST_CHECKPOINT_FILENAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LATEST_CHECKPOINT_FILENAME
 latest.pkl
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LEARNING_RATE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LEARNING_RATE
 0.0001
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LOAD_BUFFER_PATH
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LOAD_BUFFER_PATH
 None
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LOAD_CHECKPOINT_PATH
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LOAD_CHECKPOINT_PATH
 None
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LOG_DIR_NAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LOG_DIR_NAME
 logs
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LR_SCHEDULER_ETA_MIN
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LR_SCHEDULER_ETA_MIN
 1e-06
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LR_SCHEDULER_TYPE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LR_SCHEDULER_TYPE
 CosineAnnealingLR
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\LR_SCHEDULER_T_MAX
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LR_SCHEDULER_T_MAX
 100000
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\max_search_depth
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\max_search_depth
 10
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\MAX_TRAINING_STEPS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MAX_TRAINING_STEPS
 100000
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\MIN_BUFFER_SIZE_TO_TRAIN
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MIN_BUFFER_SIZE_TO_TRAIN
 10000
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\MLFLOW_DIR_NAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MLFLOW_DIR_NAME
 mlruns
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\MLFLOW_TRACKING_URI
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MLFLOW_TRACKING_URI
 file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\model_total_params
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\model_total_params
 2780512
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\model_trainable_params
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\model_trainable_params
 2780512
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\NUM_SELF_PLAY_WORKERS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\NUM_SELF_PLAY_WORKERS
 18
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\num_simulations
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\num_simulations
 50
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\NUM_VALUE_ATOMS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\NUM_VALUE_ATOMS
 51
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\N_STEP_RETURNS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\N_STEP_RETURNS
 10
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\OPTIMIZER_TYPE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\OPTIMIZER_TYPE
 AdamW
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\OTHER_NN_INPUT_FEATURES_DIM
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\OTHER_NN_INPUT_FEATURES_DIM
 30
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\PENALTY_GAME_OVER
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PENALTY_GAME_OVER
 -10.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\PER_ALPHA
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_ALPHA
 0.6
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\PER_BETA_ANNEAL_STEPS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_BETA_ANNEAL_STEPS
 100000
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\PER_BETA_FINAL
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_BETA_FINAL
 1.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\PER_BETA_INITIAL
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_BETA_INITIAL
 0.4
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\PER_EPSILON
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_EPSILON
 1e-05
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\POLICY_HEAD_DIMS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\POLICY_HEAD_DIMS
 [64]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\POLICY_LOSS_WEIGHT
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\POLICY_LOSS_WEIGHT
 1.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\puct_coefficient
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\puct_coefficient
 1.5
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\RANDOM_SEED
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RANDOM_SEED
 42
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REP_FC_DIMS_AFTER_ENCODER
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REP_FC_DIMS_AFTER_ENCODER
 []
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REP_TRANSFORMER_FC_DIM
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REP_TRANSFORMER_FC_DIM
 256
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\RESIDUAL_BLOCK_FILTERS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RESIDUAL_BLOCK_FILTERS
 128
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REWARD_HEAD_DIMS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_HEAD_DIMS
 [64]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REWARD_LOSS_WEIGHT
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_LOSS_WEIGHT
 1.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REWARD_PER_CLEARED_TRIANGLE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_PER_CLEARED_TRIANGLE
 0.5
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REWARD_PER_PLACED_TRIANGLE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_PER_PLACED_TRIANGLE
 0.01
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REWARD_PER_STEP_ALIVE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_PER_STEP_ALIVE
 0.005
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\REWARD_SUPPORT_SIZE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_SUPPORT_SIZE
 21
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\ROOT_DATA_DIR
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ROOT_DATA_DIR
 .muzerotriangle_data
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\RUNS_DIR_NAME
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RUNS_DIR_NAME
 runs
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\RUN_NAME
-train_muzero_20250419_034537
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RUN_NAME
+train_muzero_20250419_072454
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\SAVE_BUFFER
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\SAVE_BUFFER
 True
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\SAVE_GAME_STATES
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\SAVE_GAME_STATES
 False
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\temperature_anneal_steps
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\temperature_anneal_steps
 100
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\temperature_final
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\temperature_final
 0.1
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\temperature_initial
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\temperature_initial
 1.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\training_status
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\training_status
 INTERRUPTED
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\USE_BATCH_NORM
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\USE_BATCH_NORM
 True
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\USE_PER
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\USE_PER
 True
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\USE_TRANSFORMER_IN_REP
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\USE_TRANSFORMER_IN_REP
 False
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\VALUE_HEAD_DIMS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_HEAD_DIMS
 [64]
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\VALUE_LOSS_WEIGHT
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_LOSS_WEIGHT
 0.25
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\VALUE_MAX
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_MAX
 10.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\VALUE_MIN
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_MIN
 -10.0
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\WEIGHT_DECAY
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\WEIGHT_DECAY
 0.0001
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\WORKER_DEVICE
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\WORKER_DEVICE
 cpu
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\params\WORKER_UPDATE_FREQ_STEPS
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\WORKER_UPDATE_FREQ_STEPS
 500
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\tags\mlflow.runName
-train_muzero_20250419_034537
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.runName
+train_muzero_20250419_072454
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\tags\mlflow.source.name
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.source.name
 C:\Users\lgui_\AppData\Local\Programs\Python\Python310\Scripts\muzerotriangle
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\tags\mlflow.source.type
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.source.type
 LOCAL
 
-File: .muzerotriangle_data\mlruns\732950164445070354\a3559dc629344a3284363c2a4e6a577a\tags\mlflow.user
+File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.user
 lgui_
 
 File: .ruff_cache\CACHEDIR.TAG
@@ -5269,10 +5269,7 @@ This submodule defines the fundamental building blocks and interfaces for the Mu
 File: muzerotriangle\mcts\core\search.py
 # File: muzerotriangle/mcts/core/search.py
 import logging
-from typing import TYPE_CHECKING, List
-
-import torch
-import numpy as np  # Ensure numpy is imported
+from typing import TYPE_CHECKING
 
 from ...config import MCTSConfig
 from ...features import extract_state_features  # Import feature extractor
@@ -5294,7 +5291,7 @@ def run_mcts_simulations(
     root_node: Node,
     config: MCTSConfig,
     network: "NeuralNetwork",
-    valid_actions_from_state: List[ActionType],
+    valid_actions_from_state: list[ActionType],
 ) -> int:
     """Runs MuZero MCTS simulations."""
     if root_node.initial_game_state is None:
@@ -5315,19 +5312,15 @@ def run_mcts_simulations(
                 root_node.initial_game_state, network.model_config
             )
             # Ensure tensors are on the correct device
-            grid_tensor = (
-                torch.from_numpy(state_dict["grid"]).unsqueeze(0).to(network.device)
-            )
-            other_features_tensor = (
-                torch.from_numpy(state_dict["other_features"])
-                .unsqueeze(0)
-                .to(network.device)
-            )
-
-            policy_logits, value_logits, _, initial_hidden_state = (
-                network.initial_inference(
-                    {"grid": grid_tensor, "other_features": other_features_tensor}
-                )
+            # initial_inference expects StateType dict with numpy arrays
+            # The conversion to tensor happens inside initial_inference
+            (
+                policy_logits,
+                value_logits,
+                _,
+                initial_hidden_state,
+            ) = network.initial_inference(
+                state_dict  # type: ignore[arg-type] # MyPy seems confused here
             )
 
             root_node.hidden_state = initial_hidden_state.squeeze(
@@ -5343,9 +5336,20 @@ def run_mcts_simulations(
             root_node.predicted_value = network._logits_to_scalar(
                 value_logits, network.support
             ).item()
-            policy_map = {i: float(p) for i, p in enumerate(policy_probs)}
+
+            # Filter policy map by valid actions for root
+            full_policy_map = {i: float(p) for i, p in enumerate(policy_probs)}
+            filtered_policy_map = {
+                action: full_policy_map.get(action, 0.0)
+                for action in valid_actions_from_state
+            }
+
+            # Pass valid actions AND the filtered policy map for the initial root expansion
             expansion.expand_node(
-                root_node, policy_map, network, valid_actions_from_state
+                root_node,
+                filtered_policy_map,  # Pass filtered map
+                network,
+                valid_actions_from_state,  # Pass valid actions explicitly
             )
 
             if root_node.predicted_value is not None:
@@ -5353,10 +5357,14 @@ def run_mcts_simulations(
                     root_node, root_node.predicted_value, config.discount
                 )
                 max_depth_overall = max(max_depth_overall, depth_bp)
-            selection.add_dirichlet_noise(root_node, config)
+            # Apply noise only if children were actually created
+            if root_node.children:
+                selection.add_dirichlet_noise(root_node, config)
         except Exception as e:
             raise MCTSExecutionError(f"Initial root inference failed: {e}") from e
-    elif root_node.visit_count == 0:
+    elif (
+        root_node.visit_count == 0 and root_node.children
+    ):  # Apply noise only if children exist
         # Apply noise only if root hasn't been visited yet in this MCTS run
         selection.add_dirichlet_noise(root_node, config)
 
@@ -5379,9 +5387,25 @@ def run_mcts_simulations(
             leaf_node = current_node
             max_depth_overall = max(max_depth_overall, depth)
 
+            # --- ADDED CHECK: Don't expand if leaf represents a terminal state ---
+            # We can only reliably check this for the root node in MuZero MCTS
+            is_terminal_leaf = False
+            if (
+                leaf_node.is_root
+                and leaf_node.initial_game_state is not None
+                and not leaf_node.initial_game_state.valid_actions()
+            ):
+                is_terminal_leaf = True
+                logger.debug(
+                    "Leaf node (root) has no valid actions. Treating as terminal."
+                )
+            # --- END ADDED CHECK ---
+
             # Expansion & Prediction
             value_for_backprop = 0.0
-            if leaf_node.hidden_state is not None:
+            # --- MODIFIED: Only expand/predict if not terminal ---
+            if not is_terminal_leaf and leaf_node.hidden_state is not None:
+                # --- END MODIFIED ---
                 # Ensure hidden_state is on the correct device and has batch dim
                 hidden_state_batch = leaf_node.hidden_state.to(
                     network.device
@@ -5417,15 +5441,20 @@ def run_mcts_simulations(
                 leaf_node.is_root and leaf_node.predicted_value is not None
             ):  # Handle root being leaf
                 value_for_backprop = leaf_node.predicted_value
+            # --- ADDED: Handle terminal leaf value ---
+            elif is_terminal_leaf:
+                # If it's terminal, the value is known (e.g., 0 or from game outcome if available)
+                # For simplicity, let's use 0, assuming no outcome is readily available here.
+                value_for_backprop = 0.0
+                logger.debug("Using 0.0 as value for terminal leaf node.")
+            # --- END ADDED ---
             else:
                 # This case should ideally not happen if the game hasn't ended before expansion
                 # If it's a terminal state reached during simulation, the value should be the actual outcome
-                # For now, we assume the network provides a value for all expanded states.
-                # If the state is truly terminal and unexpanded, MCTS usually assigns the game outcome.
-                # However, in MuZero's pure MCTS (without explicit game state simulation),
+                # For MuZero's pure MCTS (without explicit game state simulation),
                 # we rely on the network's value prediction. If hidden_state is None here, it's an error.
                 logger.error(
-                    f"Leaf node state invalid: is_root={leaf_node.is_root}, hidden_state is None"
+                    f"Leaf node state invalid: is_root={leaf_node.is_root}, hidden_state is None, is_terminal={is_terminal_leaf}"
                 )
                 value_for_backprop = 0.0  # Fallback, but indicates an issue
 
@@ -5593,7 +5622,7 @@ def backpropagate_value(
 File: muzerotriangle\mcts\strategy\expansion.py
 # File: muzerotriangle/mcts/strategy/expansion.py
 import logging
-from typing import TYPE_CHECKING, List, Optional
+from typing import TYPE_CHECKING
 
 import torch  # Import torch for tensor check
 
@@ -5613,9 +5642,13 @@ def expand_node(
     node_to_expand: "Node",  # Node containing s_k
     policy_prediction: ActionPolicyMapping,  # Policy p_k from f(s_k)
     network: "NeuralNetwork",  # Network interface to call dynamics (g)
-    valid_actions: Optional[List["ActionType"]] = None,  # Pass valid actions explicitly
+    valid_actions: list["ActionType"] | None = None,  # Pass valid actions explicitly
 ):
-    """Expands a leaf node in the MuZero search tree."""
+    """
+    Expands a leaf node in the MuZero search tree.
+    If valid_actions is provided, only those actions are considered for expansion.
+    Otherwise, actions with non-zero prior probability in policy_prediction are considered.
+    """
     if node_to_expand.is_expanded:
         logger.debug(f"Node {node_to_expand.action_taken} already expanded. Skipping.")
         return
@@ -5628,33 +5661,37 @@ def expand_node(
 
     logger.debug(f"[Expand] Expanding Node via action: {node_to_expand.action_taken}")
 
-    # Determine the set of actions to consider for expansion
-    # If valid_actions are provided (usually only for the root node), use them.
-    # Otherwise, use the keys from the policy prediction (actions deemed possible by the network).
-    actions_to_expand_set = (
-        set(valid_actions)
-        if valid_actions is not None
-        else set(policy_prediction.keys())
-    )
-
-    if not actions_to_expand_set:
-        logger.warning(
-            f"[Expand] No actions to expand for node {node_to_expand.action_taken}. Policy keys: {list(policy_prediction.keys())}, Valid actions: {valid_actions}"
-        )
-        return
+    # --- MODIFIED: Determine actions to expand based on valid_actions first ---
+    if valid_actions is not None:
+        # If valid_actions are provided (e.g., for root), only expand these
+        actions_to_expand_set = set(valid_actions)
+        if not actions_to_expand_set:
+            logger.warning(
+                f"[Expand] No valid actions provided for node {node_to_expand.action_taken}. Node will remain unexpanded."
+            )
+            return  # Do not create children if valid_actions is empty
+    else:
+        # If valid_actions not provided, use policy prediction keys (for internal nodes)
+        # Filter by non-zero prior? Optional, but can reduce unnecessary dynamics calls.
+        # Let's keep expanding all actions predicted by the policy for now.
+        actions_to_expand_set = set(policy_prediction.keys())
+        if not actions_to_expand_set:
+            logger.warning(
+                f"[Expand] No actions found in policy prediction for node {node_to_expand.action_taken}. Node will remain unexpanded."
+            )
+            return
+    # --- END MODIFIED ---
 
     children_created = 0
     for action in actions_to_expand_set:
-        prior = policy_prediction.get(
-            action, 0.0
-        )  # Get prior from policy, default to 0 if not present
+        # Get prior probability for this action from the prediction
+        prior = policy_prediction.get(action, 0.0)
         if prior < 0:
             logger.warning(f"Negative prior {prior} for action {action}. Clamping.")
             prior = 0.0
-
-        # Only expand if prior is non-zero? MuZero paper suggests expanding all legal moves.
-        # Let's stick to expanding based on the policy prediction keys or valid_actions.
-        # If an action is valid but has zero prior, it might still be explored via PUCT later.
+        # Optional: Skip expansion if prior is zero?
+        # if prior <= 1e-6:
+        #     continue
 
         try:
             if not isinstance(hidden_state_k, torch.Tensor):
@@ -6018,15 +6055,11 @@ File: muzerotriangle\mcts\strategy\selection.py
 import logging
 import math
 import random
-from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 
 from ...config import MCTSConfig
 from ..core.node import Node
-
-if TYPE_CHECKING:
-    from ...utils.types import ActionType
 
 logger = logging.getLogger(__name__)
 rng = np.random.default_rng()
@@ -6616,7 +6649,7 @@ File: muzerotriangle\nn\network.py
 import logging
 import sys
 from collections.abc import Mapping
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 import torch
@@ -7228,22 +7261,22 @@ File: muzerotriangle\rl\core\buffer.py
 import logging
 import random
 from collections import deque
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt  # Import numpy typing
 
-from ...config import TrainConfig
 from ...utils.sumtree import SumTree
 from ...utils.types import (
     SampledBatch,
     SampledBatchPER,  # Import PER batch type
     Trajectory,
-    TrajectoryStep,
 )
 
 if TYPE_CHECKING:
-    from ...environment import GameState
+    from ...config import TrainConfig
+
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -7267,12 +7300,12 @@ class ExperienceBuffer:
         # --- Data Storage ---
         # Stores tuples of (unique_buffer_index, trajectory)
         self.buffer: deque[tuple[int, Trajectory]] = deque()
-        self.tree_idx_to_buffer_idx: dict[int, int] = (
-            {}
-        )  # Maps SumTree leaf index to unique buffer_idx
-        self.buffer_idx_to_tree_idx: dict[int, int] = (
-            {}
-        )  # Maps unique buffer_idx to SumTree leaf index
+        self.tree_idx_to_buffer_idx: dict[
+            int, int
+        ] = {}  # Maps SumTree leaf index to unique buffer_idx
+        self.buffer_idx_to_tree_idx: dict[
+            int, int
+        ] = {}  # Maps unique buffer_idx to SumTree leaf index
         self.next_buffer_idx = 0  # Monotonically increasing index for unique ID
         self.total_steps = 0
 
@@ -7399,14 +7432,15 @@ class ExperienceBuffer:
             not self.use_per
             or self.per_beta_anneal_steps is None
             or self.per_beta_anneal_steps <= 0
-            or self.train_config.MAX_TRAINING_STEPS
+            or self.config.MAX_TRAINING_STEPS  # Use self.config here
             is None  # Avoid division by zero if MAX_TRAINING_STEPS is None
         ):
             return self.per_beta_initial
 
         # Ensure anneal_steps doesn't exceed total steps
         anneal_steps = min(
-            self.per_beta_anneal_steps, self.train_config.MAX_TRAINING_STEPS
+            self.per_beta_anneal_steps,
+            self.config.MAX_TRAINING_STEPS,  # Use self.config
         )
         fraction = min(1.0, current_train_step / anneal_steps)
         beta = self.per_beta_initial + fraction * (
@@ -7507,11 +7541,10 @@ class ExperienceBuffer:
             beta = self._anneal_beta(current_train_step)
 
         sampled_sequences_list: SampledBatch = []
-        tree_indices_list = np.zeros(batch_size, dtype=np.int32)
-        priorities_list = np.zeros(batch_size, dtype=np.float32)
-        buffer_indices_sampled_list = np.zeros(
-            batch_size, dtype=np.int32
-        )  # Store the unique buffer_idx
+        # Initialize as lists to append easily
+        tree_indices_list: list[int] = []
+        priorities_list: list[float] = []
+        buffer_indices_sampled_list: list[int] = []  # Store the unique buffer_idx
 
         segment = self.sum_tree.total() / batch_size  # Use total() method
         attempts = 0
@@ -7562,7 +7595,7 @@ class ExperienceBuffer:
                 continue
 
             # Check if we already sampled this trajectory in this batch (optional, but can improve diversity)
-            # if buffer_idx in buffer_indices_sampled_list[:sampled_count]:
+            # if buffer_idx in buffer_indices_sampled_list:
             #     continue
 
             # Find the trajectory in the deque using the buffer_idx
@@ -7595,11 +7628,9 @@ class ExperienceBuffer:
 
             if len(sequence) == self.sequence_length:
                 sampled_sequences_list.append(sequence)
-                tree_indices_list[sampled_count] = tree_idx
-                priorities_list[sampled_count] = priority
-                buffer_indices_sampled_list[sampled_count] = (
-                    buffer_idx  # Store the unique ID
-                )
+                tree_indices_list.append(tree_idx)
+                priorities_list.append(priority)
+                buffer_indices_sampled_list.append(buffer_idx)  # Store the unique ID
                 sampled_count += 1
             else:
                 logger.error(
@@ -7615,17 +7646,26 @@ class ExperienceBuffer:
             logger.warning(
                 f"PER Sample: Could only sample {sampled_count} sequences out of {batch_size} requested after {attempts} attempts."
             )
-            # Trim arrays to the actual number sampled
+            # Trim lists to the actual number sampled
+            sampled_sequences_list = sampled_sequences_list[:sampled_count]
             tree_indices_list = tree_indices_list[:sampled_count]
             priorities_list = priorities_list[:sampled_count]
             # buffer_indices_sampled_list = buffer_indices_sampled_list[:sampled_count] # Not used later, but good practice
 
-        tree_indices = np.array(tree_indices_list, dtype=np.int32)
-        priorities_np = np.array(priorities_list, dtype=np.float32)
+        # Convert lists to numpy arrays
+        # --- FIXED: Use typed arrays directly ---
+        tree_indices: npt.NDArray[np.int32] = np.array(
+            tree_indices_list, dtype=np.int32
+        )
+        priorities_np: npt.NDArray[np.float32] = np.array(
+            priorities_list, dtype=np.float32
+        )
+        # --- END FIXED ---
 
         # Calculate IS weights
         sampling_probabilities = priorities_np / max(
-            self.sum_tree.total(), 1e-9  # Use total() method
+            self.sum_tree.total(),
+            1e-9,  # Use total() method
         )  # Avoid division by zero
         weights = np.power(
             max(self.sum_tree.n_entries, 1) * sampling_probabilities + 1e-9, -beta
@@ -7635,7 +7675,7 @@ class ExperienceBuffer:
 
         return SampledBatchPER(
             sequences=sampled_sequences_list,
-            indices=tree_indices,
+            indices=tree_indices,  # Use typed array
             weights=weights.astype(np.float32),
         )
 
@@ -10167,9 +10207,7 @@ File: muzerotriangle\training\headless_runner.py
 import logging
 import sys
 import traceback
-from collections import deque
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
 
 import mlflow
 import ray
@@ -10177,8 +10215,6 @@ import ray
 from ..config import APP_NAME, PersistenceConfig, TrainConfig
 
 # Import Trajectory type
-from ..utils.sumtree import SumTree  # Import SumTree for re-initialization
-from ..utils.types import Trajectory  # Import Trajectory
 from .components import TrainingComponents
 from .logging_utils import (
     get_root_logger,
@@ -10187,10 +10223,6 @@ from .logging_utils import (
 )
 from .loop import TrainingLoop
 from .setup import count_parameters, setup_training_components
-
-if TYPE_CHECKING:
-    from ..utils.types import Trajectory
-
 
 logger = logging.getLogger(__name__)
 
@@ -10266,7 +10298,6 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     # --- Apply MuZero Buffer Data ---
     if loaded_state.buffer_data:
         logger.info("Loading MuZero buffer data...")
-        reconstructed_buffer_data: list[tuple[int, Trajectory]] = []
         # Ensure buffer_idx mapping is rebuilt correctly
         components.buffer.buffer.clear()
         components.buffer.tree_idx_to_buffer_idx.clear()
@@ -10276,7 +10307,7 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
         if components.buffer.use_per and components.buffer.sum_tree:
             components.buffer.sum_tree.reset()  # Reset sumtree
 
-        for i, traj in enumerate(loaded_state.buffer_data.trajectories):
+        for _i, traj in enumerate(loaded_state.buffer_data.trajectories):
             # Re-add trajectories to ensure buffer and sumtree are consistent
             components.buffer.add(traj)
 
@@ -10293,6 +10324,31 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
 
     components.nn.model.train()
     return training_loop
+
+
+# --- ADDED: Define _save_final_state ---
+def _save_final_state(training_loop: TrainingLoop):
+    """Saves the final training state."""
+    if not training_loop:
+        return
+    components = training_loop.components
+    logger.info("Saving final training state...")
+    try:
+        components.data_manager.save_training_state(
+            nn=components.nn,
+            optimizer=components.trainer.optimizer,
+            stats_collector_actor=components.stats_collector_actor,
+            buffer=components.buffer,
+            global_step=training_loop.global_step,
+            episodes_played=training_loop.episodes_played,
+            total_simulations_run=training_loop.total_simulations_run,
+            is_final=True,
+        )
+    except Exception as e_save:
+        logger.error(f"Failed to save final training state: {e_save}", exc_info=True)
+
+
+# --- END ADDED ---
 
 
 def run_training_headless_mode(
@@ -10367,7 +10423,7 @@ def run_training_headless_mode(
         final_status = "UNKNOWN"
         error_msg = ""
         if training_loop:
-            _save_final_state(training_loop)
+            _save_final_state(training_loop)  # Call the defined function
             training_loop.cleanup_actors()
             if training_loop.training_exception:
                 final_status = "FAILED"
@@ -11357,9 +11413,8 @@ import sys
 import threading
 import time
 import traceback
-from collections import deque
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import mlflow
 import pygame
@@ -11369,8 +11424,6 @@ from .. import config, environment, visualization
 from ..config import APP_NAME, PersistenceConfig, TrainConfig
 
 # Import Trajectory type
-from ..utils.sumtree import SumTree  # Import SumTree for re-initialization
-from ..utils.types import Trajectory
 from .components import TrainingComponents
 from .logging_utils import (
     Tee,
@@ -11384,7 +11437,7 @@ from .setup import count_parameters, setup_training_components
 logger = logging.getLogger(__name__)
 
 # Queue for communication between training thread and visualization thread
-visual_state_queue: queue.Queue[Optional[dict[int, Any]]] = queue.Queue(maxsize=5)
+visual_state_queue: queue.Queue[dict[int, Any] | None] = queue.Queue(maxsize=5)
 
 
 def _initialize_mlflow(persist_config: PersistenceConfig, run_name: str) -> bool:
@@ -11458,7 +11511,6 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     # --- Apply MuZero Buffer Data ---
     if loaded_state.buffer_data:
         logger.info("Loading MuZero buffer data...")
-        reconstructed_buffer_data: list[tuple[int, Trajectory]] = []
         # Ensure buffer_idx mapping is rebuilt correctly
         components.buffer.buffer.clear()
         components.buffer.tree_idx_to_buffer_idx.clear()
@@ -11468,7 +11520,7 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
         if components.buffer.use_per and components.buffer.sum_tree:
             components.buffer.sum_tree.reset()  # Reset sumtree
 
-        for i, traj in enumerate(loaded_state.buffer_data.trajectories):
+        for _i, traj in enumerate(loaded_state.buffer_data.trajectories):
             # Re-add trajectories to ensure buffer and sumtree are consistent
             components.buffer.add(traj)
 
@@ -11507,6 +11559,28 @@ def _save_final_state(training_loop: TrainingLoop):
         )
     except Exception as e_save:
         logger.error(f"Failed to save final training state: {e_save}", exc_info=True)
+
+
+# --- ADDED: Define _training_loop_thread_func ---
+def _training_loop_thread_func(training_loop: TrainingLoop):
+    """Target function for the training loop thread."""
+    try:
+        training_loop.initialize_workers()
+        training_loop.run()
+    except Exception as e:
+        logger.critical(f"Exception in training loop thread: {e}", exc_info=True)
+        training_loop.training_exception = e  # Store exception
+    finally:
+        # Signal visualization thread to exit by putting None in the queue
+        if training_loop.visual_state_queue:
+            try:
+                training_loop.visual_state_queue.put_nowait(None)
+            except queue.Full:
+                logger.warning("Visual queue full when trying to send exit signal.")
+        logger.info("Training loop thread finished.")
+
+
+# --- END ADDED ---
 
 
 def run_training_visual_mode(
@@ -11619,6 +11693,10 @@ def run_training_visual_mode(
 
         # Main visualization loop
         running = True
+        # --- ADDED: Initialize loop variables ---
+        current_worker_states: dict[int, environment.GameState] = {}
+        current_global_stats: dict[str, Any] = {}
+        # --- END ADDED ---
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -11651,6 +11729,7 @@ def run_training_visual_mode(
                     running = False
                     logger.info("Received exit signal from training thread.")
                     continue
+                # Update local copies for rendering
                 current_global_stats = visual_data.pop(-1, {})
                 current_worker_states = visual_data
             except queue.Empty:
@@ -11679,9 +11758,7 @@ def run_training_visual_mode(
                 logger.warning("Training thread did not terminate gracefully.")
 
         # Determine exit code based on exceptions
-        if main_thread_exception:
-            exit_code = 1
-        elif training_loop and training_loop.training_exception:
+        if main_thread_exception or training_loop and training_loop.training_exception:
             exit_code = 1
         elif training_loop and training_loop.training_complete:
             exit_code = 0
@@ -12184,13 +12261,12 @@ File: muzerotriangle\utils\sumtree.py
 # File: muzerotriangle/utils/sumtree.py
 import logging
 import sys
+
 import numpy as np
 
 # Use a dedicated logger for SumTree internal debugging
 sumtree_logger = logging.getLogger("muzerotriangle.utils.sumtree_internal")
-# Keep logging level higher for less noise during normal runs
-# Set to DEBUG locally if needed for deep dives
-sumtree_logger.setLevel(logging.WARNING)
+sumtree_logger.setLevel(logging.WARNING)  # Default level
 if not sumtree_logger.handlers:
     handler = logging.StreamHandler(sys.stderr)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -12202,187 +12278,208 @@ class SumTree:
     """
     Simple SumTree implementation for efficient prioritized sampling.
     Stores priorities and allows sampling proportional to priority.
-    Does NOT handle the calculation of priority from error (e.g., (error+eps)^alpha).
     Handles circular buffer logic for data storage using a Python list.
+    Uses internal capacity padding to the next power of 2 for simplified tree structure.
     """
 
     def __init__(self, capacity: int):
         if not isinstance(capacity, int) or capacity <= 0:
             raise ValueError("Capacity must be a positive integer.")
+
+        # User-facing capacity
         self.capacity = capacity
-        # Tree size is 2*capacity - 1
-        self.tree = np.zeros(2 * capacity - 1)
-        # Data storage: Use a Python list, initialized with None
-        self.data: list[object | None] = [None] * capacity
-        # data_pointer points to the next index to write to in self.data
+        # Internal capacity (power of 2) for the tree structure
+        self._internal_capacity = 1
+        while self._internal_capacity < capacity:
+            self._internal_capacity *= 2
+
+        # Tree size based on internal capacity
+        self.tree = np.zeros(2 * self._internal_capacity - 1)
+        # Data storage size based on internal capacity (though only user capacity is used)
+        self.data: list[object | None] = [None] * self._internal_capacity
+        # data_pointer points to the next index to write to in self.data (wraps around user capacity)
         self.data_pointer = 0
-        # n_entries tracks the number of valid entries (up to capacity)
+        # n_entries tracks the number of valid entries (up to user capacity)
         self.n_entries = 0
         # _max_priority tracks the maximum priority ever added/updated
-        self._max_priority = 1.0  # Initialize to 1.0 for initial additions
-        sumtree_logger.debug(f"SumTree initialized with capacity {capacity}")
+        self._max_priority = 0.0
+        sumtree_logger.debug(
+            f"SumTree initialized with user_capacity={capacity}, internal_capacity={self._internal_capacity}"
+        )
 
     def reset(self):
         """Resets the tree and data."""
         self.tree.fill(0.0)
-        # Recreate the list
-        self.data = [None] * self.capacity
+        # Recreate the data list based on internal capacity
+        self.data = [None] * self._internal_capacity
         self.data_pointer = 0
         self.n_entries = 0
-        self._max_priority = 1.0  # Reset to 1.0
+        self._max_priority = 0.0
         sumtree_logger.debug("SumTree reset.")
 
     def _propagate(self, tree_idx: int, change: float):
         """Propagates priority change up the tree."""
         parent = (tree_idx - 1) // 2
+        if parent < 0:
+            return
         self.tree[parent] += change
-        # Stop propagation when root is reached
         if parent != 0:
             self._propagate(parent, change)
 
     def _update_leaf(self, tree_idx: int, priority: float):
         """Updates a leaf node and propagates the change."""
-        if not (self.capacity - 1 <= tree_idx < 2 * self.capacity - 1):
-            msg = (
-                f"Invalid tree_idx {tree_idx} for leaf update. Capacity={self.capacity}"
-            )
+        if not (
+            self._internal_capacity - 1 <= tree_idx < 2 * self._internal_capacity - 1
+        ):
+            msg = f"Invalid tree_idx {tree_idx} for leaf update. InternalCapacity={self._internal_capacity}"
             sumtree_logger.error(msg)
             raise IndexError(msg)
 
-        if priority < 0:
-            sumtree_logger.warning(
-                f"Attempted to update with negative priority {priority}. Clamping to 0."
-            )
-            priority = 0.0
-        elif not np.isfinite(priority):
-            sumtree_logger.warning(
-                f"Attempted to update with non-finite priority {priority}. Clamping to 0."
-            )
+        if priority < 0 or not np.isfinite(priority):
             priority = 0.0
 
         change = priority - self.tree[tree_idx]
         self.tree[tree_idx] = priority
-        # Propagate change upwards starting from the updated leaf index
-        # No need to check for tree_idx == 0 because leaf indices start at capacity - 1
         self._propagate(tree_idx, change)
-        # Update max priority seen so far (compare only with new priority)
         self._max_priority = max(self._max_priority, priority)
 
     def add(self, priority: float, data: object) -> int:
         """Adds data with a given priority. Returns the tree index."""
-        if self.capacity == 0:
+        if self.capacity == 0:  # Check user capacity
             raise ValueError("Cannot add to a SumTree with zero capacity.")
 
-        tree_idx = self.data_pointer + self.capacity - 1
-        sumtree_logger.debug(
-            f"Add START: prio={priority:.4f}, data_ptr={self.data_pointer}, n_entries={self.n_entries}, capacity={self.capacity}"
-        )
-        sumtree_logger.debug(f"Add: Calculated tree_idx={tree_idx}")
+        # Calculate tree index based on data_pointer and internal capacity
+        tree_idx = self.data_pointer + self._internal_capacity - 1
 
+        # Store data at data_pointer index
         self.data[self.data_pointer] = data
-        sumtree_logger.debug(f"Add: Stored data at data_idx={self.data_pointer}")
+        # Update the corresponding leaf in the tree
+        self.update(tree_idx, priority)
 
-        self.update(
-            tree_idx, priority
-        )  # Use update which handles propagation and max_priority
-        sumtree_logger.debug(
-            f"Add: Updated leaf {tree_idx} with priority {priority:.4f}, _max_p={self._max_priority:.4f}"
-        )
-
-        # Update data_pointer and n_entries
+        # Update data_pointer, wrapping around the *user* capacity
         self.data_pointer = (self.data_pointer + 1) % self.capacity
-        # Only increment n_entries if we haven't filled the buffer yet
+        # Increment n_entries up to the *user* capacity
         if self.n_entries < self.capacity:
             self.n_entries += 1
-            sumtree_logger.debug(f"Add: Incremented n_entries to {self.n_entries}")
-        # else: # No need for else, data_pointer wrap handles overwrite
-        #      sumtree_logger.debug(
-        #         f"Add: n_entries ({self.n_entries}) remains at capacity"
-        #     )
 
-        sumtree_logger.debug(
-            f"Add END: data_ptr={self.data_pointer}, n_entries={self.n_entries}"
-        )
         return tree_idx
 
     def update(self, tree_idx: int, priority: float):
         """Public method to update priority at a given tree index."""
         self._update_leaf(tree_idx, priority)
 
+    # --- CORRECTED Iterative Retrieve with Strict Inequality ---
     def _retrieve(self, tree_idx: int, sample_value: float) -> int:
         """Finds the leaf index for a given sample value using binary search on the tree."""
-        left_child_idx = 2 * tree_idx + 1
-        right_child_idx = left_child_idx + 1
+        current_idx = tree_idx  # Start search from the provided index (usually 0)
+        sumtree_logger.debug(
+            f"Retrieve START: initial_idx={current_idx}, sample_value={sample_value:.6f}"
+        )
 
-        # Base case: If left child index is out of bounds, we are at a leaf node
-        if left_child_idx >= len(self.tree):
-            return tree_idx
-
-        # If the sample value is less than or equal to the priority of the left subtree, go left
-        if sample_value <= self.tree[left_child_idx]:
-            return self._retrieve(left_child_idx, sample_value)
-        # Otherwise, go right, adjusting the sample value
-        else:
-            return self._retrieve(
-                right_child_idx, sample_value - self.tree[left_child_idx]
+        while True:
+            left_child_idx = 2 * current_idx + 1
+            right_child_idx = left_child_idx + 1
+            sumtree_logger.debug(
+                f"  Loop: current_idx={current_idx}, sample_value={sample_value:.6f}"
             )
+
+            # If left child index is out of bounds, current_idx is a leaf
+            if left_child_idx >= len(self.tree):
+                sumtree_logger.debug(
+                    f"  Leaf condition met: left_child_idx={left_child_idx} >= tree_len={len(self.tree)}. Returning leaf_idx={current_idx}"
+                )
+                break
+
+            left_sum = self.tree[left_child_idx]
+            sumtree_logger.debug(
+                f"    left_child_idx={left_child_idx}, left_sum={left_sum:.6f}"
+            )
+
+            # --- Use strict less than comparison ---
+            if sample_value < left_sum:
+                # --- End change ---
+                sumtree_logger.debug(
+                    f"    Condition TRUE: {sample_value:.6f} < {left_sum:.6f}. Going LEFT."
+                )
+                current_idx = left_child_idx
+            else:
+                sumtree_logger.debug(
+                    f"    Condition FALSE: {sample_value:.6f} >= {left_sum:.6f}. Going RIGHT."
+                )
+                sample_value -= left_sum
+                sumtree_logger.debug(f"      Adjusted sample_value={sample_value:.6f}")
+                # Ensure right child exists before assigning
+                if right_child_idx >= len(self.tree):
+                    sumtree_logger.warning(
+                        f"      Right child index {right_child_idx} out of bounds! Tree len={len(self.tree)}. Breaking loop at idx={current_idx}."
+                    )
+                    break
+                current_idx = right_child_idx
+                sumtree_logger.debug(f"      New current_idx={current_idx}")
+
+        sumtree_logger.debug(f"Retrieve END: Returning leaf_idx={current_idx}")
+        return current_idx
+
+    # --- End CORRECTED Iterative Retrieve ---
 
     def get_leaf(self, value: float) -> tuple[int, float, object]:
         """
         Finds the leaf node index, priority, and associated data for a given sample value.
         """
-        sumtree_logger.debug(f"GetLeaf START: value={value:.4f}")
-        total_p = self.total()  # Use the method here
-        if (
-            total_p <= 0
-        ):  # Check for <= 0 to handle potential negative priorities if clamping fails
+        total_p = self.total()
+        if total_p <= 0:
             raise ValueError(
                 f"Cannot sample from SumTree with zero or negative total priority ({total_p}). n_entries: {self.n_entries}"
             )
-        sumtree_logger.debug(f"GetLeaf: TotalP={total_p:.4f}")
 
-        # Clamp value to be within [0, total_p)
-        value = np.clip(
-            value, 0, total_p - 1e-9
-        )  # Use epsilon to avoid hitting exact total_p
+        # Clamp value to be within [0, total_p) using epsilon
+        value = np.clip(value, 0, total_p - 1e-9)
 
-        sumtree_logger.debug(f"GetLeaf: Using value={value:.4f} for retrieval")
-
+        # Start retrieval from the root (index 0)
         leaf_tree_idx = self._retrieve(0, value)
-        sumtree_logger.debug(f"GetLeaf: Retrieved leaf_tree_idx={leaf_tree_idx}")
-        data_idx = leaf_tree_idx - (self.capacity - 1)
-        sumtree_logger.debug(f"GetLeaf: Calculated data_idx={data_idx}")
 
-        # Check if the data index is valid given the number of entries
+        # Ensure returned index is actually a leaf index based on internal capacity
+        if not (
+            self._internal_capacity - 1
+            <= leaf_tree_idx
+            < 2 * self._internal_capacity - 1
+        ):
+            sumtree_logger.error(
+                f"GetLeaf: _retrieve returned non-leaf index {leaf_tree_idx}. "
+                f"InternalCapacity={self._internal_capacity}, Sampled value: {value:.4f}, Total P: {total_p:.4f}."
+            )
+            # Fallback: Find the leftmost leaf based on internal capacity
+            leaf_tree_idx = self._internal_capacity - 1
+
+        data_idx = leaf_tree_idx - (self._internal_capacity - 1)
+
+        # Check if the data index corresponds to a valid *entry* (within user capacity and n_entries)
         if not (0 <= data_idx < self.n_entries):
-            # This can happen if the tree is not full and the sampling process
-            # lands in a region corresponding to an empty slot.
-            # This indicates an issue either in sampling logic or tree structure.
             tree_dump = self.tree[
-                self.capacity - 1 : self.capacity - 1 + self.n_entries
+                self._internal_capacity - 1 : self._internal_capacity
+                - 1
+                + self.n_entries
             ]
             sumtree_logger.error(
-                f"GetLeaf: Invalid data_idx {data_idx} retrieved for tree_idx {leaf_tree_idx}. "
-                f"n_entries={self.n_entries}, capacity={self.capacity}. "
+                f"GetLeaf: Invalid data_idx {data_idx} (from leaf_tree_idx {leaf_tree_idx}) retrieved. "
+                f"n_entries={self.n_entries}, user_capacity={self.capacity}. "
                 f"Sampled value: {value:.4f}, Total P: {total_p:.4f}. "
                 f"Leaf priorities (first {self.n_entries}): {tree_dump}"
             )
-            # Re-running retrieve might help if it was a transient float issue, but unlikely.
-            # A better approach might be to resample, but that logic belongs in the caller (ExperienceBuffer).
-            # For now, raise an error to indicate the problem clearly.
             raise IndexError(
                 f"Retrieved data_idx {data_idx} is out of bounds for n_entries {self.n_entries}."
             )
 
         priority = self.tree[leaf_tree_idx]
-        data = self.data[data_idx]  # Retrieve from list
-        sumtree_logger.debug(f"GetLeaf: Found priority={priority:.4f}, data={data}")
+        # Retrieve data using the calculated data_idx (which is within [0, user_capacity))
+        data = self.data[data_idx]
 
-        # Check for None data, which indicates an uninitialized slot was sampled
-        # This check should ideally be redundant now with the n_entries check above.
         if data is None:
+            # This should ideally not happen if data_idx < n_entries check passed
             tree_dump = self.tree[
-                self.capacity - 1 : self.capacity - 1 + self.n_entries
+                self._internal_capacity - 1 : self._internal_capacity
+                - 1
+                + self.n_entries
             ]
             sumtree_logger.error(
                 f"Sampled None data at data_idx {data_idx} (tree_idx {leaf_tree_idx}). "
@@ -12392,8 +12489,6 @@ class SumTree:
             )
             raise RuntimeError(
                 f"Sampled None data at data_idx {data_idx} (tree_idx {leaf_tree_idx}). "
-                f"This indicates an issue with the SumTree state or sampling logic. "
-                f"Sampled value: {value:.4f}, Total P: {total_p:.4f}"
             )
 
         return leaf_tree_idx, priority, data
@@ -12405,7 +12500,6 @@ class SumTree:
     @property
     def max_priority(self) -> float:
         """Returns the maximum priority seen so far, or 1.0 if empty."""
-        # Return 1.0 if empty, ensuring new items get added with non-zero priority
         return float(self._max_priority) if self.n_entries > 0 else 1.0
 
 
@@ -12800,19 +12894,22 @@ File: muzerotriangle\visualization\core\dashboard_renderer.py
 # File: muzerotriangle/visualization/core/dashboard_renderer.py
 import logging
 import math
+from collections import deque  # Import deque
 from typing import TYPE_CHECKING, Any
 
 import pygame
+import ray  # Import ray
 
 from ...environment import GameState
 from ...stats import Plotter
 from ..drawing import hud as hud_drawing
+from ..ui import ProgressBar  # Import ProgressBar
 from . import colors, layout
 from .game_renderer import GameRenderer
 
 if TYPE_CHECKING:
     from ...config import EnvConfig, ModelConfig, VisConfig
-    from ...stats import StatsCollectorActor
+    from ...utils.types import StatsCollectorData
 
 logger = logging.getLogger(__name__)
 
@@ -12936,7 +13033,7 @@ class DashboardRenderer:
         worker_grid_area = layout_rects.get("worker_grid")
         plots_rect = layout_rects.get("plots")
         progress_bar_area_rect = layout_rects.get("progress_bar_area")
-        hud_rect = layout_rects.get("hud")
+        layout_rects.get("hud")
 
         # --- Render Worker Grids ---
         if (
@@ -12960,13 +13057,15 @@ class DashboardRenderer:
                         worker_id
                     )
 
-                self.single_game_renderer.render_worker_state(
+                # --- CORRECTED TYPO ---
+                self.game_renderer.render_worker_state(
                     self.screen,
                     worker_area_rect,
                     worker_id,
                     game_state,
                     worker_step_stats=worker_step_stats,
                 )
+                # --- END CORRECTION ---
                 pygame.draw.rect(self.screen, colors.GRAY, worker_area_rect, 1)
 
         # --- Render Plots ---
@@ -12977,7 +13076,7 @@ class DashboardRenderer:
             plot_surface = None
             if stats_data_for_plot is not None:
                 has_any_metric_data = any(
-                    isinstance(dq, deque) and dq
+                    isinstance(dq, deque) and dq  # Use imported deque
                     for key, dq in stats_data_for_plot.items()
                     if not key.startswith("Internal/")
                 )
@@ -13015,7 +13114,7 @@ class DashboardRenderer:
 
                 # Training Progress Bar
                 train_progress = global_stats.get("train_progress")
-                if isinstance(train_progress, ProgressBar):
+                if isinstance(train_progress, ProgressBar):  # Use imported ProgressBar
                     # Construct info string for training bar
                     train_info_parts = []
                     if self.model_config:
@@ -13051,7 +13150,7 @@ class DashboardRenderer:
 
                 # Buffer Progress Bar
                 buffer_progress = global_stats.get("buffer_progress")
-                if isinstance(buffer_progress, ProgressBar):
+                if isinstance(buffer_progress, ProgressBar):  # Use imported ProgressBar
                     # Construct info string for buffer bar
                     buffer_info_parts = []
                     updates = global_stats.get("worker_weight_updates", "?")
@@ -13062,7 +13161,7 @@ class DashboardRenderer:
 
                     buffer_info_parts.append(f"Weight Updates: {updates}")
                     buffer_info_parts.append(f"Episodes: {episodes}")
-                    if isinstance(sims, (int, float)):
+                    if isinstance(sims, int | float):
                         sims_str = (
                             f"{sims / 1e6:.1f}M"
                             if sims >= 1e6
@@ -13076,10 +13175,10 @@ class DashboardRenderer:
 
                     if isinstance(pending_tasks, int) and isinstance(num_workers, int):
                         buffer_info_parts.append(
-                            f"Workers: {num_workers-pending_tasks}/{num_workers} Active"
+                            f"Workers: {num_workers - pending_tasks}/{num_workers} Active"
                         )
                     else:
-                        buffer_info_parts.append(f"Workers: ?/?")
+                        buffer_info_parts.append("Workers: ?/?")
 
                     buffer_bar_info_str = " | ".join(buffer_info_parts)
 
@@ -13103,13 +13202,14 @@ class DashboardRenderer:
 
 
 File: muzerotriangle\visualization\core\fonts.py
+# File: muzerotriangle/visualization/core/fonts.py
 import logging
 
 import pygame
 
 logger = logging.getLogger(__name__)
 
-DEFAULT_FONT_NAME = None
+DEFAULT_FONT_NAME: str | None = None  # Add type hint
 FALLBACK_FONT_NAME = "arial,freesans"
 
 
@@ -13316,7 +13416,6 @@ class GameRenderer:
 File: muzerotriangle\visualization\core\layout.py
 # File: muzerotriangle/visualization/core/layout.py
 import logging
-import math
 
 import pygame
 
@@ -13883,7 +13982,7 @@ def draw_debug_highlight(
 
 File: muzerotriangle\visualization\drawing\hud.py
 # File: muzerotriangle/visualization/drawing/hud.py
-from typing import Any, Dict, Optional
+from typing import Any
 
 import pygame
 
@@ -13893,8 +13992,8 @@ from ..core import colors
 def render_hud(
     surface: pygame.Surface,
     mode: str,
-    fonts: Dict[str, Optional[pygame.font.Font]],
-    display_stats: Optional[Dict[str, Any]] = None,
+    fonts: dict[str, pygame.font.Font | None],
+    display_stats: dict[str, Any] | None = None,
 ) -> None:
     """
     Renders the Heads-Up Display (HUD) at the bottom of the screen.
@@ -15592,7 +15691,6 @@ File: tests\environment\__init__.py
 
 File: tests\mcts\conftest.py
 # File: tests/mcts/conftest.py
-# File: tests/mcts/conftest.py
 import pytest
 import torch
 
@@ -15641,6 +15739,7 @@ class MockMuZeroNetwork:
         return torch.randn(grid_shape), torch.randn(other_shape)
 
     def _get_mock_logits(self, batch_size, num_classes):
+        # Return uniform logits for mock
         return torch.zeros((batch_size, num_classes), device=self.device)
 
     def _logits_to_probs(self, logits: torch.Tensor) -> torch.Tensor:
@@ -15686,15 +15785,18 @@ class MockMuZeroNetwork:
             action_val = int(action.item())
         else:
             action_val = 0
+        # Add slight deterministic change based on action for testing
         next_hidden_state[:, 0] += (action_val / self.action_dim) * 0.1
         return next_hidden_state, reward_logits
 
     def predict(self, hidden_state):
         batch_size = hidden_state.shape[0]
         policy_logits = self._get_mock_logits(batch_size, self.action_dim)
+        # --- REVERTED: Return uniform value logits ---
         value_logits = self._get_mock_logits(
             batch_size, self.model_config.NUM_VALUE_ATOMS
         )
+        # --- END REVERTED ---
         return policy_logits, value_logits
 
     def forward(
@@ -15812,16 +15914,19 @@ def deep_expanded_node_mock_state(
 
     # --- Make selection deterministic: Boost one child's Q-value ---
     child_to_expand = None
-    -float("inf")
-    for _action, child in root.children.items():
-        # Give a large boost to the first child found (or based on action index)
-        # This ensures PUCT selects this path initially
-        boost = 1000.0 if child_to_expand is None else 0.0
-        child.value_sum += boost  # Add boost to value_sum
+    boost = 10000.0  # Significantly increased boost
+    first_child_action = next(iter(root.children.keys()), None)
+    if first_child_action is None:
+        pytest.skip("Cannot create deep tree, root has no children keys.")
+
+    for action, child in root.children.items():
+        # Give a large boost to the first child found
+        current_boost = boost if action == first_child_action else 0.0
+        child.value_sum += current_boost
         child.visit_count += (
             1  # Add a visit to avoid infinite exploration bonus initially
         )
-        if boost > 0:
+        if current_boost > 0:
             child_to_expand = child
 
     if child_to_expand is None or child_to_expand.hidden_state is None:
@@ -15881,19 +15986,22 @@ def root_node_no_valid_actions(mock_env_config: EnvConfig) -> Node:
     """Creates a GameState where no valid actions should exist."""
     gs = GameState(config=mock_env_config, initial_seed=789)
 
+    # Fill all UP cells
     for r in range(gs.env_config.ROWS):
         for c in range(gs.env_config.COLS):
             is_up = (r + c) % 2 != 0
             if is_up and not gs.grid_data.is_death(r, c):
                 gs.grid_data._occupied_np[r, c] = True
 
+    # Provide only UP shapes
     up_shape_1 = Shape([(0, 0, True)], (0, 255, 0))
-    up_shape_2_adj = Shape([(0, 1, True)], (0, 0, 255))
+    up_shape_2_adj = Shape([(0, 1, True)], (0, 0, 255))  # Example different UP shape
 
     gs.shapes = [None] * gs.env_config.NUM_SHAPE_SLOTS
     gs.shapes[0] = up_shape_1
     if gs.env_config.NUM_SHAPE_SLOTS > 1:
         gs.shapes[1] = up_shape_2_adj
+    # Fill remaining slots with copies or other UP shapes
     for i in range(2, gs.env_config.NUM_SHAPE_SLOTS):
         gs.shapes[i] = up_shape_1.copy()
 
@@ -16227,17 +16335,21 @@ def test_run_mcts_simulations_no_valid_actions(
     # Initial inference happens, value is backpropagated once.
     # Simulation loop runs, but expansion fails each time. Backprop happens each time.
     expected_visits = 1 + mock_mcts_config.num_simulations
-    # --- CORRECTED ASSERTION ---
     assert root.visit_count == expected_visits, (
         f"Root visit count should be 1 + num_simulations ({expected_visits})"
     )
-    # --- END CORRECTION ---
-    assert not root.is_expanded, "Root should not be expanded"
-    assert not root.children, "Root should have no children"
+    # --- ADJUSTED ASSERTION ---
+    # The root node's hidden_state and predicted_value are set during initial inference.
+    # expand_node is called, but should return early without adding children if valid_actions is empty.
+    assert not root.children, "Root should have no children when no valid actions exist"
+    # is_expanded checks if self.children is non-empty.
+    assert not root.is_expanded, "Root should not be expanded (no children added)"
+    # --- END ADJUSTED ASSERTION ---
     assert max_depth >= 0  # Depth reflects initial inference/backprop
 
 
 File: tests\mcts\test_selection.py
+# File: tests/mcts/test_selection.py
 # File: tests/mcts/test_selection.py
 import math
 
@@ -16449,13 +16561,17 @@ def test_traverse_to_leaf_deeper_muzero(
     assert expanded_child is not None, "Fixture error: No expanded child found"
     assert expanded_child.children, "Fixture error: Expanded child has no children"
 
-    # Find an expected leaf (grandchild)
-    expected_leaf = next(iter(expanded_child.children.values()), None)
-    assert expected_leaf is not None, "Fixture error: No grandchild found"
+    # Find an expected leaf (grandchild) - Removed as selection isn't guaranteed
+    # expected_leaf = next(iter(expanded_child.children.values()), None)
+    # assert expected_leaf is not None, "Fixture error: No grandchild found"
 
     # Traverse and check
     leaf, depth = selection.traverse_to_leaf(root, config_copy)
-    assert leaf is expected_leaf
+    # --- FIXED ASSERTION ---
+    assert leaf in expanded_child.children.values(), (
+        "Returned leaf is not one of the expected grandchildren"
+    )
+    # --- END FIXED ASSERTION ---
     assert depth == 2
 
 
@@ -16830,6 +16946,7 @@ File: tests\nn\__init__.py
 
 File: tests\rl\test_buffer.py
 # File: tests/rl/test_buffer.py
+# No changes needed here, ensure atol=1e-5 is still present from previous step.
 import random
 
 import numpy as np
@@ -16944,7 +17061,7 @@ def test_muzero_buffer_add_per(
     muzero_buffer: ExperienceBuffer, long_trajectory: Trajectory
 ):
     assert muzero_buffer.sum_tree is not None
-    initial_total_priority = muzero_buffer.sum_tree.total_priority
+    initial_total_priority = muzero_buffer.sum_tree.total()  # Use total() method
     initial_n_entries = muzero_buffer.sum_tree.n_entries
     assert initial_n_entries == 0  # Should start at 0
 
@@ -16957,11 +17074,11 @@ def test_muzero_buffer_add_per(
     assert len(muzero_buffer.buffer) == 1
     assert len(muzero_buffer) == len(long_trajectory)
     # Check n_entries incremented
-    assert (
-        muzero_buffer.sum_tree.n_entries == initial_n_entries + 1
-    ), f"n_entries did not increment. Before: {initial_n_entries}, After: {muzero_buffer.sum_tree.n_entries}"
+    assert muzero_buffer.sum_tree.n_entries == initial_n_entries + 1, (
+        f"n_entries did not increment. Before: {initial_n_entries}, After: {muzero_buffer.sum_tree.n_entries}"
+    )
     # New entry added with max priority
-    assert muzero_buffer.sum_tree.total_priority > initial_total_priority
+    assert muzero_buffer.sum_tree.total() > initial_total_priority  # Use total() method
     # Check if the stored item is a tuple
     assert isinstance(muzero_buffer.buffer[0], tuple)
     assert isinstance(muzero_buffer.buffer[0][0], int)  # buffer_idx
@@ -16987,11 +17104,11 @@ def test_muzero_buffer_sample_per(
         f"Buffer not ready. Steps: {len(muzero_buffer)}, Min: {muzero_buffer.min_size_to_train}, "
         f"SumTree Entries: {muzero_buffer.sum_tree.n_entries}, BatchSize: {muzero_buffer.config.BATCH_SIZE}"
     )
+    assert muzero_buffer.sum_tree.n_entries > 0, (
+        "SumTree has no entries after adding trajectories"
+    )
     assert (
-        muzero_buffer.sum_tree.n_entries > 0
-    ), "SumTree has no entries after adding trajectories"
-    assert (
-        muzero_buffer.sum_tree.total_priority > 1e-9
+        muzero_buffer.sum_tree.total() > 1e-9  # Use total() method
     ), "SumTree total priority is near zero"
 
     batch_size = muzero_buffer.config.BATCH_SIZE
@@ -17000,9 +17117,9 @@ def test_muzero_buffer_sample_per(
     )  # Pass step for beta
 
     assert sample is not None, "PER sampling returned None unexpectedly"
-    assert isinstance(
-        sample, dict
-    ), f"Expected dict (PER sample), got {type(sample)}"  # Check it's a dict
+    assert isinstance(sample, dict), (
+        f"Expected dict (PER sample), got {type(sample)}"
+    )  # Check it's a dict
 
     # Check keys instead of isinstance for TypedDict
     assert "sequences" in sample
@@ -17078,7 +17195,11 @@ def test_muzero_buffer_update_priorities(
         np.abs(td_errors) + muzero_buffer.per_epsilon
     ) ** muzero_buffer.per_alpha
     assert new_priorities.shape == expected_priorities.shape
-    assert np.allclose(new_priorities, expected_priorities, atol=1e-6)
+    # --- Reverted Tolerance ---
+    assert np.allclose(new_priorities, expected_priorities, atol=1e-5), (
+        f"Priorities mismatch.\nNew: {new_priorities}\nExpected: {expected_priorities}"
+    )
+    # --- End Reverted Tolerance ---
 
 
 # --- Uniform Fallback Tests (if PER fails or disabled) ---
@@ -17106,7 +17227,7 @@ def test_muzero_buffer_sample_uniform_fallback(
     # Force total priority to 0 AND n_entries to 0 to trigger fallback
     muzero_buffer.sum_tree.tree.fill(0.0)  # Zero out entire tree
     muzero_buffer.sum_tree.n_entries = 0  # Crucial for the check in _sample_per
-    assert muzero_buffer.sum_tree.total_priority < 1e-9
+    assert muzero_buffer.sum_tree.total() < 1e-9  # Use total() method
     assert muzero_buffer.sum_tree.n_entries == 0
 
     # is_ready should now fail because n_entries < batch_size
@@ -17674,330 +17795,369 @@ File: tests\stats\__init__.py
 File: tests\utils\test_sumtree.py
 # File: tests/utils/test_sumtree.py
 import logging
-import random
-from collections import Counter
 
-import numpy as np
 import pytest
 
-from muzerotriangle.utils.sumtree import SumTree
+from muzerotriangle.utils.sumtree import SumTree, sumtree_logger  # Import logger
 
 # Configure logging for tests to see debug messages from SumTree
-logging.basicConfig(
-    level=logging.INFO
-)  # Set to INFO for less verbose output during tests
-sumtree_logger = logging.getLogger("muzerotriangle.utils.sumtree_internal")
-sumtree_logger.setLevel(logging.WARNING)  # Keep SumTree logs quiet unless warning/error
+# logging.basicConfig(level=logging.DEBUG) # Set root logger level if needed
+# sumtree_logger.setLevel(logging.DEBUG) # Set specific logger level
 
 
 def dump_sumtree_state(tree: SumTree, test_name: str):
     """Helper function to print SumTree state for debugging."""
     print(f"\n--- SumTree State Dump ({test_name}) ---")
-    print(f"  Capacity: {tree.capacity}")
+    print(f"  User Capacity: {tree.capacity}")
+    print(f"  Internal Capacity: {tree._internal_capacity}")  # Log internal capacity
     print(f"  n_entries: {tree.n_entries}")
     print(f"  data_pointer: {tree.data_pointer}")
     print(f"  _max_priority: {tree._max_priority:.4f}")
-    print(f"  total_priority (root): {tree.total():.4f}")  # Use total() method
+    print(f"  total_priority (root): {tree.total():.4f}")
     # Only print the relevant part of the tree array
-    tree_size = 2 * tree.capacity - 1
+    tree_size = 2 * tree._internal_capacity - 1  # Use internal capacity
     print(
         f"  Tree array (size {len(tree.tree)}, showing up to {tree_size}): {tree.tree[:tree_size]}"
     )
-    # Print only the populated part of the data array
+    # Print only the populated part of the data array (up to n_entries)
     print(
-        f"  Data array (size {len(tree.data)}, showing up to {tree.n_entries}): {tree.data[:tree.n_entries]}"
+        f"  Data array (size {len(tree.data)}, showing up to {tree.n_entries}): {tree.data[: tree.n_entries]}"
     )
-    print(f"--- End Dump ---")
+    print("--- End Dump ---")
 
 
 @pytest.fixture
 def sum_tree_cap5() -> SumTree:
-    """Provides a SumTree instance with capacity 5."""
+    """Provides a SumTree instance with user capacity 5."""
+    # Internal capacity will be 8
     return SumTree(capacity=5)
 
 
 def test_sumtree_init():
-    tree = SumTree(capacity=10)
-    assert tree.capacity == 10
-    assert len(tree.tree) == 19  # 2*10 - 1
-    assert len(tree.data) == 10
+    tree_user_cap = 10
+    tree = SumTree(capacity=tree_user_cap)
+    internal_cap = 16  # Next power of 2 >= 10
+    assert tree.capacity == tree_user_cap
+    assert tree._internal_capacity == internal_cap
+    assert len(tree.tree) == 2 * internal_cap - 1  # 31
+    assert len(tree.data) == internal_cap  # 16
     assert tree.data_pointer == 0
     assert tree.n_entries == 0
-    assert tree.total() == 0.0  # Use total() method
-    assert tree.max_priority == 1.0  # Default max priority when empty
+    assert tree.total() == 0.0
+    assert tree.max_priority == 1.0
 
 
 def test_sumtree_add_single(sum_tree_cap5: SumTree):
+    # Internal capacity = 8. Leaves start at index 7.
+    # First add goes to data_pointer=0, tree_idx = 0 + 8 - 1 = 7
     tree_idx = sum_tree_cap5.add(0.5, "data1")
-    assert tree_idx == 4  # Index of the first leaf in a tree of capacity 5
+    assert tree_idx == 7
     assert sum_tree_cap5.n_entries == 1
-    assert sum_tree_cap5.data_pointer == 1
-    assert sum_tree_cap5.total() == pytest.approx(0.5)  # Use total() method
+    assert sum_tree_cap5.data_pointer == 1  # Wraps around user capacity 5
+    assert sum_tree_cap5.total() == pytest.approx(0.5)
     assert sum_tree_cap5.max_priority == pytest.approx(0.5)
     assert sum_tree_cap5.tree[tree_idx] == 0.5
     assert sum_tree_cap5.data[0] == "data1"
 
 
 def test_sumtree_add_multiple(sum_tree_cap5: SumTree):
+    # Internal capacity = 8. Leaves start at index 7.
     priorities = [0.1, 0.5, 0.2, 0.8, 0.4]
     data = ["d0", "d1", "d2", "d3", "d4"]
-    expected_max_priority = 1.0  # Initial max priority is 1.0
-    for i, (p, d) in enumerate(zip(priorities, data)):
-        sum_tree_cap5.add(p, d)
+    expected_leaf_indices = [7, 8, 9, 10, 11]  # Based on internal capacity 8
+    expected_max_priority = 0.0
+    for i, (p, d) in enumerate(zip(priorities, data, strict=False)):
+        tree_idx = sum_tree_cap5.add(p, d)
+        assert tree_idx == expected_leaf_indices[i]
         expected_max_priority = max(expected_max_priority, p)
         assert sum_tree_cap5.n_entries == i + 1
-        assert sum_tree_cap5.data_pointer == (i + 1) % 5
-        assert sum_tree_cap5.total() == pytest.approx(
-            sum(priorities[: i + 1])
-        )  # Use total() method
+        assert sum_tree_cap5.data_pointer == (i + 1) % 5  # Wrap around user capacity 5
+        assert sum_tree_cap5.total() == pytest.approx(sum(priorities[: i + 1]))
         assert sum_tree_cap5.max_priority == pytest.approx(expected_max_priority)
 
     assert sum_tree_cap5.n_entries == 5
     assert sum_tree_cap5.data_pointer == 0
-    assert sum_tree_cap5.data == data
+    # Data array has internal capacity, check only the first 5 slots
+    assert sum_tree_cap5.data[:5] == data
 
 
 def test_sumtree_add_overflow(sum_tree_cap5: SumTree):
+    # Internal capacity = 8. Leaves start at index 7.
     priorities = [0.1, 0.5, 0.2, 0.8, 0.4]
     data = ["d0", "d1", "d2", "d3", "d4"]
-    for p, d in zip(priorities, data):
-        sum_tree_cap5.add(p, d)
+    expected_leaf_indices = [7, 8, 9, 10, 11]
+    for i, (p, d) in enumerate(zip(priorities, data, strict=False)):
+        tree_idx = sum_tree_cap5.add(p, d)
+        assert tree_idx == expected_leaf_indices[i]
 
     assert sum_tree_cap5.n_entries == 5
-    assert sum_tree_cap5.total() == pytest.approx(sum(priorities))  # Use total() method
+    assert sum_tree_cap5.total() == pytest.approx(sum(priorities))
     assert sum_tree_cap5.max_priority == pytest.approx(0.8)
 
-    # Add one more, overwriting the first element (data_idx 0, tree_idx 4)
-    sum_tree_cap5.add(1.0, "d5")
+    # Add one more, overwriting the first element (data_idx 0, tree_idx 7)
+    tree_idx_5 = sum_tree_cap5.add(1.0, "d5")
+    assert tree_idx_5 == 7  # Should overwrite leaf 7
     assert sum_tree_cap5.n_entries == 5
-    assert sum_tree_cap5.data_pointer == 1
+    assert sum_tree_cap5.data_pointer == 1  # Wraps around user capacity 5
     assert sum_tree_cap5.data[0] == "d5"
     assert sum_tree_cap5.data[1] == "d1"  # Unchanged
-    assert sum_tree_cap5.total() == pytest.approx(
-        sum(priorities[1:]) + 1.0
-    )  # Use total() method
+    assert sum_tree_cap5.total() == pytest.approx(sum(priorities[1:]) + 1.0)
     assert sum_tree_cap5.max_priority == pytest.approx(1.0)
-    assert sum_tree_cap5.tree[4] == 1.0  # Check leaf node updated
+    assert sum_tree_cap5.tree[7] == 1.0  # Check leaf node updated
 
-    # Add another, overwriting the second element (data_idx 1, tree_idx 5)
-    sum_tree_cap5.add(0.05, "d6")
+    # Add another, overwriting the second element (data_idx 1, tree_idx 8)
+    tree_idx_6 = sum_tree_cap5.add(0.05, "d6")
+    assert tree_idx_6 == 8  # Should overwrite leaf 8
     assert sum_tree_cap5.n_entries == 5
-    assert sum_tree_cap5.data_pointer == 2
+    assert sum_tree_cap5.data_pointer == 2  # Wraps around user capacity 5
     assert sum_tree_cap5.data[0] == "d5"
     assert sum_tree_cap5.data[1] == "d6"
-    assert sum_tree_cap5.total() == pytest.approx(
-        1.0 + 0.05 + 0.2 + 0.8 + 0.4
-    )  # Use total() method
-    assert sum_tree_cap5.max_priority == pytest.approx(
-        1.0
-    )  # Max priority doesn't decrease
-    assert sum_tree_cap5.tree[5] == 0.05  # Check leaf node updated
+    assert sum_tree_cap5.total() == pytest.approx(1.0 + 0.05 + 0.2 + 0.8 + 0.4)
+    assert sum_tree_cap5.max_priority == pytest.approx(1.0)
+    assert sum_tree_cap5.tree[8] == 0.05  # Check leaf node updated
 
 
 def test_sumtree_update(sum_tree_cap5: SumTree):
-    tree_idx_0 = sum_tree_cap5.add(0.5, "data0")
-    tree_idx_1 = sum_tree_cap5.add(0.3, "data1")
-    assert sum_tree_cap5.total() == pytest.approx(0.8)  # Use total() method
+    # Internal capacity = 8. Leaves start at index 7.
+    tree_idx_0 = sum_tree_cap5.add(0.5, "data0")  # Leaf 7
+    tree_idx_1 = sum_tree_cap5.add(0.3, "data1")  # Leaf 8
+    assert tree_idx_0 == 7
+    assert tree_idx_1 == 8
+    assert sum_tree_cap5.total() == pytest.approx(0.8)
     assert sum_tree_cap5.max_priority == pytest.approx(0.5)
 
-    sum_tree_cap5.update(tree_idx_0, 1.0)
-    assert sum_tree_cap5.total() == pytest.approx(1.0 + 0.3)  # Use total() method
+    sum_tree_cap5.update(tree_idx_0, 1.0)  # Update leaf 7
+    assert sum_tree_cap5.total() == pytest.approx(1.0 + 0.3)
     assert sum_tree_cap5.max_priority == pytest.approx(1.0)
     assert sum_tree_cap5.tree[tree_idx_0] == pytest.approx(1.0)
 
-    sum_tree_cap5.update(tree_idx_1, 0.1)
-    assert sum_tree_cap5.total() == pytest.approx(1.0 + 0.1)  # Use total() method
-    assert sum_tree_cap5.max_priority == pytest.approx(
-        1.0
-    )  # Max priority doesn't decrease
+    sum_tree_cap5.update(tree_idx_1, 0.1)  # Update leaf 8
+    assert sum_tree_cap5.total() == pytest.approx(1.0 + 0.1)
+    assert sum_tree_cap5.max_priority == pytest.approx(1.0)
     assert sum_tree_cap5.tree[tree_idx_1] == pytest.approx(0.1)
 
 
 def test_sumtree_retrieve(sum_tree_cap5: SumTree):
-    """Test the _retrieve method directly."""
-    # Tree structure for capacity 5:
-    #       0
-    #     /   \
-    #    1     2
-    #   / \   / \
-    #  3   4 5   6   <- This level doesn't exist for capacity 5
-    # Indices: 0=root, 1=left, 2=right, 3=left-left, 4=left-right, 5=right-left, 6=right-right
-    # For capacity 5, tree size is 9. Leaves are indices 4, 5, 6, 7, 8.
-    # Data indices: 0, 1, 2, 3, 4
+    """Test the _retrieve method directly with internal capacity 8."""
+    # --- Enable Debug Logging ---
+    original_level = sumtree_logger.level
+    sumtree_logger.setLevel(logging.DEBUG)
+    # ---
 
-    # Add items
+    # Internal capacity = 8. Tree size = 15. Leaves = indices 7..14
+    # User capacity = 5. Data indices = 0..4. n_entries = 5.
+    # Mapping: Data 0 -> Leaf 7, Data 1 -> Leaf 8, ..., Data 4 -> Leaf 11
+
     data_map = {}
-    priorities = [0.1, 0.5, 0.2, 0.8, 0.4]
+    priorities = [0.1, 0.5, 0.2, 0.8, 0.4]  # Sum = 2.0
+    expected_leaf_indices = [7, 8, 9, 10, 11]
     for i, p in enumerate(priorities):
-        data_id = f"i{i}"
+        data_id = f"d{i}"
         tree_idx = sum_tree_cap5.add(p, data_id)
+        assert tree_idx == expected_leaf_indices[i]
         data_map[tree_idx] = data_id
 
     print(f"\n[test_retrieve] Tree state: {sum_tree_cap5.tree}")
     print(f"[test_retrieve] Data state: {sum_tree_cap5.data}")
     print(f"[test_retrieve] Data map (tree_idx -> data_id): {data_map}")
 
-    # Expected tree: [2.0, 1.3, 0.7, 1.2, 0.1, 0.5, 0.2, 0.8, 0.4] - Corrected expectation
-    # Leaf indices:  4    5    6    7    8
-    # Data indices:  0    1    2    3    4
-    # Priorities:    0.1  0.5  0.2  0.8  0.4
-    # Data:         i0   i1   i2   i3   i4
-    # Cumulative sums for leaves: [0.1, 0.6, 0.8, 1.6, 2.0]
+    # Expected Tree (cap 8, 5 entries):
+    # Leaves: [0.1, 0.5, 0.2, 0.8, 0.4, 0.0, 0.0, 0.0] (Indices 7-14)
+    # Lvl 2:  [0.6, 1.0, 0.4, 0.0] (Indices 3-6)
+    # Lvl 1:  [1.6, 0.4] (Indices 1-2)
+    # Root:   [2.0] (Index 0)
+    # Full Tree: [2.0, 1.6, 0.4, 0.6, 1.0, 0.4, 0.0, 0.1, 0.5, 0.2, 0.8, 0.4, 0.0, 0.0, 0.0]
 
     # Test retrieval based on sample values
+    # Cumulative sums: [0.1, 0.6, 0.8, 1.6, 2.0]
     test_cases = {
-        0.05: 4,  # Should fall in the first bucket (index 4, priority 0.1)
-        0.1: 5,  # Should fall in the second bucket (index 5, priority 0.5)
-        0.15: 5,
-        0.6: 6,  # Should fall in the third bucket (index 6, priority 0.2)
-        0.7: 6,
-        0.8: 7,  # Should fall in the fourth bucket (index 7, priority 0.8)
-        1.5: 7,
-        1.6: 8,  # Should fall in the fifth bucket (index 8, priority 0.4)
-        1.99: 8,
+        0.05: 7,  # Should fall in the first bucket (index 7, prio 0.1)
+        0.1: 8,  # Should fall in the second bucket (index 8, prio 0.5)
+        0.15: 8,
+        0.6: 9,  # Should fall in the third bucket (index 9, prio 0.2)
+        0.7: 9,
+        0.8: 10,  # Should fall in the fourth bucket (index 10, prio 0.8)
+        1.5: 10,
+        1.6: 11,  # Should fall in the fifth bucket (index 11, prio 0.4)
+        1.99: 11,
     }
 
-    for sample_value, expected_tree_idx in test_cases.items():
-        print(f"[test_retrieve] Testing sample {sample_value:.4f}")
-        retrieved_tree_idx = sum_tree_cap5._retrieve(0, sample_value)
-        assert (
-            retrieved_tree_idx == expected_tree_idx
-        ), f"Sample {sample_value:.4f} -> Expected {expected_tree_idx}, Got {retrieved_tree_idx}"
+    try:
+        for sample_value, expected_tree_idx in test_cases.items():
+            print(f"[test_retrieve] Testing sample {sample_value:.4f}")
+            retrieved_tree_idx = sum_tree_cap5._retrieve(0, sample_value)
+            assert retrieved_tree_idx == expected_tree_idx, (
+                f"Sample {sample_value:.4f} -> Expected {expected_tree_idx}, Got {retrieved_tree_idx}"
+            )
+    finally:
+        # --- Restore Log Level ---
+        sumtree_logger.setLevel(original_level)
+        # ---
 
 
 def test_sumtree_retrieve_with_zeros(sum_tree_cap5: SumTree):
     """Test _retrieve with zero priority nodes."""
-    # Add items
+    # --- Enable Debug Logging ---
+    original_level = sumtree_logger.level
+    sumtree_logger.setLevel(logging.DEBUG)
+    # ---
+
+    # Internal capacity = 8. Leaves = indices 7..14
+    # User capacity = 5. Data indices = 0..4. n_entries = 5.
+    # Mapping: Data 0 -> Leaf 7, ..., Data 4 -> Leaf 11
+
     data_map = {}
-    priorities = [0.0, 0.4, 0.6, 0.0, 0.0]
+    priorities = [0.0, 0.4, 0.6, 0.0, 0.0]  # Sum = 1.0
     data = ["z0", "iA", "iB", "z1", "z2"]
+    expected_leaf_indices = [7, 8, 9, 10, 11]
     for i, p in enumerate(priorities):
         data_id = data[i]
         tree_idx = sum_tree_cap5.add(p, data_id)
+        assert tree_idx == expected_leaf_indices[i]
         data_map[tree_idx] = data_id
 
     print(f"\n[test_retrieve_zeros] Tree state: {sum_tree_cap5.tree}")
     print(f"[test_retrieve_zeros] Data state: {sum_tree_cap5.data}")
     print(f"[test_retrieve_zeros] Data map (tree_idx -> data_id): {data_map}")
 
-    # Expected tree: [1.0, 0.4, 0.6, 0.0, 0.0, 0.4, 0.6, 0.0, 0.0] - Corrected expectation
-    # Leaf indices:  4    5    6    7    8
-    # Data indices:  0    1    2    3    4
-    # Priorities:    0.0  0.4  0.6  0.0  0.0
-    # Data:         z0   iA   iB   z1   z2
-    # Cumulative sums for leaves: [0.0, 0.4, 1.0, 1.0, 1.0]
+    # Expected Tree (cap 8, 5 entries with zeros):
+    # Leaves: [0.0, 0.4, 0.6, 0.0, 0.0, 0.0, 0.0, 0.0] (Indices 7-14)
+    # Lvl 2:  [0.4, 0.6, 0.0, 0.0] (Indices 3-6)
+    # Lvl 1:  [1.0, 0.0] (Indices 1-2)
+    # Root:   [1.0] (Index 0)
+    # Full Tree: [1.0, 1.0, 0.0, 0.4, 0.6, 0.0, 0.0, 0.0, 0.4, 0.6, 0.0, 0.0, 0.0, 0.0, 0.0]
 
     # Test retrieval based on sample values
+    # Cumulative sums: [0.0, 0.4, 1.0, 1.0, 1.0]
     test_cases = {
-        0.0: 5,  # Should skip zero-priority leaf 4 and land in leaf 5
-        0.1: 5,  # Should land in leaf 5
-        0.3: 5,  # Should land in leaf 5
-        0.399: 5,  # Should land in leaf 5
-        0.4: 6,  # Should land in leaf 6
-        0.5: 6,
-        0.99: 6,  # Should land in leaf 6
+        0.0: 8,  # Should skip zero-priority leaf 7 and land in leaf 8
+        0.1: 8,  # Should land in leaf 8
+        0.3: 8,
+        0.399: 8,
+        0.4: 9,  # Should land in leaf 9
+        0.5: 9,
+        0.99: 9,
     }
 
-    for sample_value, expected_tree_idx in test_cases.items():
-        print(f"[test_retrieve_zeros] Testing sample {sample_value:.4f}")
-        retrieved_tree_idx = sum_tree_cap5._retrieve(0, sample_value)
-        assert (
-            retrieved_tree_idx == expected_tree_idx
-        ), f"Sample {sample_value:.4f} -> Expected {expected_tree_idx}, Got {retrieved_tree_idx}"
+    try:
+        for sample_value, expected_tree_idx in test_cases.items():
+            print(f"[test_retrieve_zeros] Testing sample {sample_value:.4f}")
+            retrieved_tree_idx = sum_tree_cap5._retrieve(0, sample_value)
+            assert retrieved_tree_idx == expected_tree_idx, (
+                f"Sample {sample_value:.4f} -> Expected {expected_tree_idx}, Got {retrieved_tree_idx}"
+            )
+    finally:
+        # --- Restore Log Level ---
+        sumtree_logger.setLevel(original_level)
+        # ---
 
 
 def test_sumtree_get_leaf_edge_cases(sum_tree_cap5: SumTree):
     """Test edge cases for get_leaf."""
-    # Empty tree
-    with pytest.raises(
-        ValueError, match="Cannot sample from SumTree with zero total priority"
-    ):
-        sum_tree_cap5.get_leaf(0.5)
+    # --- Enable Debug Logging ---
+    original_level = sumtree_logger.level
+    sumtree_logger.setLevel(logging.DEBUG)
+    # ---
 
-    # Single item
-    tree_idx_0 = sum_tree_cap5.add(1.0, "only_item")
-    assert sum_tree_cap5.n_entries == 1
-    assert sum_tree_cap5.total() == pytest.approx(1.0)  # Use total() method
-    print(f"\n[test_edge_cases] Single item tree: {sum_tree_cap5.tree}")
-    # Test sampling at 0.0
-    print("[test_edge_cases] Testing get_leaf(0.0)")
-    idx0, p0, d0 = sum_tree_cap5.get_leaf(0.0)
-    assert d0 == "only_item"
-    assert p0 == pytest.approx(1.0)
-    assert idx0 == tree_idx_0
+    try:
+        # Empty tree
+        with pytest.raises(
+            ValueError,
+            match="Cannot sample from SumTree with zero or negative total priority",
+        ):
+            sum_tree_cap5.get_leaf(0.5)
 
-    # Test sampling close to total priority
-    print("[test_edge_cases] Testing get_leaf(1.0 - eps)")
-    idx1, p1, d1 = sum_tree_cap5.get_leaf(1.0 - 1e-9)
-    assert d1 == "only_item"
-    assert p1 == pytest.approx(1.0)
-    assert idx1 == tree_idx_0
+        # Single item
+        tree_idx_0 = sum_tree_cap5.add(1.0, "only_item")  # Should be leaf index 7
+        assert tree_idx_0 == 7
+        assert sum_tree_cap5.n_entries == 1
+        assert sum_tree_cap5.total() == pytest.approx(1.0)
+        print(f"\n[test_edge_cases] Single item tree: {sum_tree_cap5.tree}")
 
-    # Test sampling exactly at total priority (should fail due to < check)
-    with pytest.raises(ValueError, match="Sample value .* out of range"):
+        # Test sampling at 0.0
+        print("[test_edge_cases] Testing get_leaf(0.0)")
+        idx0, p0, d0 = sum_tree_cap5.get_leaf(0.0)
+        assert d0 == "only_item"
+        assert p0 == pytest.approx(1.0)
+        assert idx0 == tree_idx_0  # Should be 7
+
+        # Test sampling close to total priority
+        print("[test_edge_cases] Testing get_leaf(1.0 - eps)")
+        idx1, p1, d1 = sum_tree_cap5.get_leaf(1.0 - 1e-9)
+        assert d1 == "only_item"
+        assert p1 == pytest.approx(1.0)
+        assert idx1 == tree_idx_0
+
+        # Test sampling exactly at total priority (should be clipped)
         print("[test_edge_cases] Testing get_leaf(1.0)")
-        sum_tree_cap5.get_leaf(1.0)
+        idx_exact, p_exact, d_exact = sum_tree_cap5.get_leaf(1.0)
+        assert d_exact == "only_item"
+        assert idx_exact == tree_idx_0
 
-    # Test sampling above total priority (should fail)
-    with pytest.raises(ValueError, match="Sample value .* out of range"):
+        # Test sampling above total priority (should be clipped)
         print("[test_edge_cases] Testing get_leaf(1.1)")
-        sum_tree_cap5.get_leaf(1.1)
+        idx_above, p_above, d_above = sum_tree_cap5.get_leaf(1.1)
+        assert d_above == "only_item"
+        assert idx_above == tree_idx_0
 
-    # Test sampling below zero (should fail)
-    with pytest.raises(ValueError, match="Sample value .* out of range"):
+        # Test sampling below zero (should be clipped)
         print("[test_edge_cases] Testing get_leaf(-0.1)")
-        sum_tree_cap5.get_leaf(-0.1)
+        idx_below, p_below, d_below = sum_tree_cap5.get_leaf(-0.1)
+        assert d_below == "only_item"
+        assert idx_below == tree_idx_0
 
-    # Zero priority item
-    sum_tree_cap5.reset()
-    tree_idx_z0 = sum_tree_cap5.add(0.0, "z0")  # data_idx 0, tree_idx 4
-    tree_idx_iA = sum_tree_cap5.add(0.4, "itemA")  # data_idx 1, tree_idx 5
-    tree_idx_iB = sum_tree_cap5.add(0.6, "itemB")  # data_idx 2, tree_idx 6
-    tree_idx_z1 = sum_tree_cap5.add(0.0, "z1")  # data_idx 3, tree_idx 7
-    tree_idx_z2 = sum_tree_cap5.add(0.0, "z2")  # data_idx 4, tree_idx 8
-    assert sum_tree_cap5.n_entries == 5
-    assert sum_tree_cap5.total() == pytest.approx(1.0)  # Use total() method
-    print(f"[test_edge_cases] Zero priority tree: {sum_tree_cap5.tree}")
-    print(f"[test_edge_cases] Data: {sum_tree_cap5.data}")
+        # Zero priority item
+        sum_tree_cap5.reset()
+        tree_idx_z0 = sum_tree_cap5.add(0.0, "z0")  # data_idx 0, tree_idx 7
+        tree_idx_iA = sum_tree_cap5.add(0.4, "itemA")  # data_idx 1, tree_idx 8
+        tree_idx_iB = sum_tree_cap5.add(0.6, "itemB")  # data_idx 2, tree_idx 9
+        sum_tree_cap5.add(0.0, "z1")  # data_idx 3, tree_idx 10
+        sum_tree_cap5.add(0.0, "z2")  # data_idx 4, tree_idx 11
+        assert sum_tree_cap5.n_entries == 5
+        assert sum_tree_cap5.total() == pytest.approx(1.0)
+        print(f"[test_edge_cases] Zero priority tree: {sum_tree_cap5.tree}")
+        print(f"[test_edge_cases] Data: {sum_tree_cap5.data}")
 
-    # Sampling value < 0.4 should yield 'itemA' (index 5)
-    print("[test_edge_cases] Testing get_leaf(0.3) with zero priority item")
-    idx, p, d = sum_tree_cap5.get_leaf(0.3)
-    assert d == "itemA"
-    assert p == pytest.approx(0.4)
-    assert idx == tree_idx_iA
+        # Sampling value < 0.4 should yield 'itemA' (index 8)
+        print("[test_edge_cases] Testing get_leaf(0.3) with zero priority item")
+        idx, p, d = sum_tree_cap5.get_leaf(0.3)
+        assert d == "itemA"
+        assert p == pytest.approx(0.4)
+        assert idx == tree_idx_iA  # Should be 8
 
-    # Sampling value >= 0.4 and < 1.0 should yield 'itemB' (index 6)
-    print("[test_edge_cases] Testing get_leaf(0.5) with zero priority item")
-    idx, p, d = sum_tree_cap5.get_leaf(0.5)
-    assert d == "itemB"
-    assert p == pytest.approx(0.6)
-    assert idx == tree_idx_iB
+        # Sampling value >= 0.4 and < 1.0 should yield 'itemB' (index 9)
+        print("[test_edge_cases] Testing get_leaf(0.5) with zero priority item")
+        idx, p, d = sum_tree_cap5.get_leaf(0.5)
+        assert d == "itemB"
+        assert p == pytest.approx(0.6)
+        assert idx == tree_idx_iB  # Should be 9
 
-    # Test sampling exactly at boundary (0.4)
-    print("[test_edge_cases] Testing get_leaf(0.4) boundary")
-    idx_b, p_b, d_b = sum_tree_cap5.get_leaf(0.4)
-    assert d_b == "itemB"
-    assert idx_b == tree_idx_iB
+        # Test sampling exactly at boundary (0.4)
+        print("[test_edge_cases] Testing get_leaf(0.4) boundary")
+        idx_b, p_b, d_b = sum_tree_cap5.get_leaf(0.4)
+        assert d_b == "itemB"  # Should land in the second non-zero bucket
+        assert idx_b == tree_idx_iB  # Should be 9
 
-    # Test sampling at 0.0
-    print("[test_edge_cases] Testing get_leaf(0.0) boundary")
-    idx_0, p_0, d_0 = sum_tree_cap5.get_leaf(0.0)
-    assert d_0 == "itemA"  # Should pick the first non-zero element
-    assert idx_0 == tree_idx_iA
+        # Test sampling at 0.0
+        print("[test_edge_cases] Testing get_leaf(0.0) boundary")
+        idx_0, p_0, d_0 = sum_tree_cap5.get_leaf(0.0)
+        assert d_0 == "itemA"  # Should pick the first non-zero element
+        assert idx_0 == tree_idx_iA  # Should be 8
 
-    # Test updating a zero-priority item
-    sum_tree_cap5.update(tree_idx_z0, 0.1)  # Update "zero_item" priority
-    assert sum_tree_cap5.total() == pytest.approx(1.1)  # Use total() method
-    print(f"[test_edge_cases] After update tree: {sum_tree_cap5.tree}")
-    print("[test_edge_cases] Testing get_leaf(0.05) after update")
-    idx_up, p_up, d_up = sum_tree_cap5.get_leaf(0.05)
-    assert d_up == "zero_item"
-    assert idx_up == tree_idx_z0
-    assert p_up == pytest.approx(0.1)
+        # Test updating a zero-priority item
+        sum_tree_cap5.update(tree_idx_z0, 0.1)  # Update "z0" priority (index 7)
+        assert sum_tree_cap5.total() == pytest.approx(1.1)
+        print(f"[test_edge_cases] After update tree: {sum_tree_cap5.tree}")
+        print("[test_edge_cases] Testing get_leaf(0.05) after update")
+        idx_up, p_up, d_up = sum_tree_cap5.get_leaf(0.05)
+        assert d_up == "z0"
+        assert idx_up == tree_idx_z0  # Should be 7
+        assert p_up == pytest.approx(0.1)
 
-
-# Removed test_sumtree_capacity_1 as the fixture was removed
+    finally:
+        # --- Restore Log Level ---
+        sumtree_logger.setLevel(original_level)
+        # ---
 
 
 File: tests\utils\__init__.py

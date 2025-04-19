@@ -2,22 +2,22 @@
 import logging
 import random
 from collections import deque
-from typing import TYPE_CHECKING, Any, Optional, Union, cast
+from typing import TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt  # Import numpy typing
 
-from ...config import TrainConfig
 from ...utils.sumtree import SumTree
 from ...utils.types import (
     SampledBatch,
     SampledBatchPER,  # Import PER batch type
     Trajectory,
-    TrajectoryStep,
 )
 
 if TYPE_CHECKING:
-    from ...environment import GameState
+    from ...config import TrainConfig
+
+    pass
 
 logger = logging.getLogger(__name__)
 
@@ -41,12 +41,12 @@ class ExperienceBuffer:
         # --- Data Storage ---
         # Stores tuples of (unique_buffer_index, trajectory)
         self.buffer: deque[tuple[int, Trajectory]] = deque()
-        self.tree_idx_to_buffer_idx: dict[int, int] = (
-            {}
-        )  # Maps SumTree leaf index to unique buffer_idx
-        self.buffer_idx_to_tree_idx: dict[int, int] = (
-            {}
-        )  # Maps unique buffer_idx to SumTree leaf index
+        self.tree_idx_to_buffer_idx: dict[
+            int, int
+        ] = {}  # Maps SumTree leaf index to unique buffer_idx
+        self.buffer_idx_to_tree_idx: dict[
+            int, int
+        ] = {}  # Maps unique buffer_idx to SumTree leaf index
         self.next_buffer_idx = 0  # Monotonically increasing index for unique ID
         self.total_steps = 0
 
@@ -282,11 +282,10 @@ class ExperienceBuffer:
             beta = self._anneal_beta(current_train_step)
 
         sampled_sequences_list: SampledBatch = []
-        tree_indices_list = np.zeros(batch_size, dtype=np.int32)
-        priorities_list = np.zeros(batch_size, dtype=np.float32)
-        buffer_indices_sampled_list = np.zeros(
-            batch_size, dtype=np.int32
-        )  # Store the unique buffer_idx
+        # Initialize as lists to append easily
+        tree_indices_list: list[int] = []
+        priorities_list: list[float] = []
+        buffer_indices_sampled_list: list[int] = []  # Store the unique buffer_idx
 
         segment = self.sum_tree.total() / batch_size  # Use total() method
         attempts = 0
@@ -337,7 +336,7 @@ class ExperienceBuffer:
                 continue
 
             # Check if we already sampled this trajectory in this batch (optional, but can improve diversity)
-            # if buffer_idx in buffer_indices_sampled_list[:sampled_count]:
+            # if buffer_idx in buffer_indices_sampled_list:
             #     continue
 
             # Find the trajectory in the deque using the buffer_idx
@@ -370,11 +369,9 @@ class ExperienceBuffer:
 
             if len(sequence) == self.sequence_length:
                 sampled_sequences_list.append(sequence)
-                tree_indices_list[sampled_count] = tree_idx
-                priorities_list[sampled_count] = priority
-                buffer_indices_sampled_list[sampled_count] = (
-                    buffer_idx  # Store the unique ID
-                )
+                tree_indices_list.append(tree_idx)
+                priorities_list.append(priority)
+                buffer_indices_sampled_list.append(buffer_idx)  # Store the unique ID
                 sampled_count += 1
             else:
                 logger.error(
@@ -390,23 +387,26 @@ class ExperienceBuffer:
             logger.warning(
                 f"PER Sample: Could only sample {sampled_count} sequences out of {batch_size} requested after {attempts} attempts."
             )
-            # Trim arrays to the actual number sampled
-            # --- ADDED CAST ---
-            tree_indices_list = cast(
-                npt.NDArray[np.int32], tree_indices_list[:sampled_count]
-            )
-            priorities_list = cast(
-                npt.NDArray[np.float32], priorities_list[:sampled_count]
-            )
-            # --- END ADDED CAST ---
+            # Trim lists to the actual number sampled
+            sampled_sequences_list = sampled_sequences_list[:sampled_count]
+            tree_indices_list = tree_indices_list[:sampled_count]
+            priorities_list = priorities_list[:sampled_count]
             # buffer_indices_sampled_list = buffer_indices_sampled_list[:sampled_count] # Not used later, but good practice
 
-        tree_indices = np.array(tree_indices_list, dtype=np.int32)
-        priorities_np = np.array(priorities_list, dtype=np.float32)
+        # Convert lists to numpy arrays
+        # --- FIXED: Use typed arrays directly ---
+        tree_indices: npt.NDArray[np.int32] = np.array(
+            tree_indices_list, dtype=np.int32
+        )
+        priorities_np: npt.NDArray[np.float32] = np.array(
+            priorities_list, dtype=np.float32
+        )
+        # --- END FIXED ---
 
         # Calculate IS weights
         sampling_probabilities = priorities_np / max(
-            self.sum_tree.total(), 1e-9  # Use total() method
+            self.sum_tree.total(),
+            1e-9,  # Use total() method
         )  # Avoid division by zero
         weights = np.power(
             max(self.sum_tree.n_entries, 1) * sampling_probabilities + 1e-9, -beta
@@ -416,7 +416,7 @@ class ExperienceBuffer:
 
         return SampledBatchPER(
             sequences=sampled_sequences_list,
-            indices=tree_indices,
+            indices=tree_indices,  # Use typed array
             weights=weights.astype(np.float32),
         )
 

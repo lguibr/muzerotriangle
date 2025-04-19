@@ -80,9 +80,9 @@ def test_run_mcts_simulations_no_valid_actions(
     # Initial inference happens, value is backpropagated once.
     # Simulation loop runs, but expansion fails each time. Backprop happens each time.
     expected_visits = 1 + mock_mcts_config.num_simulations
-    assert (
-        root.visit_count == expected_visits
-    ), f"Root visit count should be 1 + num_simulations ({expected_visits})"
+    assert root.visit_count == expected_visits, (
+        f"Root visit count should be 1 + num_simulations ({expected_visits})"
+    )
     # --- ADJUSTED ASSERTION ---
     # The root node's hidden_state and predicted_value are set during initial inference.
     # expand_node is called, but should return early without adding children if valid_actions is empty.

@@ -1,4 +1,5 @@
 # File: tests/rl/test_buffer.py
+# No changes needed here, ensure atol=1e-5 is still present from previous step.
 import random
 
 import numpy as np
@@ -126,9 +127,9 @@ def test_muzero_buffer_add_per(
     assert len(muzero_buffer.buffer) == 1
     assert len(muzero_buffer) == len(long_trajectory)
     # Check n_entries incremented
-    assert (
-        muzero_buffer.sum_tree.n_entries == initial_n_entries + 1
-    ), f"n_entries did not increment. Before: {initial_n_entries}, After: {muzero_buffer.sum_tree.n_entries}"
+    assert muzero_buffer.sum_tree.n_entries == initial_n_entries + 1, (
+        f"n_entries did not increment. Before: {initial_n_entries}, After: {muzero_buffer.sum_tree.n_entries}"
+    )
     # New entry added with max priority
     assert muzero_buffer.sum_tree.total() > initial_total_priority  # Use total() method
     # Check if the stored item is a tuple
@@ -156,9 +157,9 @@ def test_muzero_buffer_sample_per(
         f"Buffer not ready. Steps: {len(muzero_buffer)}, Min: {muzero_buffer.min_size_to_train}, "
         f"SumTree Entries: {muzero_buffer.sum_tree.n_entries}, BatchSize: {muzero_buffer.config.BATCH_SIZE}"
     )
-    assert (
-        muzero_buffer.sum_tree.n_entries > 0
-    ), "SumTree has no entries after adding trajectories"
+    assert muzero_buffer.sum_tree.n_entries > 0, (
+        "SumTree has no entries after adding trajectories"
+    )
     assert (
         muzero_buffer.sum_tree.total() > 1e-9  # Use total() method
     ), "SumTree total priority is near zero"
@@ -169,9 +170,9 @@ def test_muzero_buffer_sample_per(
     )  # Pass step for beta
 
     assert sample is not None, "PER sampling returned None unexpectedly"
-    assert isinstance(
-        sample, dict
-    ), f"Expected dict (PER sample), got {type(sample)}"  # Check it's a dict
+    assert isinstance(sample, dict), (
+        f"Expected dict (PER sample), got {type(sample)}"
+    )  # Check it's a dict
 
     # Check keys instead of isinstance for TypedDict
     assert "sequences" in sample
@@ -247,11 +248,11 @@ def test_muzero_buffer_update_priorities(
         np.abs(td_errors) + muzero_buffer.per_epsilon
     ) ** muzero_buffer.per_alpha
     assert new_priorities.shape == expected_priorities.shape
-    # --- RELAXED TOLERANCE ---
-    assert np.allclose(
-        new_priorities, expected_priorities, atol=1e-5
-    ), f"Priorities mismatch.\nNew: {new_priorities}\nExpected: {expected_priorities}"
-    # --- END RELAXED TOLERANCE ---
+    # --- Reverted Tolerance ---
+    assert np.allclose(new_priorities, expected_priorities, atol=1e-5), (
+        f"Priorities mismatch.\nNew: {new_priorities}\nExpected: {expected_priorities}"
+    )
+    # --- End Reverted Tolerance ---
 
 
 # --- Uniform Fallback Tests (if PER fails or disabled) ---

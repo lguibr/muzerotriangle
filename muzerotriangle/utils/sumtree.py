@@ -1,13 +1,12 @@
 # File: muzerotriangle/utils/sumtree.py
 import logging
 import sys
+
 import numpy as np
 
 # Use a dedicated logger for SumTree internal debugging
 sumtree_logger = logging.getLogger("muzerotriangle.utils.sumtree_internal")
-# Keep logging level higher for less noise during normal runs
-# Set to DEBUG locally if needed for deep dives
-sumtree_logger.setLevel(logging.WARNING)
+sumtree_logger.setLevel(logging.WARNING)  # Default level
 if not sumtree_logger.handlers:
     handler = logging.StreamHandler(sys.stderr)
     formatter = logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
@@ -19,195 +18,208 @@ class SumTree:
     """
     Simple SumTree implementation for efficient prioritized sampling.
     Stores priorities and allows sampling proportional to priority.
-    Does NOT handle the calculation of priority from error (e.g., (error+eps)^alpha).
     Handles circular buffer logic for data storage using a Python list.
+    Uses internal capacity padding to the next power of 2 for simplified tree structure.
     """
 
     def __init__(self, capacity: int):
         if not isinstance(capacity, int) or capacity <= 0:
             raise ValueError("Capacity must be a positive integer.")
+
+        # User-facing capacity
         self.capacity = capacity
-        # Tree size is 2*capacity - 1
-        self.tree = np.zeros(2 * capacity - 1)
-        # Data storage: Use a Python list, initialized with None
-        self.data: list[object | None] = [None] * capacity
-        # data_pointer points to the next index to write to in self.data
+        # Internal capacity (power of 2) for the tree structure
+        self._internal_capacity = 1
+        while self._internal_capacity < capacity:
+            self._internal_capacity *= 2
+
+        # Tree size based on internal capacity
+        self.tree = np.zeros(2 * self._internal_capacity - 1)
+        # Data storage size based on internal capacity (though only user capacity is used)
+        self.data: list[object | None] = [None] * self._internal_capacity
+        # data_pointer points to the next index to write to in self.data (wraps around user capacity)
         self.data_pointer = 0
-        # n_entries tracks the number of valid entries (up to capacity)
+        # n_entries tracks the number of valid entries (up to user capacity)
         self.n_entries = 0
         # _max_priority tracks the maximum priority ever added/updated
-        self._max_priority = 0.0  # Initialize to 0.0
-        sumtree_logger.debug(f"SumTree initialized with capacity {capacity}")
+        self._max_priority = 0.0
+        sumtree_logger.debug(
+            f"SumTree initialized with user_capacity={capacity}, internal_capacity={self._internal_capacity}"
+        )
 
     def reset(self):
         """Resets the tree and data."""
         self.tree.fill(0.0)
-        # Recreate the list
-        self.data = [None] * self.capacity
+        # Recreate the data list based on internal capacity
+        self.data = [None] * self._internal_capacity
         self.data_pointer = 0
         self.n_entries = 0
-        self._max_priority = 0.0  # Reset to 0.0
+        self._max_priority = 0.0
         sumtree_logger.debug("SumTree reset.")
 
     def _propagate(self, tree_idx: int, change: float):
         """Propagates priority change up the tree."""
         parent = (tree_idx - 1) // 2
+        if parent < 0:
+            return
         self.tree[parent] += change
-        # Stop propagation when root is reached
         if parent != 0:
             self._propagate(parent, change)
 
     def _update_leaf(self, tree_idx: int, priority: float):
         """Updates a leaf node and propagates the change."""
-        if not (self.capacity - 1 <= tree_idx < 2 * self.capacity - 1):
-            msg = (
-                f"Invalid tree_idx {tree_idx} for leaf update. Capacity={self.capacity}"
-            )
+        if not (
+            self._internal_capacity - 1 <= tree_idx < 2 * self._internal_capacity - 1
+        ):
+            msg = f"Invalid tree_idx {tree_idx} for leaf update. InternalCapacity={self._internal_capacity}"
             sumtree_logger.error(msg)
             raise IndexError(msg)
 
-        if priority < 0:
-            sumtree_logger.warning(
-                f"Attempted to update with negative priority {priority}. Clamping to 0."
-            )
-            priority = 0.0
-        elif not np.isfinite(priority):
-            sumtree_logger.warning(
-                f"Attempted to update with non-finite priority {priority}. Clamping to 0."
-            )
+        if priority < 0 or not np.isfinite(priority):
             priority = 0.0
 
         change = priority - self.tree[tree_idx]
         self.tree[tree_idx] = priority
-        # Propagate change upwards starting from the updated leaf index
-        # No need to check for tree_idx == 0 because leaf indices start at capacity - 1
         self._propagate(tree_idx, change)
-        # Update max priority seen so far (compare only with new priority)
         self._max_priority = max(self._max_priority, priority)
 
     def add(self, priority: float, data: object) -> int:
         """Adds data with a given priority. Returns the tree index."""
-        if self.capacity == 0:
+        if self.capacity == 0:  # Check user capacity
             raise ValueError("Cannot add to a SumTree with zero capacity.")
 
-        tree_idx = self.data_pointer + self.capacity - 1
-        sumtree_logger.debug(
-            f"Add START: prio={priority:.4f}, data_ptr={self.data_pointer}, n_entries={self.n_entries}, capacity={self.capacity}"
-        )
-        sumtree_logger.debug(f"Add: Calculated tree_idx={tree_idx}")
+        # Calculate tree index based on data_pointer and internal capacity
+        tree_idx = self.data_pointer + self._internal_capacity - 1
 
+        # Store data at data_pointer index
         self.data[self.data_pointer] = data
-        sumtree_logger.debug(f"Add: Stored data at data_idx={self.data_pointer}")
+        # Update the corresponding leaf in the tree
+        self.update(tree_idx, priority)
 
-        self.update(
-            tree_idx, priority
-        )  # Use update which handles propagation and max_priority
-        sumtree_logger.debug(
-            f"Add: Updated leaf {tree_idx} with priority {priority:.4f}, _max_p={self._max_priority:.4f}"
-        )
-
-        # Update data_pointer and n_entries
+        # Update data_pointer, wrapping around the *user* capacity
         self.data_pointer = (self.data_pointer + 1) % self.capacity
-        # Only increment n_entries if we haven't filled the buffer yet
+        # Increment n_entries up to the *user* capacity
         if self.n_entries < self.capacity:
             self.n_entries += 1
-            sumtree_logger.debug(f"Add: Incremented n_entries to {self.n_entries}")
-        # else: # No need for else, data_pointer wrap handles overwrite
-        #      sumtree_logger.debug(
-        #         f"Add: n_entries ({self.n_entries}) remains at capacity"
-        #     )
 
-        sumtree_logger.debug(
-            f"Add END: data_ptr={self.data_pointer}, n_entries={self.n_entries}"
-        )
         return tree_idx
 
     def update(self, tree_idx: int, priority: float):
         """Public method to update priority at a given tree index."""
         self._update_leaf(tree_idx, priority)
 
-    # --- CORRECTED Iterative _retrieve ---
+    # --- CORRECTED Iterative Retrieve with Strict Inequality ---
     def _retrieve(self, tree_idx: int, sample_value: float) -> int:
         """Finds the leaf index for a given sample value using binary search on the tree."""
-        # Start from the root (tree_idx = 0)
-        current_idx = 0
+        current_idx = tree_idx  # Start search from the provided index (usually 0)
+        sumtree_logger.debug(
+            f"Retrieve START: initial_idx={current_idx}, sample_value={sample_value:.6f}"
+        )
+
         while True:
             left_child_idx = 2 * current_idx + 1
             right_child_idx = left_child_idx + 1
+            sumtree_logger.debug(
+                f"  Loop: current_idx={current_idx}, sample_value={sample_value:.6f}"
+            )
 
-            # If left child index is out of bounds, we are at a leaf node
+            # If left child index is out of bounds, current_idx is a leaf
             if left_child_idx >= len(self.tree):
-                return current_idx  # This is the leaf index
+                sumtree_logger.debug(
+                    f"  Leaf condition met: left_child_idx={left_child_idx} >= tree_len={len(self.tree)}. Returning leaf_idx={current_idx}"
+                )
+                break
 
             left_sum = self.tree[left_child_idx]
+            sumtree_logger.debug(
+                f"    left_child_idx={left_child_idx}, left_sum={left_sum:.6f}"
+            )
 
-            # If the sample value is less than the priority of the left subtree, go left
-            # Use strict inequality to handle zero-priority nodes correctly
+            # --- Use strict less than comparison ---
             if sample_value < left_sum:
+                # --- End change ---
+                sumtree_logger.debug(
+                    f"    Condition TRUE: {sample_value:.6f} < {left_sum:.6f}. Going LEFT."
+                )
                 current_idx = left_child_idx
-            # Otherwise, go right, adjusting the sample value
             else:
+                sumtree_logger.debug(
+                    f"    Condition FALSE: {sample_value:.6f} >= {left_sum:.6f}. Going RIGHT."
+                )
                 sample_value -= left_sum
+                sumtree_logger.debug(f"      Adjusted sample_value={sample_value:.6f}")
+                # Ensure right child exists before assigning
+                if right_child_idx >= len(self.tree):
+                    sumtree_logger.warning(
+                        f"      Right child index {right_child_idx} out of bounds! Tree len={len(self.tree)}. Breaking loop at idx={current_idx}."
+                    )
+                    break
                 current_idx = right_child_idx
+                sumtree_logger.debug(f"      New current_idx={current_idx}")
 
-    # --- END CORRECTED ---
+        sumtree_logger.debug(f"Retrieve END: Returning leaf_idx={current_idx}")
+        return current_idx
+
+    # --- End CORRECTED Iterative Retrieve ---
 
     def get_leaf(self, value: float) -> tuple[int, float, object]:
         """
         Finds the leaf node index, priority, and associated data for a given sample value.
         """
-        sumtree_logger.debug(f"GetLeaf START: value={value:.4f}")
-        total_p = self.total()  # Use the method here
-        if (
-            total_p <= 0
-        ):  # Check for <= 0 to handle potential negative priorities if clamping fails
+        total_p = self.total()
+        if total_p <= 0:
             raise ValueError(
                 f"Cannot sample from SumTree with zero or negative total priority ({total_p}). n_entries: {self.n_entries}"
             )
-        sumtree_logger.debug(f"GetLeaf: TotalP={total_p:.4f}")
 
-        # Clamp value to be within [0, total_p)
-        value = np.clip(
-            value, 0, total_p - 1e-9
-        )  # Use epsilon to avoid hitting exact total_p
+        # Clamp value to be within [0, total_p) using epsilon
+        value = np.clip(value, 0, total_p - 1e-9)
 
-        sumtree_logger.debug(f"GetLeaf: Using value={value:.4f} for retrieval")
-
+        # Start retrieval from the root (index 0)
         leaf_tree_idx = self._retrieve(0, value)
-        sumtree_logger.debug(f"GetLeaf: Retrieved leaf_tree_idx={leaf_tree_idx}")
-        data_idx = leaf_tree_idx - (self.capacity - 1)
-        sumtree_logger.debug(f"GetLeaf: Calculated data_idx={data_idx}")
 
-        # Check if the data index is valid given the number of entries
+        # Ensure returned index is actually a leaf index based on internal capacity
+        if not (
+            self._internal_capacity - 1
+            <= leaf_tree_idx
+            < 2 * self._internal_capacity - 1
+        ):
+            sumtree_logger.error(
+                f"GetLeaf: _retrieve returned non-leaf index {leaf_tree_idx}. "
+                f"InternalCapacity={self._internal_capacity}, Sampled value: {value:.4f}, Total P: {total_p:.4f}."
+            )
+            # Fallback: Find the leftmost leaf based on internal capacity
+            leaf_tree_idx = self._internal_capacity - 1
+
+        data_idx = leaf_tree_idx - (self._internal_capacity - 1)
+
+        # Check if the data index corresponds to a valid *entry* (within user capacity and n_entries)
         if not (0 <= data_idx < self.n_entries):
-            # This can happen if the tree is not full and the sampling process
-            # lands in a region corresponding to an empty slot.
-            # This indicates an issue either in sampling logic or tree structure.
             tree_dump = self.tree[
-                self.capacity - 1 : self.capacity - 1 + self.n_entries
+                self._internal_capacity - 1 : self._internal_capacity
+                - 1
+                + self.n_entries
             ]
             sumtree_logger.error(
-                f"GetLeaf: Invalid data_idx {data_idx} retrieved for tree_idx {leaf_tree_idx}. "
-                f"n_entries={self.n_entries}, capacity={self.capacity}. "
+                f"GetLeaf: Invalid data_idx {data_idx} (from leaf_tree_idx {leaf_tree_idx}) retrieved. "
+                f"n_entries={self.n_entries}, user_capacity={self.capacity}. "
                 f"Sampled value: {value:.4f}, Total P: {total_p:.4f}. "
                 f"Leaf priorities (first {self.n_entries}): {tree_dump}"
             )
-            # Re-running retrieve might help if it was a transient float issue, but unlikely.
-            # A better approach might be to resample, but that logic belongs in the caller (ExperienceBuffer).
-            # For now, raise an error to indicate the problem clearly.
             raise IndexError(
                 f"Retrieved data_idx {data_idx} is out of bounds for n_entries {self.n_entries}."
             )
 
         priority = self.tree[leaf_tree_idx]
-        data = self.data[data_idx]  # Retrieve from list
-        sumtree_logger.debug(f"GetLeaf: Found priority={priority:.4f}, data={data}")
+        # Retrieve data using the calculated data_idx (which is within [0, user_capacity))
+        data = self.data[data_idx]
 
-        # Check for None data, which indicates an uninitialized slot was sampled
-        # This check should ideally be redundant now with the n_entries check above.
         if data is None:
+            # This should ideally not happen if data_idx < n_entries check passed
             tree_dump = self.tree[
-                self.capacity - 1 : self.capacity - 1 + self.n_entries
+                self._internal_capacity - 1 : self._internal_capacity
+                - 1
+                + self.n_entries
             ]
             sumtree_logger.error(
                 f"Sampled None data at data_idx {data_idx} (tree_idx {leaf_tree_idx}). "
@@ -217,8 +229,6 @@ class SumTree:
             )
             raise RuntimeError(
                 f"Sampled None data at data_idx {data_idx} (tree_idx {leaf_tree_idx}). "
-                f"This indicates an issue with the SumTree state or sampling logic. "
-                f"Sampled value: {value:.4f}, Total P: {total_p:.4f}"
             )
 
         return leaf_tree_idx, priority, data
@@ -230,6 +240,4 @@ class SumTree:
     @property
     def max_priority(self) -> float:
         """Returns the maximum priority seen so far, or 1.0 if empty."""
-        # Return 1.0 if empty, ensuring new items get added with non-zero priority
-        # If not empty, return the actual max seen.
         return float(self._max_priority) if self.n_entries > 0 else 1.0

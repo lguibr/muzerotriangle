@@ -2,9 +2,7 @@
 import logging
 import sys
 import traceback
-from collections import deque
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
 
 import mlflow
 import ray
@@ -12,8 +10,6 @@ import ray
 from ..config import APP_NAME, PersistenceConfig, TrainConfig
 
 # Import Trajectory type
-from ..utils.sumtree import SumTree  # Import SumTree for re-initialization
-from ..utils.types import Trajectory  # Import Trajectory
 from .components import TrainingComponents
 from .logging_utils import (
     get_root_logger,
@@ -22,10 +18,6 @@ from .logging_utils import (
 )
 from .loop import TrainingLoop
 from .setup import count_parameters, setup_training_components
-
-if TYPE_CHECKING:
-    from ..utils.types import Trajectory
-
 
 logger = logging.getLogger(__name__)
 
@@ -101,7 +93,6 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
     # --- Apply MuZero Buffer Data ---
     if loaded_state.buffer_data:
         logger.info("Loading MuZero buffer data...")
-        reconstructed_buffer_data: list[tuple[int, Trajectory]] = []
         # Ensure buffer_idx mapping is rebuilt correctly
         components.buffer.buffer.clear()
         components.buffer.tree_idx_to_buffer_idx.clear()
@@ -111,7 +102,7 @@ def _load_and_apply_initial_state(components: TrainingComponents) -> TrainingLoo
         if components.buffer.use_per and components.buffer.sum_tree:
             components.buffer.sum_tree.reset()  # Reset sumtree
 
-        for i, traj in enumerate(loaded_state.buffer_data.trajectories):
+        for _i, traj in enumerate(loaded_state.buffer_data.trajectories):
             # Re-add trajectories to ensure buffer and sumtree are consistent
             components.buffer.add(traj)
 

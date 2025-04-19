@@ -9,7 +9,6 @@ import ray  # Import ray
 
 from ...environment import GameState
 from ...stats import Plotter
-from ...utils.types import StatsCollectorData  # Import StatsCollectorData
 from ..drawing import hud as hud_drawing
 from ..ui import ProgressBar  # Import ProgressBar
 from . import colors, layout
@@ -17,7 +16,7 @@ from .game_renderer import GameRenderer
 
 if TYPE_CHECKING:
     from ...config import EnvConfig, ModelConfig, VisConfig
-    from ...stats import StatsCollectorActor
+    from ...utils.types import StatsCollectorData
 
 logger = logging.getLogger(__name__)
 
@@ -141,7 +140,7 @@ class DashboardRenderer:
         worker_grid_area = layout_rects.get("worker_grid")
         plots_rect = layout_rects.get("plots")
         progress_bar_area_rect = layout_rects.get("progress_bar_area")
-        hud_rect = layout_rects.get("hud")
+        layout_rects.get("hud")
 
         # --- Render Worker Grids ---
         if (
@@ -269,7 +268,7 @@ class DashboardRenderer:
 
                     buffer_info_parts.append(f"Weight Updates: {updates}")
                     buffer_info_parts.append(f"Episodes: {episodes}")
-                    if isinstance(sims, (int, float)):
+                    if isinstance(sims, int | float):
                         sims_str = (
                             f"{sims / 1e6:.1f}M"
                             if sims >= 1e6
@@ -283,10 +282,10 @@ class DashboardRenderer:
 
                     if isinstance(pending_tasks, int) and isinstance(num_workers, int):
                         buffer_info_parts.append(
-                            f"Workers: {num_workers-pending_tasks}/{num_workers} Active"
+                            f"Workers: {num_workers - pending_tasks}/{num_workers} Active"
                         )
                     else:
-                        buffer_info_parts.append(f"Workers: ?/?")
+                        buffer_info_parts.append("Workers: ?/?")
 
                     buffer_bar_info_str = " | ".join(buffer_info_parts)
 

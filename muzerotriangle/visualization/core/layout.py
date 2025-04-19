@@ -1,6 +1,5 @@
 # File: muzerotriangle/visualization/core/layout.py
 import logging
-import math
 
 import pygame
 
