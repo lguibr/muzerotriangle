@@ -82,6 +82,7 @@ def mock_state_type_nn(model_config: ModelConfig, env_config: EnvConfig) -> Stat
         "other_features": rng.random(other_shape).astype(np.float32),
     }
 
+
 # --- Test Initialization ---
 def test_nn_initialization_muzero(nn_interface: NeuralNetwork, device: torch.device):
     """Test if the NeuralNetwork wrapper initializes correctly with MuZeroNet."""
@@ -95,6 +96,7 @@ def test_nn_initialization_muzero(nn_interface: NeuralNetwork, device: torch.dev
 
 # --- Test Core MuZero Interface Methods ---
 
+
 @patch("muzerotriangle.nn.network.extract_state_features")
 def test_initial_inference(
     mock_extract: MagicMock,
@@ -104,14 +106,19 @@ def test_initial_inference(
 ):
     """Test the initial_inference method."""
     mock_extract.return_value = mock_state_type_nn
-    batch_size = 1 # initial_inference takes StateType, implies batch=1 internally
+    batch_size = 1  # initial_inference takes StateType, implies batch=1 internally
 
-    policy_logits, value_logits, reward_logits, hidden_state = nn_interface.initial_inference(mock_state_type_nn)
+    policy_logits, value_logits, reward_logits, hidden_state = (
+        nn_interface.initial_inference(mock_state_type_nn)
+    )
 
     # Check shapes
     assert policy_logits.shape == (batch_size, nn_interface.action_dim)
     assert value_logits.shape == (batch_size, model_config.NUM_VALUE_ATOMS)
-    assert reward_logits.shape == (batch_size, model_config.REWARD_SUPPORT_SIZE) # Dummy reward
+    assert reward_logits.shape == (
+        batch_size,
+        model_config.REWARD_SUPPORT_SIZE,
+    )  # Dummy reward
     assert hidden_state.shape == (batch_size, model_config.HIDDEN_STATE_DIM)
 
     # Check types and device
@@ -132,8 +139,8 @@ def test_recurrent_inference(nn_interface: NeuralNetwork, model_config: ModelCon
         0, nn_interface.action_dim, (batch_size,), device=nn_interface.device
     )
 
-    policy_logits, value_logits, reward_logits, next_hidden_state = nn_interface.recurrent_inference(
-        dummy_hidden_state, dummy_actions
+    policy_logits, value_logits, reward_logits, next_hidden_state = (
+        nn_interface.recurrent_inference(dummy_hidden_state, dummy_actions)
     )
 
     # Check shapes
@@ -152,6 +159,7 @@ def test_recurrent_inference(nn_interface: NeuralNetwork, model_config: ModelCon
 
 # --- Test Compatibility Evaluate Methods ---
 
+
 @patch("muzerotriangle.nn.network.extract_state_features")
 def test_evaluate_single_muzero(
     mock_extract: MagicMock,
@@ -162,7 +170,7 @@ def test_evaluate_single_muzero(
 ):
     """Test the evaluate method (uses initial_inference)."""
     mock_extract.return_value = mock_state_type_nn
-    action_dim_int = int(env_config.ACTION_DIM) # type: ignore[call-overload]
+    action_dim_int = int(env_config.ACTION_DIM)  # type: ignore[call-overload]
 
     policy_map, value = nn_interface.evaluate(mock_game_state)
 
@@ -191,7 +199,7 @@ def test_evaluate_batch_muzero(
         }
         for i in range(batch_size)
     ]
-    action_dim_int = int(env_config.ACTION_DIM) # type: ignore[call-overload]
+    action_dim_int = int(env_config.ACTION_DIM)  # type: ignore[call-overload]
 
     results = nn_interface.evaluate_batch(mock_states)
 
@@ -222,6 +230,10 @@ def test_get_set_weights_muzero(nn_interface: NeuralNetwork):
     # Compare parameter tensors
     for key in initial_weights:
         if initial_weights[key].dtype.is_floating_point:
-            assert torch.allclose(modified_weights[key], new_weights[key], atol=1e-6), f"Weight mismatch for key {key}"
+            assert torch.allclose(modified_weights[key], new_weights[key], atol=1e-6), (
+                f"Weight mismatch for key {key}"
+            )
         else:
-            assert torch.equal(initial_weights[key], new_weights[key]), f"Non-float tensor mismatch for key {key}"
+            assert torch.equal(initial_weights[key], new_weights[key]), (
+                f"Non-float tensor mismatch for key {key}"
+            )

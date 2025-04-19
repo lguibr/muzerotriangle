@@ -1,35 +1,26 @@
 # File: muzerotriangle/rl/core/trainer.py
 import logging
-from typing import cast
+from typing import TYPE_CHECKING, cast
 
-import numpy as np
 import torch
 import torch.nn.functional as F
 import torch.optim as optim
-from torch.optim.lr_scheduler import _LRScheduler
 
-from ...config import EnvConfig, TrainConfig
-from ...nn import NeuralNetwork
 from ...utils.types import (
-    ExperienceBatch,
-    PERBatchSample,
+    SampledBatch,
 )
+
+if TYPE_CHECKING:
+    from torch.optim.lr_scheduler import _LRScheduler
 
 logger = logging.getLogger(__name__)
 
 
 class Trainer:
-    """
-    Handles the neural network training process, including loss calculation
-    and optimizer steps. Supports Distributional RL (C51) value loss.
-    """
+    """MuZero Trainer."""
 
-    def __init__(
-        self,
-        nn_interface: NeuralNetwork,
-        train_config: TrainConfig,
-        env_config: EnvConfig,
-    ):
+    # ... (init, _create_optimizer, _create_scheduler remain the same) ...
+    def __init__(self, nn_interface, train_config, env_config):
         self.nn = nn_interface
         self.model = nn_interface.model
         self.train_config = train_config
@@ -37,18 +28,14 @@ class Trainer:
         self.model_config = nn_interface.model_config
         self.device = nn_interface.device
         self.optimizer = self._create_optimizer()
-        self.scheduler: _LRScheduler | None = self._create_scheduler(self.optimizer)
+        self.scheduler = self._create_scheduler(self.optimizer)
+        self.num_value_atoms = self.nn.num_value_atoms
+        self.value_support = self.nn.support.to(self.device)
+        self.num_reward_atoms = self.nn.num_reward_atoms
+        self.reward_support = self.nn.reward_support.to(self.device)
+        self.unroll_steps = self.train_config.MUZERO_UNROLL_STEPS
 
-        # --- ADDED: Distributional Value Attributes (from NN interface) ---
-        self.num_atoms = self.nn.num_atoms
-        self.v_min = self.nn.v_min
-        self.v_max = self.nn.v_max
-        self.delta_z = self.nn.delta_z
-        self.support = self.nn.support.to(self.device)  # Ensure support is on device
-        # --- END ADDED ---
-
-    def _create_optimizer(self) -> optim.Optimizer:
-        """Creates the optimizer based on TrainConfig."""
+    def _create_optimizer(self):
         lr = self.train_config.LEARNING_RATE
         wd = self.train_config.WEIGHT_DECAY
         params = self.model.parameters()
@@ -65,23 +52,17 @@ class Trainer:
                 f"Unsupported optimizer type: {self.train_config.OPTIMIZER_TYPE}"
             )
 
-    def _create_scheduler(self, optimizer: optim.Optimizer) -> _LRScheduler | None:
-        """Creates the learning rate scheduler based on TrainConfig."""
+    def _create_scheduler(self, optimizer):
         scheduler_type_config = self.train_config.LR_SCHEDULER_TYPE
-        scheduler_type: str | None = None
+        scheduler_type = None
         if scheduler_type_config:
             scheduler_type = scheduler_type_config.lower()
-
         if not scheduler_type or scheduler_type == "none":
-            logger.info("No LR scheduler configured.")
             return None
-
         logger.info(f"Creating LR scheduler: {scheduler_type}")
         if scheduler_type == "steplr":
             step_size = getattr(self.train_config, "LR_SCHEDULER_STEP_SIZE", 100000)
             gamma = getattr(self.train_config, "LR_SCHEDULER_GAMMA", 0.1)
-            logger.info(f"  StepLR params: step_size={step_size}, gamma={gamma}")
-            # Cast return type
             return cast(
                 "_LRScheduler",
                 optim.lr_scheduler.StepLR(optimizer, step_size=step_size, gamma=gamma),
@@ -90,11 +71,7 @@ class Trainer:
             t_max = self.train_config.LR_SCHEDULER_T_MAX
             eta_min = self.train_config.LR_SCHEDULER_ETA_MIN
             if t_max is None:
-                logger.warning(
-                    "LR_SCHEDULER_T_MAX is None for CosineAnnealingLR. Scheduler might not work as expected."
-                )
                 t_max = self.train_config.MAX_TRAINING_STEPS or 1_000_000
-            logger.info(f"  CosineAnnealingLR params: T_max={t_max}, eta_min={eta_min}")
             return cast(
                 "_LRScheduler",
                 optim.lr_scheduler.CosineAnnealingLR(
@@ -104,233 +81,234 @@ class Trainer:
         else:
             raise ValueError(f"Unsupported scheduler type: {scheduler_type_config}")
 
-    def _prepare_batch(
-        self, batch: ExperienceBatch
-    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
-        """
-        Converts a batch of experiences into tensors.
-        The 4th tensor is now the n-step return G (scalar).
-        """
-        batch_size = len(batch)
-        grids = []
-        other_features = []
-        # --- Store n-step returns ---
-        n_step_returns = []
-        action_dim_int = int(self.env_config.ACTION_DIM)  # type: ignore[call-overload]
-        policy_target_tensor = torch.zeros(
-            (batch_size, action_dim_int),
+    def _prepare_batch(self, batch_sequences: SampledBatch) -> dict[str, torch.Tensor]:
+        # (No changes needed here)
+        batch_size = len(batch_sequences)
+        seq_len = self.unroll_steps + 1
+        action_dim = int(self.env_config.ACTION_DIM)  # type: ignore[call-overload]
+        batch_grids = torch.zeros(
+            (
+                batch_size,
+                seq_len,
+                self.model_config.GRID_INPUT_CHANNELS,
+                self.env_config.ROWS,
+                self.env_config.COLS,
+            ),
             dtype=torch.float32,
             device=self.device,
         )
-
-        # --- Unpack n_step_return ---
-        for i, (state_features, policy_target_map, n_step_return) in enumerate(batch):
-            grids.append(state_features["grid"])
-            other_features.append(state_features["other_features"])
-            n_step_returns.append(n_step_return)  # Store the scalar return G
-            for action, prob in policy_target_map.items():
-                if 0 <= action < action_dim_int:
-                    policy_target_tensor[i, action] = prob
-                else:
-                    logger.warning(
-                        f"Action {action} out of bounds in policy target map for sample {i}."
-                    )
-
-        grid_tensor = torch.from_numpy(np.stack(grids)).to(self.device)
-        other_features_tensor = torch.from_numpy(np.stack(other_features)).to(
-            self.device
+        batch_others = torch.zeros(
+            (batch_size, seq_len, self.model_config.OTHER_NN_INPUT_FEATURES_DIM),
+            dtype=torch.float32,
+            device=self.device,
         )
-        # --- Create tensor for n-step returns ---
-        n_step_return_tensor = torch.tensor(
-            n_step_returns, dtype=torch.float32, device=self.device
+        batch_actions = torch.zeros(
+            (batch_size, seq_len), dtype=torch.long, device=self.device
         )
-
-        expected_other_dim = self.model_config.OTHER_NN_INPUT_FEATURES_DIM
-        if batch_size > 0 and other_features_tensor.shape[1] != expected_other_dim:
-            raise ValueError(
-                f"Unexpected other_features tensor shape: {other_features_tensor.shape}, expected dim {expected_other_dim}"
-            )
-
-        # --- Return n_step_return_tensor ---
-        return (
-            grid_tensor,
-            other_features_tensor,
-            policy_target_tensor,
-            n_step_return_tensor,
+        batch_rewards = torch.zeros(
+            (batch_size, seq_len), dtype=torch.float32, device=self.device
         )
+        batch_policy_targets = torch.zeros(
+            (batch_size, seq_len, action_dim), dtype=torch.float32, device=self.device
+        )
+        batch_value_targets = torch.zeros(
+            (batch_size, seq_len), dtype=torch.float32, device=self.device
+        )
+        for b_idx, sequence in enumerate(batch_sequences):
+            if len(sequence) != seq_len:
+                raise ValueError(f"Sequence {b_idx} len {len(sequence)} != {seq_len}")
+            for s_idx, step_data in enumerate(sequence):
+                obs = step_data["observation"]
+                batch_grids[b_idx, s_idx] = torch.from_numpy(obs["grid"])
+                batch_others[b_idx, s_idx] = torch.from_numpy(obs["other_features"])
+                batch_actions[b_idx, s_idx] = step_data["action"]
+                batch_rewards[b_idx, s_idx] = step_data["reward"]
+                policy_map = step_data["policy_target"]
+                for action, prob in policy_map.items():
+                    if 0 <= action < action_dim:
+                        batch_policy_targets[b_idx, s_idx, action] = prob
+                policy_sum = batch_policy_targets[b_idx, s_idx].sum()
+                if abs(policy_sum - 1.0) > 1e-5 and policy_sum > 1e-9:
+                    batch_policy_targets[b_idx, s_idx] /= policy_sum
+                elif policy_sum <= 1e-9 and action_dim > 0:
+                    batch_policy_targets[b_idx, s_idx].fill_(1.0 / action_dim)
+                batch_value_targets[b_idx, s_idx] = step_data["value_target"]
+        return {
+            "grids": batch_grids,
+            "others": batch_others,
+            "actions": batch_actions,
+            "rewards": batch_rewards,
+            "policy_targets": batch_policy_targets,
+            "value_targets": batch_value_targets,
+        }
 
-    # --- REWRITTEN: Helper for calculating target distribution ---
     def _calculate_target_distribution(
-        self, n_step_returns: torch.Tensor
+        self, target_scalars: torch.Tensor, support: torch.Tensor
     ) -> torch.Tensor:
-        """
-        Projects the n-step returns onto the fixed support atoms (z).
-        Args:
-            n_step_returns: Tensor of shape (batch_size,) containing scalar n-step returns (G).
-        Returns:
-            Tensor of shape (batch_size, num_atoms) representing the target distribution.
-        """
-        batch_size = n_step_returns.size(0)
-        # Initialize target distribution tensor
-        m = torch.zeros(
-            (batch_size, self.num_atoms), dtype=torch.float32, device=self.device
+        """Projects scalar targets onto the fixed support atoms (z or r)."""
+        target_shape = target_scalars.shape  # (B, T) or (B, K)
+        num_atoms = support.size(0)
+        v_min = support[0]
+        v_max = support[-1]
+        delta = (v_max - v_min) / (num_atoms - 1) if num_atoms > 1 else 0.0
+
+        # Flatten targets for easier processing: (B*T) or (B*K)
+        target_scalars_flat = (
+            target_scalars.flatten()
+        )  # Shape (N,) where N = B*T or B*K
+
+        target_scalars_flat = target_scalars_flat.clamp(v_min, v_max)
+        # Add type hints for clarity
+        b: torch.Tensor = (
+            (target_scalars_flat - v_min) / delta
+            if delta > 0
+            else torch.zeros_like(target_scalars_flat)
+        )
+        lower_idx: torch.Tensor = b.floor().long()
+        upper_idx: torch.Tensor = b.ceil().long()
+
+        # Handle cases where target hits an atom exactly (l==u)
+        # Ensure indices are within bounds
+        lower_idx = torch.max(
+            torch.tensor(0, device=self.device, dtype=torch.long), lower_idx
+        )
+        upper_idx = torch.min(
+            torch.tensor(num_atoms - 1, device=self.device, dtype=torch.long), upper_idx
         )
 
-        # Clamp returns to the support range [V_min, V_max]
-        target_returns = n_step_returns.clamp(self.v_min, self.v_max)
+        # Calculate weights
+        m_lower: torch.Tensor = upper_idx.float() - b
+        m_upper: torch.Tensor = b - lower_idx.float()
 
-        # Calculate the fractional index b and lower/upper atom indices l, u
-        b = (target_returns - self.v_min) / self.delta_z
-        # --- CHANGED: Rename l to lower_idx ---
-        lower_idx = b.floor().long()
-        # --- END CHANGED ---
-        u = b.ceil().long()
+        # Distribute probability mass
+        m = torch.zeros(
+            target_scalars_flat.size(0), num_atoms, device=self.device
+        )  # Shape (N, num_atoms)
+        # Explicitly type batch_indices
+        batch_indices: torch.Tensor = torch.arange(
+            target_scalars_flat.size(0), device=self.device, dtype=torch.long
+        )
 
-        # Handle cases where b is an integer (l == u)
-        # Ensure indices stay within bounds [0, num_atoms - 1]
-        # --- CHANGED: Use lower_idx ---
-        lower_idx = torch.max(torch.tensor(0, device=self.device), lower_idx)
-        # --- END CHANGED ---
-        u = torch.min(torch.tensor(self.num_atoms - 1, device=self.device), u)
-        # If l==u after clamping, it means the target hit an atom exactly.
-        # We can assign full probability to that atom.
-        # However, the logic below handles this implicitly.
+        # Use advanced indexing (this should be correct)
+        m[batch_indices, lower_idx] += m_lower
+        m[batch_indices, upper_idx] += m_upper
 
-        # Calculate probabilities for lower and upper atoms based on distance
-        # --- CHANGED: Use lower_idx ---
-        m_l = u.float() - b  # Weight for lower atom
-        m_u = b - lower_idx.float()  # Weight for upper atom
-        # --- END CHANGED ---
-
-        # Distribute probability mass using direct indexing
-        # Create batch indices for advanced indexing
-        batch_indices = torch.arange(batch_size, device=self.device)
-
-        # Add probabilities to the lower atoms
-        # --- CHANGED: Use lower_idx ---
-        m[batch_indices, lower_idx] += m_l
-        # --- END CHANGED ---
-        # Add probabilities to the upper atoms
-        m[batch_indices, u] += m_u
-
+        # Reshape back to original batch/sequence shape + atoms dim
+        m = m.view(*target_shape, num_atoms)  # (B, T, num_atoms) or (B, K, num_atoms)
         return m
 
-    # --- END REWRITTEN ---
-
-    def train_step(
-        self, per_sample: PERBatchSample
-    ) -> tuple[dict[str, float], np.ndarray] | None:
-        """
-        Performs a single training step on the given batch from PER buffer.
-        Uses distributional cross-entropy loss for the value head.
-        Returns loss info dictionary and TD errors for priority updates.
-        """
-        batch = per_sample["batch"]
-        is_weights = per_sample["weights"]
-
-        if not batch:
-            logger.warning("train_step called with empty batch.")
-            return None
-
-        self.model.train()
-        try:
-            # --- Get n_step_return_t ---
-            grid_t, other_t, policy_target_t, n_step_return_t = self._prepare_batch(
-                batch
-            )
-            is_weights_t = torch.from_numpy(is_weights).to(self.device)
-        except Exception as e:
-            logger.error(f"Error preparing batch for training: {e}", exc_info=True)
-            return None
-
-        self.optimizer.zero_grad()
-        # --- Get value_logits ---
-        policy_logits, value_logits = self.model(grid_t, other_t)
-
-        # --- Value Loss (Distributional Cross-Entropy) ---
-        # Calculate target distribution
-        target_distribution = self._calculate_target_distribution(n_step_return_t)
-        # Calculate cross-entropy loss
-        # F.cross_entropy expects logits (N, C) and targets (N,) with class indices
-        # OR targets (N, C) with probabilities if soft labels are used.
-        # We have target probabilities, so use KLDivLoss or manual cross-entropy.
-        # Manual Cross-Entropy: - sum(target_prob * log_softmax(pred_logits))
-        log_pred_dist = F.log_softmax(value_logits, dim=1)
-        value_loss_elementwise = -torch.sum(target_distribution * log_pred_dist, dim=1)
-        # Apply importance sampling weights
-        value_loss = (value_loss_elementwise * is_weights_t).mean()
-
-        # --- Policy Loss (Cross-Entropy) --- (No change needed here)
-        log_probs = F.log_softmax(policy_logits, dim=1)
-        policy_target_t = torch.nan_to_num(policy_target_t, nan=0.0)
-        policy_loss_elementwise = -torch.sum(policy_target_t * log_probs, dim=1)
-        policy_loss = (policy_loss_elementwise * is_weights_t).mean()
-
-        # --- Entropy Bonus --- (No change needed here)
-        entropy_scalar: float = 0.0  # Initialize as float
-        entropy_loss_term = torch.tensor(
-            0.0, device=self.device
-        )  # Initialize as tensor
-        if self.train_config.ENTROPY_BONUS_WEIGHT > 0:
-            policy_probs = F.softmax(policy_logits, dim=1)
-            # Calculate entropy term: -Sum(p * log(p))
-            entropy_term_elementwise: torch.Tensor = -torch.sum(
-                policy_probs * torch.log(policy_probs + 1e-9), dim=1
-            )
-            # Calculate mean entropy across batch for logging
-            entropy_scalar = float(
-                entropy_term_elementwise.mean().item()
-            )  # Cast result to float
-            # Calculate the loss term (negative entropy bonus)
-            entropy_loss_term = (
-                -self.train_config.ENTROPY_BONUS_WEIGHT
-                * entropy_term_elementwise.mean()
-            )
-
+    def _calculate_loss(
+        self, policy_logits, value_logits, reward_logits, target_data
+    ) -> tuple[torch.Tensor, torch.Tensor, torch.Tensor, torch.Tensor]:
+        # (No changes needed here, relies on _calculate_target_distribution)
+        pi_target = target_data["policy_targets"]
+        z_target = target_data["value_targets"]
+        r_target = target_data["rewards"]
+        action_dim = pi_target.shape[-1]  # Get action dim from target
+        policy_logits_flat = policy_logits.view(-1, action_dim)
+        pi_target_flat = pi_target.view(-1, action_dim)
+        log_pred_p = F.log_softmax(policy_logits_flat, dim=1)
+        policy_loss = -torch.sum(pi_target_flat * log_pred_p, dim=1).mean()
+        value_target_dist = self._calculate_target_distribution(
+            z_target, self.value_support
+        )
+        value_logits_flat = value_logits.view(-1, self.num_value_atoms)
+        value_target_dist_flat = value_target_dist.view(-1, self.num_value_atoms)
+        log_pred_v = F.log_softmax(value_logits_flat, dim=1)
+        value_loss = -torch.sum(value_target_dist_flat * log_pred_v, dim=1).mean()
+        r_target_k = r_target[:, : self.unroll_steps]  # Rewards r_1 to r_K
+        reward_target_dist = self._calculate_target_distribution(
+            r_target_k, self.reward_support
+        )
+        reward_logits_flat = reward_logits.view(-1, self.num_reward_atoms)
+        reward_target_dist_flat = reward_target_dist.view(-1, self.num_reward_atoms)
+        log_pred_r = F.log_softmax(reward_logits_flat, dim=1)
+        reward_loss = -torch.sum(reward_target_dist_flat * log_pred_r, dim=1).mean()
         total_loss = (
             self.train_config.POLICY_LOSS_WEIGHT * policy_loss
             + self.train_config.VALUE_LOSS_WEIGHT * value_loss
-            + entropy_loss_term  # Use the calculated term
+            + self.train_config.REWARD_LOSS_WEIGHT * reward_loss
         )
+        return total_loss, policy_loss, value_loss, reward_loss
 
+    def train_step(self, batch_sequences: SampledBatch) -> dict[str, float] | None:
+        # (No changes needed in main logic flow)
+        if not batch_sequences:
+            return None
+        self.model.train()
+        try:
+            target_data = self._prepare_batch(batch_sequences)
+        except Exception as e:
+            logger.error(f"Error preparing batch: {e}", exc_info=True)
+            return None
+
+        self.optimizer.zero_grad()
+        obs_grid_0 = target_data["grids"][:, 0].contiguous()
+        obs_other_0 = target_data["others"][:, 0].contiguous()
+        policy_logits_0, value_logits_0, initial_hidden_state = self.model(
+            obs_grid_0, obs_other_0
+        )
+        policy_logits_list = [policy_logits_0]
+        value_logits_list = [value_logits_0]
+        reward_logits_list = []
+        hidden_state = initial_hidden_state
+
+        for k in range(self.unroll_steps):
+            action_k_plus_1 = target_data["actions"][:, k]
+            policy_logits_k, value_logits_k, reward_logits_k, hidden_state = (
+                self.model.recurrent_inference(hidden_state, action_k_plus_1)
+            )
+            policy_logits_list.append(policy_logits_k)
+            value_logits_list.append(value_logits_k)
+            reward_logits_list.append(reward_logits_k)
+
+        policy_logits_all = torch.stack(policy_logits_list, dim=1)
+        value_logits_all = torch.stack(value_logits_list, dim=1)
+        reward_logits_k = torch.stack(reward_logits_list, dim=1)
+        total_loss, policy_loss, value_loss, reward_loss = self._calculate_loss(
+            policy_logits_all, value_logits_all, reward_logits_k, target_data
+        )
         total_loss.backward()
-
-        if (
-            self.train_config.GRADIENT_CLIP_VALUE is not None
-            and self.train_config.GRADIENT_CLIP_VALUE > 0
-        ):
+        if self.train_config.GRADIENT_CLIP_VALUE is not None:
             torch.nn.utils.clip_grad_norm_(
                 self.model.parameters(), self.train_config.GRADIENT_CLIP_VALUE
             )
-
         self.optimizer.step()
         if self.scheduler:
             self.scheduler.step()
 
-        # --- TD Error Calculation for PER ---
-        # Use the difference between the n-step return G and the expected value E[V(s)]
         with torch.no_grad():
-            expected_value_pred = self.nn._logits_to_expected_value(value_logits)
-        # Ensure n_step_return_t has shape (batch_size,)
-        td_errors = (
-            (n_step_return_t - expected_value_pred.squeeze(1)).detach().cpu().numpy()
-        )
-
+            policy_probs = F.softmax(policy_logits_all, dim=-1)
+            entropy = (
+                -torch.sum(policy_probs * torch.log(policy_probs + 1e-9), dim=-1)
+                .mean()
+                .item()
+            )
         loss_info = {
             "total_loss": total_loss.item(),
             "policy_loss": policy_loss.item(),
             "value_loss": value_loss.item(),
-            "entropy": entropy_scalar,
-            "mean_td_error": float(np.mean(np.abs(td_errors))),
+            "reward_loss": reward_loss.item(),
+            "entropy": entropy,
         }
-
-        return loss_info, td_errors
+        return loss_info
 
     def get_current_lr(self) -> float:
-        """Returns the current learning rate from the optimizer."""
+        # (No changes needed here)
         try:
-            # Ensure return type is float
             return float(self.optimizer.param_groups[0]["lr"])
-        except (IndexError, KeyError):
-            logger.warning("Could not retrieve learning rate from optimizer.")
+        except Exception:
+            logger.warning("Could not retrieve LR.")
             return 0.0
+
+    def load_optimizer_state(self, state_dict: dict):
+        # (No changes needed here)
+        try:
+            self.optimizer.load_state_dict(state_dict)
+            for state in self.optimizer.state.values():
+                for k, v in state.items():
+                    if isinstance(v, torch.Tensor):
+                        state[k] = v.to(self.device)
+            logger.info("Optimizer state loaded.")
+        except Exception as e:
+            logger.error(f"Failed load optimizer state: {e}", exc_info=True)

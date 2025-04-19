@@ -1,9 +1,10 @@
+# File: muzerotriangle/data/schemas.py
 from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
-# Use relative import
-from ..utils.types import Experience
+# Use relative import for Trajectory
+from ..utils.types import Trajectory  # Import Trajectory type
 
 arbitrary_types_config = ConfigDict(arbitrary_types_allowed=True)
 
@@ -25,11 +26,14 @@ class CheckpointData(BaseModel):
 
 
 class BufferData(BaseModel):
-    """Pydantic model defining the structure of saved buffer data."""
+    """Pydantic model defining the structure of saved MuZero buffer data."""
 
     model_config = arbitrary_types_config
 
-    buffer_list: list[Experience]
+    # --- CHANGED: Store list of Trajectories ---
+    trajectories: list[Trajectory]
+    total_steps: int = Field(..., ge=0)  # Store total steps for quicker loading
+    # --- END CHANGED ---
 
 
 class LoadedTrainingState(BaseModel):
@@ -41,5 +45,7 @@ class LoadedTrainingState(BaseModel):
     buffer_data: BufferData | None = None
 
 
+# Rebuild models after changes
+CheckpointData.model_rebuild(force=True)
 BufferData.model_rebuild(force=True)
 LoadedTrainingState.model_rebuild(force=True)

@@ -17,7 +17,7 @@ This module centralizes all configuration parameters for the MuZeroTriangle proj
 -   **Pydantic Models:**
     -   [`EnvConfig`](env_config.py): Environment parameters (grid size, shapes).
     -   [`ModelConfig`](model_config.py): Defines the MuZero **network architecture** parameters (representation, dynamics, prediction functions, hidden state dimension, reward/value support sizes, etc.).
-    -   [`TrainConfig`](train_config.py): Training loop hyperparameters (batch size, learning rate, workers, **PER settings**, **MuZero unroll steps**, etc.). **Defaults tuned for longer runs.**
+    -   [`TrainConfig`](train_config.py): Training loop hyperparameters (batch size, learning rate, workers, **MuZero unroll steps**, **loss weights**, etc.). **PER disabled by default.**
     -   [`VisConfig`](vis_config.py): Visualization parameters (screen size, FPS, layout).
     -   [`PersistenceConfig`](persistence_config.py): Data saving/loading parameters (directories, filenames).
     -   [`MCTSConfig`](mcts_config.py): MCTS parameters (simulations, exploration constants, temperature).

@@ -1,15 +1,14 @@
+# File: muzerotriangle/rl/core/buffer.py
 import logging
 import random
 from collections import deque
 
-import numpy as np
-
 from ...config import TrainConfig
-from ...utils.sumtree import SumTree
+
+# from ...utils.sumtree import SumTree # REMOVED: PER disabled
 from ...utils.types import (
-    Experience,
-    ExperienceBatch,
-    PERBatchSample,
+    SampledBatch,  # Use SampledBatch
+    Trajectory,
 )
 
 logger = logging.getLogger(__name__)
@@ -17,187 +16,120 @@ logger = logging.getLogger(__name__)
 
 class ExperienceBuffer:
     """
-    Experience Replay Buffer storing (StateType, PolicyTarget, Value).
-    Supports both uniform sampling and Prioritized Experience Replay (PER)
-    based on TrainConfig.
+    Experience Replay Buffer for MuZero. Stores complete game trajectories.
+    Samples sequences of fixed length for training.
+    **Currently uses uniform sampling only (PER disabled).**
     """
 
     def __init__(self, config: TrainConfig):
         self.config = config
-        self.capacity = config.BUFFER_CAPACITY
-        self.min_size_to_train = config.MIN_BUFFER_SIZE_TO_TRAIN
-        self.use_per = config.USE_PER
+        self.capacity = (
+            config.BUFFER_CAPACITY
+        )  # Capacity in terms of total steps/transitions
+        self.min_size_to_train = config.MIN_BUFFER_SIZE_TO_TRAIN  # Min total steps
+        self.unroll_steps = config.MUZERO_UNROLL_STEPS
+        self.sequence_length = self.unroll_steps + 1  # K unroll steps + 1 initial state
 
-        if self.use_per:
-            self.tree = SumTree(self.capacity)
-            self.per_alpha = config.PER_ALPHA
-            self.per_beta_initial = config.PER_BETA_INITIAL
-            self.per_beta_final = config.PER_BETA_FINAL
-            # Ensure anneal steps is at least 1 to avoid division by zero
-            self.per_beta_anneal_steps = max(
-                1, config.PER_BETA_ANNEAL_STEPS or config.MAX_TRAINING_STEPS or 1
-            )
-            self.per_epsilon = config.PER_EPSILON
-            logger.info(
-                f"Experience buffer initialized with PER (alpha={self.per_alpha}, beta_init={self.per_beta_initial}). Capacity: {self.capacity}"
-            )
-        else:
-            self.buffer: deque[Experience] = deque(maxlen=self.capacity)
-            logger.info(
-                f"Experience buffer initialized with uniform sampling. Capacity: {self.capacity}"
-            )
+        self.buffer: deque[Trajectory] = deque()
+        self.total_steps = 0  # Track total steps stored across all trajectories
 
-    def _get_priority(self, error: float) -> float:
-        """Calculates priority from TD error."""
-        # Ensure return type is float
-        return float((np.abs(error) + self.per_epsilon) ** self.per_alpha)
+        # --- REMOVED: PER attributes ---
+        # self.use_per = config.USE_PER
+        # if self.use_per: ...
+        # ---
 
-    def add(self, experience: Experience):
-        """Adds a single experience. Uses max priority if PER is enabled."""
-        if self.use_per:
-            max_p = self.tree.max_priority
-            self.tree.add(max_p, experience)
-        else:
-            self.buffer.append(experience)
-
-    def add_batch(self, experiences: list[Experience]):
-        """Adds a batch of experiences. Uses max priority if PER is enabled."""
-        if self.use_per:
-            max_p = self.tree.max_priority
-            for exp in experiences:
-                self.tree.add(max_p, exp)
-        else:
-            self.buffer.extend(experiences)
-
-    def _calculate_beta(self, current_step: int) -> float:
-        """Linearly anneals beta from initial to final value."""
-        fraction = min(1.0, current_step / self.per_beta_anneal_steps)
-        beta = self.per_beta_initial + fraction * (
-            self.per_beta_final - self.per_beta_initial
+        logger.info(
+            f"MuZero Experience buffer initialized with uniform sampling. "
+            f"Capacity (total steps): {self.capacity}, Sequence Length: {self.sequence_length}"
         )
-        return beta
+
+    def add(self, trajectory: Trajectory):
+        """Adds a complete trajectory to the buffer."""
+        if not trajectory:
+            logger.warning("Attempted to add an empty trajectory to the buffer.")
+            return
+
+        traj_len = len(trajectory)
+        # --- Check capacity and evict oldest trajectories if needed ---
+        while self.total_steps + traj_len > self.capacity and len(self.buffer) > 0:
+            removed_traj = self.buffer.popleft()
+            self.total_steps -= len(removed_traj)
+            logger.debug(
+                f"Buffer capacity reached. Removed oldest trajectory (len: {len(removed_traj)}). Current total steps: {self.total_steps}"
+            )
+        # ---
+
+        self.buffer.append(trajectory)
+        self.total_steps += traj_len
+        logger.debug(
+            f"Added trajectory (len: {traj_len}). Buffer trajectories: {len(self.buffer)}, Total steps: {self.total_steps}"
+        )
+
+    def add_batch(self, trajectories: list[Trajectory]):
+        """Adds a batch of trajectories."""
+        for traj in trajectories:
+            self.add(traj)  # Use single add logic for capacity check
 
     def sample(
-        self, batch_size: int, current_train_step: int | None = None
-    ) -> PERBatchSample | None:
+        self,
+        batch_size: int,
+        _current_train_step: int | None = None,  # Step unused for uniform
+    ) -> SampledBatch | None:  # Returns batch of sequences
         """
-        Samples a batch of experiences.
-        Uses prioritized sampling if PER is enabled, otherwise uniform.
-        Requires current_train_step if PER is enabled to calculate beta.
+        Samples a batch of sequences uniformly.
+        Each sequence has length `unroll_steps + 1`.
         """
-        current_size = len(self)
-        if current_size < batch_size or current_size < self.min_size_to_train:
+        if not self.is_ready():
             return None
 
-        if self.use_per:
-            if current_train_step is None:
-                raise ValueError("current_train_step is required for PER sampling.")
+        sampled_sequences: SampledBatch = []
+        attempts = 0
+        max_attempts = batch_size * 5  # Allow some failed samples
 
-            batch: ExperienceBatch = []
-            idxs = np.empty((batch_size,), dtype=np.int32)
-            is_weights = np.empty((batch_size,), dtype=np.float32)
-            beta = self._calculate_beta(current_train_step)
+        while len(sampled_sequences) < batch_size and attempts < max_attempts:
+            attempts += 1
+            # 1. Sample a trajectory uniformly
+            traj_index = random.randrange(len(self.buffer))
+            trajectory = self.buffer[traj_index]
 
-            priority_segment = self.tree.total_priority / batch_size
-            max_weight = 0.0
+            # 2. Sample a starting index within the trajectory
+            # Need at least sequence_length steps available
+            if len(trajectory) < self.sequence_length:
+                # logger.debug(f"Skipping trajectory {traj_index} (len {len(trajectory)} < required {self.sequence_length})")
+                continue  # Skip short trajectories
 
-            for i in range(batch_size):
-                a = priority_segment * i
-                b = priority_segment * (i + 1)
-                value = random.uniform(a, b)
-                idx, p, data = self.tree.get_leaf(value)
+            start_index = random.randrange(len(trajectory) - self.sequence_length + 1)
 
-                if not isinstance(data, tuple):
-                    logger.warning(
-                        f"PER sampling encountered non-experience data at index {idx}. Resampling."
-                    )
-                    # Resample with a random value across the entire range
-                    value = random.uniform(0, self.tree.total_priority)
-                    idx, p, data = self.tree.get_leaf(value)
-                    if not isinstance(data, tuple):
-                        logger.error(f"PER resampling failed. Skipping sample {i}.")
-                        # Fallback: sample a random valid index if possible
-                        if self.tree.n_entries > 0:
-                            rand_data_idx = random.randint(0, self.tree.n_entries - 1)
-                            rand_tree_idx = rand_data_idx + self.capacity - 1
-                            idx, p, data = self.tree.get_leaf(
-                                self.tree.tree[rand_tree_idx]
-                            )
-                            if not isinstance(data, tuple):
-                                continue  # Give up on this sample if fallback fails
-                        else:
-                            continue  # Cannot sample if tree is empty
+            # 3. Extract the sequence
+            sequence = trajectory[start_index : start_index + self.sequence_length]
 
-                sampling_prob = p / self.tree.total_priority
-                weight = (
-                    (current_size * sampling_prob) ** (-beta)
-                    if sampling_prob > 1e-9
-                    else 0.0
-                )
-                is_weights[i] = weight
-                max_weight = max(max_weight, weight)
-                idxs[i] = idx
-                batch.append(data)
-
-            if max_weight > 1e-9:
-                is_weights /= max_weight
+            # 4. Basic validation (ensure correct length)
+            if len(sequence) == self.sequence_length:
+                sampled_sequences.append(sequence)
             else:
                 logger.warning(
-                    "Max importance sampling weight is near zero. Weights might be invalid."
+                    f"Sampled sequence has incorrect length {len(sequence)} (expected {self.sequence_length}) from traj {traj_index}, index {start_index}."
                 )
-                is_weights.fill(1.0)
 
-            return {"batch": batch, "indices": idxs, "weights": is_weights}
-
-        else:
-            uniform_batch = random.sample(self.buffer, batch_size)
-            dummy_indices = np.zeros(batch_size, dtype=np.int32)
-            uniform_weights = np.ones(batch_size, dtype=np.float32)
-            return {
-                "batch": uniform_batch,
-                "indices": dummy_indices,
-                "weights": uniform_weights,
-            }
-
-    def update_priorities(self, tree_indices: np.ndarray, td_errors: np.ndarray):
-        """Updates the priorities of sampled experiences based on TD errors."""
-        if not self.use_per:
-            return
-
-        if len(tree_indices) != len(td_errors):
-            logger.error(
-                f"Mismatch between tree_indices ({len(tree_indices)}) and td_errors ({len(td_errors)}) lengths."
+        if len(sampled_sequences) < batch_size:
+            logger.warning(
+                f"Could only sample {len(sampled_sequences)} sequences after {attempts} attempts (batch size {batch_size}). Buffer might contain many short trajectories."
             )
-            return
+            # Return partial batch if needed? Or None? Let's return partial.
+            # return None
 
-        # Calculate priorities for each error
-        priorities = np.array([self._get_priority(err) for err in td_errors])
-
-        if not np.all(np.isfinite(priorities)):
-            logger.warning("Non-finite priorities calculated. Clamping.")
-            priorities = np.nan_to_num(
-                priorities,
-                nan=self.per_epsilon,
-                posinf=self.tree.max_priority,
-                neginf=self.per_epsilon,
-            )
-            priorities = np.maximum(priorities, self.per_epsilon)
-
-        # Use strict=False for zip, although lengths should match after check above
-        for idx, p in zip(tree_indices, priorities, strict=False):
-            if not (0 <= idx < len(self.tree.tree)):
-                logger.error(f"Invalid tree index {idx} provided for priority update.")
-                continue
-            self.tree.update(idx, p)
-
-        # Update the overall max priority tracked by the tree
-        if len(priorities) > 0:
-            self.tree._max_priority = max(self.tree.max_priority, np.max(priorities))
+        return sampled_sequences
 
     def __len__(self) -> int:
-        """Returns the current number of experiences in the buffer."""
-        return self.tree.n_entries if self.use_per else len(self.buffer)
+        """Returns the total number of steps stored in the buffer."""
+        return self.total_steps
 
     def is_ready(self) -> bool:
-        """Checks if the buffer has enough samples to start training."""
-        return len(self) >= self.min_size_to_train
+        """Checks if the buffer has enough total steps to start training."""
+        # Also ensure there are enough trajectories to form a batch
+        return self.total_steps >= self.min_size_to_train and len(self.buffer) > 0
+
+    # --- REMOVED: PER methods ---
+    # def _get_priority(self, error: float) -> float: ...
+    # def update_priorities(self, tree_indices: np.ndarray, td_errors: np.ndarray): ...
+    # ---

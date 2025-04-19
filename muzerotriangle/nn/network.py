@@ -88,9 +88,7 @@ class NeuralNetwork:
             logger.warning("Model compilation skipped on MPS (compatibility issues).")
             return
         if not hasattr(torch, "compile"):
-            logger.warning(
-                "Model compilation skipped (torch.compile not available)."
-            )
+            logger.warning("Model compilation skipped (torch.compile not available).")
             return
 
         try:
@@ -182,13 +180,9 @@ class NeuralNetwork:
                    Reward logits are dummy here as they come from dynamics.
         """
         self.model.eval()
-        grid_tensor = (
-            torch.from_numpy(observation["grid"]).unsqueeze(0).to(self.device)
-        )
+        grid_tensor = torch.from_numpy(observation["grid"]).unsqueeze(0).to(self.device)
         other_features_tensor = (
-            torch.from_numpy(observation["other_features"])
-            .unsqueeze(0)
-            .to(self.device)
+            torch.from_numpy(observation["other_features"]).unsqueeze(0).to(self.device)
         )
 
         policy_logits, value_logits, initial_hidden_state = self.model(

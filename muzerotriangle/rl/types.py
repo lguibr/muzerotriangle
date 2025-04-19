@@ -1,9 +1,11 @@
+# File: muzerotriangle/rl/types.py
 import logging
 
 import numpy as np
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
-from ..utils.types import Experience
+# Use relative import for Trajectory
+from ..utils.types import Trajectory
 
 logger = logging.getLogger(__name__)
 
@@ -11,64 +13,83 @@ arbitrary_types_config = ConfigDict(arbitrary_types_allowed=True)
 
 
 class SelfPlayResult(BaseModel):
-    """Pydantic model for structuring results from a self-play worker."""
+    """Pydantic model for structuring results from a self-play worker (MuZero)."""
 
     model_config = arbitrary_types_config
 
-    episode_experiences: list[Experience]
+    # --- CHANGED: Store the full trajectory ---
+    trajectory: Trajectory
+    # --- END CHANGED ---
+
     final_score: float
     episode_steps: int
 
+    # MCTS Stats
     total_simulations: int = Field(..., ge=0)
     avg_root_visits: float = Field(..., ge=0)
     avg_tree_depth: float = Field(..., ge=0)
 
     @model_validator(mode="after")
-    def check_experience_structure(self) -> "SelfPlayResult":
-        """Basic structural validation for experiences."""
+    def check_trajectory_structure(self) -> "SelfPlayResult":
+        """Basic structural validation for trajectory steps."""
         invalid_count = 0
-        valid_experiences = []
-        # Rename unused loop variable 'i' to '_i'
-        for _i, exp in enumerate(self.episode_experiences):
+        valid_steps = []
+        for i, step in enumerate(self.trajectory):
             is_valid = False
-            if isinstance(exp, tuple) and len(exp) == 3:
-                state_type, policy_map, value = exp
-                # Combine nested if statements
-                if (
-                    isinstance(state_type, dict)
-                    and "grid" in state_type
-                    and "other_features" in state_type
-                    and isinstance(state_type["grid"], np.ndarray)
-                    and isinstance(state_type["other_features"], np.ndarray)
-                    and isinstance(policy_map, dict)
-                    # Use isinstance with | for multiple types
-                    and isinstance(value, float | int)
-                    # Basic check for NaN/inf in features
-                    and np.all(np.isfinite(state_type["grid"]))
-                    and np.all(np.isfinite(state_type["other_features"]))
+            try:
+                # Check if step is a dict (TypedDict) and has required keys
+                if isinstance(step, dict) and all(
+                    k in step
+                    for k in [
+                        "observation",
+                        "action",
+                        "reward",
+                        "policy_target",
+                        "value_target",
+                    ]
                 ):
-                    is_valid = True
+                    obs = step["observation"]
+                    # Further checks on observation structure
+                    if (
+                        isinstance(obs, dict)
+                        and "grid" in obs
+                        and "other_features" in obs
+                        and isinstance(obs["grid"], np.ndarray)
+                        and isinstance(obs["other_features"], np.ndarray)
+                        and np.all(np.isfinite(obs["grid"]))
+                        and np.all(np.isfinite(obs["other_features"]))
+                    ):
+                        # Check other types
+                        if (
+                            isinstance(step["action"], int)
+                            and isinstance(step["reward"], float | int)
+                            and isinstance(step["policy_target"], dict)
+                            and isinstance(step["value_target"], float | int)
+                        ):
+                            is_valid = True
+            except Exception as e:
+                logger.warning(f"Error validating trajectory step {i}: {e}")
 
             if is_valid:
-                valid_experiences.append(exp)
+                valid_steps.append(step)
             else:
                 invalid_count += 1
-                # Log only once per validation failure type if needed
-                # logger.warning(f"SelfPlayResult validation: Invalid experience structure at index {i}: {type(exp)}")
+                # logger.warning(f"SelfPlayResult validation: Invalid trajectory step structure at index {i}: {type(step)}")
 
         if invalid_count > 0:
             logger.warning(
-                f"SelfPlayResult validation: Found {invalid_count} invalid experience structures. Keeping only valid ones."
+                f"SelfPlayResult validation: Found {invalid_count} invalid trajectory steps. Keeping only valid ones."
             )
-            # Note: Modifying self within validator is generally discouraged,
-            # but here we filter invalid data before it propagates.
-            # A cleaner approach might be a separate validation function called after creation.
-            # However, for immediate use, this ensures the validated object has valid experiences.
-            object.__setattr__(
-                self, "episode_experiences", valid_experiences
-            )  # Use object.__setattr__ to bypass Pydantic's immutability during validation
+            # Modify trajectory in place (consider alternatives if mutation in validator is problematic)
+            object.__setattr__(self, "trajectory", valid_steps)
 
         return self
 
 
 SelfPlayResult.model_rebuild(force=True)
+
+# --- REMOVED: PERBatchSample (for now) ---
+# class PERBatchSample(TypedDict):
+#    batch: SampledBatch # Would need update
+#    indices: np.ndarray
+#    weights: np.ndarray

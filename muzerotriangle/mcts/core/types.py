@@ -1,3 +1,5 @@
+# File: muzerotriangle/mcts/core/types.py
+# No changes needed for this refactoring step. Keep the existing content.
 from collections.abc import Mapping
 from typing import TYPE_CHECKING, Protocol
 

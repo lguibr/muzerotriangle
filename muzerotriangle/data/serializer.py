@@ -10,13 +10,13 @@ import numpy as np
 import torch
 from pydantic import ValidationError
 
-from ..utils.sumtree import SumTree
+# Use relative import for Trajectory
 from .schemas import BufferData, CheckpointData
 
 if TYPE_CHECKING:
     from torch.optim import Optimizer
 
-    from ..rl.core.buffer import ExperienceBuffer
+    from ..rl.core.buffer import ExperienceBuffer  # Keep this type hint
 
 logger = logging.getLogger(__name__)
 
@@ -30,11 +30,10 @@ class Serializer:
             with path.open("rb") as f:
                 loaded_data = cloudpickle.load(f)
             if isinstance(loaded_data, CheckpointData):
-                # Pydantic automatically validates on load if type matches
                 return loaded_data
             else:
                 logger.error(
-                    f"Loaded checkpoint file {path} did not contain a CheckpointData object (type: {type(loaded_data)})."
+                    f"Loaded checkpoint file {path} type mismatch: {type(loaded_data)}."
                 )
                 return None
         except ValidationError as e:
@@ -63,44 +62,89 @@ class Serializer:
             logger.error(
                 f"Failed to save checkpoint file to {path}: {e}", exc_info=True
             )
-            raise  # Re-raise the exception
+            raise
 
     def load_buffer(self, path: Path) -> BufferData | None:
-        """Loads and validates buffer data from a file."""
+        """Loads and validates MuZero buffer data (trajectories) from a file."""
         try:
             with path.open("rb") as f:
                 loaded_data = cloudpickle.load(f)
             if isinstance(loaded_data, BufferData):
-                # Perform basic validation on loaded experiences
-                valid_experiences = []
-                invalid_count = 0
-                for i, exp in enumerate(loaded_data.buffer_list):
+                # --- Validate Trajectories ---
+                valid_trajectories = []
+                total_valid_steps = 0
+                invalid_traj_count = 0
+                invalid_step_count = 0
+
+                for i, traj in enumerate(loaded_data.trajectories):
+                    if not isinstance(traj, list):
+                        invalid_traj_count += 1
+                        continue
+
+                    valid_steps_in_traj = []
+                    for j, step in enumerate(traj):
+                        is_valid_step = False
+                        try:
+                            if isinstance(step, dict) and all(
+                                k in step
+                                for k in [
+                                    "observation",
+                                    "action",
+                                    "reward",
+                                    "policy_target",
+                                    "value_target",
+                                ]
+                            ):
+                                obs = step["observation"]
+                                if (
+                                    isinstance(obs, dict)
+                                    and "grid" in obs
+                                    and "other_features" in obs
+                                    and isinstance(obs["grid"], np.ndarray)
+                                    and isinstance(obs["other_features"], np.ndarray)
+                                    and np.all(np.isfinite(obs["grid"]))
+                                    and np.all(np.isfinite(obs["other_features"]))
+                                ):
+                                    if (
+                                        isinstance(step["action"], int)
+                                        and isinstance(step["reward"], float | int)
+                                        and isinstance(step["policy_target"], dict)
+                                        and isinstance(
+                                            step["value_target"], float | int
+                                        )
+                                    ):
+                                        is_valid_step = True
+                        except Exception as val_err:
+                            logger.warning(
+                                f"Validation error in step {j} of trajectory {i}: {val_err}"
+                            )
+
+                        if is_valid_step:
+                            valid_steps_in_traj.append(step)
+                        else:
+                            invalid_step_count += 1
+
                     if (
-                        isinstance(exp, tuple)
-                        and len(exp) == 3
-                        and isinstance(exp[0], dict)
-                        and "grid" in exp[0]
-                        and "other_features" in exp[0]
-                        and isinstance(exp[0]["grid"], np.ndarray)
-                        and isinstance(exp[0]["other_features"], np.ndarray)
-                        and isinstance(exp[1], dict)
-                        and isinstance(exp[2], float | int)
-                    ):
-                        valid_experiences.append(exp)
+                        valid_steps_in_traj
+                    ):  # Only keep trajectories with at least one valid step
+                        valid_trajectories.append(valid_steps_in_traj)
+                        total_valid_steps += len(valid_steps_in_traj)
                     else:
-                        invalid_count += 1
-                        logger.warning(
-                            f"Skipping invalid experience structure at index {i} in loaded buffer: {type(exp)}"
-                        )
-                if invalid_count > 0:
+                        invalid_traj_count += 1
+
+                if invalid_traj_count > 0 or invalid_step_count > 0:
                     logger.warning(
-                        f"Found {invalid_count} invalid experience structures in loaded buffer."
+                        f"Loaded buffer: Skipped {invalid_traj_count} invalid trajectories and {invalid_step_count} invalid steps."
                     )
-                loaded_data.buffer_list = valid_experiences
+
+                # Update the loaded data object
+                loaded_data.trajectories = valid_trajectories
+                loaded_data.total_steps = total_valid_steps
+                # --- End Validation ---
                 return loaded_data
             else:
                 logger.error(
-                    f"Loaded buffer file {path} did not contain a BufferData object (type: {type(loaded_data)})."
+                    f"Loaded buffer file {path} type mismatch: {type(loaded_data)}."
                 )
                 return None
         except ValidationError as e:
@@ -113,23 +157,23 @@ class Serializer:
             return None
         except Exception as e:
             logger.error(
-                f"Failed to load/deserialize experience buffer from {path}: {e}",
+                f"Failed to load/deserialize MuZero buffer from {path}: {e}",
                 exc_info=True,
             )
             return None
 
     def save_buffer(self, data: BufferData, path: Path):
-        """Saves buffer data to a file using cloudpickle."""
+        """Saves MuZero buffer data (trajectories) to a file."""
         try:
             path.parent.mkdir(parents=True, exist_ok=True)
             with path.open("wb") as f:
                 cloudpickle.dump(data, f)
-            logger.info(f"Buffer data saved to {path}")
-        except Exception as e:
-            logger.error(
-                f"Error saving experience buffer to {path}: {e}", exc_info=True
+            logger.info(
+                f"MuZero Buffer data saved to {path} ({len(data.trajectories)} trajectories, {data.total_steps} steps)"
             )
-            raise  # Re-raise the exception
+        except Exception as e:
+            logger.error(f"Error saving MuZero buffer to {path}: {e}", exc_info=True)
+            raise
 
     def prepare_optimizer_state(self, optimizer: "Optimizer") -> dict[str, Any]:
         """Prepares optimizer state dictionary, moving tensors to CPU."""
@@ -153,50 +197,39 @@ class Serializer:
         return optimizer_state_cpu
 
     def prepare_buffer_data(self, buffer: "ExperienceBuffer") -> BufferData | None:
-        """Prepares buffer data for saving, extracting experiences."""
+        """Prepares MuZero buffer data for saving (extracts trajectories)."""
         try:
-            if buffer.use_per:
-                if hasattr(buffer, "tree") and isinstance(buffer.tree, SumTree):
-                    buffer_list = [
-                        buffer.tree.data[i]
-                        for i in range(buffer.tree.n_entries)
-                        if buffer.tree.data[i] != 0
-                    ]
-                else:
-                    logger.error("PER buffer tree is missing or invalid during save.")
-                    return None
-            else:
-                buffer_list = list(buffer.buffer)
+            # Directly access the deque of trajectories
+            if not hasattr(buffer, "buffer") or not isinstance(buffer.buffer, deque):
+                logger.error("Buffer object does not have a 'buffer' deque attribute.")
+                return None
 
-            # Basic validation before creating BufferData
-            valid_experiences = []
-            invalid_count = 0
-            for i, exp in enumerate(buffer_list):
-                if (
-                    isinstance(exp, tuple)
-                    and len(exp) == 3
-                    and isinstance(exp[0], dict)
-                    and "grid" in exp[0]
-                    and "other_features" in exp[0]
-                    and isinstance(exp[0]["grid"], np.ndarray)
-                    and isinstance(exp[0]["other_features"], np.ndarray)
-                    and isinstance(exp[1], dict)
-                    and isinstance(exp[2], float | int)
-                ):
-                    valid_experiences.append(exp)
+            # Convert deque to list for serialization
+            trajectories_list = list(buffer.buffer)
+            total_steps = buffer.total_steps  # Get stored total steps
+
+            # Basic validation (optional, as saving raw list is fine)
+            valid_trajectories = []
+            actual_steps = 0
+            for traj in trajectories_list:
+                if isinstance(traj, list) and traj:  # Check if it's a non-empty list
+                    # Can add per-step validation here if desired, similar to load_buffer
+                    valid_trajectories.append(traj)
+                    actual_steps += len(traj)
                 else:
-                    invalid_count += 1
                     logger.warning(
-                        f"Skipping invalid experience structure at index {i} during save prep: {type(exp)}"
+                        "Skipping invalid/empty trajectory during save prep."
                     )
-            if invalid_count > 0:
-                logger.warning(
-                    f"Found {invalid_count} invalid experience structures before saving buffer."
-                )
 
-            return BufferData(buffer_list=valid_experiences)
+            if actual_steps != total_steps:
+                logger.warning(
+                    f"Buffer total_steps mismatch during save prep. Stored: {total_steps}, Calculated: {actual_steps}. Saving with calculated value."
+                )
+                total_steps = actual_steps
+
+            return BufferData(trajectories=valid_trajectories, total_steps=total_steps)
         except Exception as e:
-            logger.error(f"Error preparing buffer data for saving: {e}")
+            logger.error(f"Error preparing MuZero buffer data for saving: {e}")
             return None
 
     def save_config_json(self, configs: dict[str, Any], path: Path):

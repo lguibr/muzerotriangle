@@ -1,3 +1,4 @@
+# File: muzerotriangle/utils/__init__.py
 from .geometry import is_point_in_polygon
 from .helpers import (
     format_eta,
@@ -6,15 +7,22 @@ from .helpers import (
     set_random_seeds,
 )
 from .sumtree import SumTree
+
+# Import MuZero-specific types
 from .types import (
     ActionType,
-    Experience,
-    ExperienceBatch,
-    PERBatchSample,
-    PolicyValueOutput,
-    StateType,
-    StatsCollectorData,
+    PolicyTargetMapping,  # Keep
+    PolicyValueOutput,  # Keep
+    SampledBatch,  # Keep
+    SampledSequence,  # Keep
+    StateType,  # Keep
+    StatsCollectorData,  # Keep
+    StepInfo,  # Keep
+    Trajectory,  # Keep
+    TrajectoryStep,  # Keep
 )
+
+# REMOVED: Experience, ExperienceBatch, PERBatchSample
 
 __all__ = [
     # helpers
@@ -22,16 +30,19 @@ __all__ = [
     "set_random_seeds",
     "format_eta",
     "normalize_color_for_matplotlib",
-    # types
+    # types (MuZero relevant)
     "StateType",
     "ActionType",
-    "Experience",
-    "ExperienceBatch",
+    "PolicyTargetMapping",
     "PolicyValueOutput",
+    "Trajectory",
+    "TrajectoryStep",
+    "SampledSequence",
+    "SampledBatch",
     "StatsCollectorData",
-    "PERBatchSample",
+    "StepInfo",
     # geometry
     "is_point_in_polygon",
     # structures
-    "SumTree",
+    "SumTree",  # Keep SumTree even if PER disabled, might be used later
 ]

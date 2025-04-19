@@ -8,14 +8,20 @@ class MCTSConfig(BaseModel):
     --- TUNED FOR INCREASED EXPLORATION & DEPTH ---
     """
 
-    num_simulations: int = Field(default=2048, ge=1)
-    puct_coefficient: float = Field(default=2.0, gt=0)
+    num_simulations: int = Field(default=50, ge=1)  # Reduced for faster debugging
+    puct_coefficient: float = Field(default=1.5, gt=0)  # Adjusted c1/c2 balance
     temperature_initial: float = Field(default=1.0, ge=0)
     temperature_final: float = Field(default=0.1, ge=0)
-    temperature_anneal_steps: int = Field(default=100, ge=0)
+    temperature_anneal_steps: int = Field(default=100, ge=0)  # Reduced anneal
     dirichlet_alpha: float = Field(default=0.3, gt=0)
     dirichlet_epsilon: float = Field(default=0.25, ge=0, le=1.0)
-    max_search_depth: int = Field(default=64, ge=1)
+    max_search_depth: int = Field(default=10, ge=1)  # Reduced depth
+    discount: float = Field(
+        default=0.99,
+        gt=0,
+        le=1.0,
+        description="Discount factor (gamma) used in MCTS backpropagation and value targets.",
+    )  # ADDED
 
     @field_validator("temperature_final")
     @classmethod

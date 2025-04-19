@@ -29,7 +29,7 @@ def test_muzero_model_initialization(
 ):
     """Test if the MuZeroNet model initializes without errors."""
     assert model is not None
-    assert model.action_dim == int(env_config.ACTION_DIM) # type: ignore[call-overload]
+    assert model.action_dim == int(env_config.ACTION_DIM)  # type: ignore[call-overload]
     assert model.hidden_dim == model_config.HIDDEN_STATE_DIM
     # Add more checks for internal components if needed
     assert hasattr(model, "representation_encoder")
@@ -79,9 +79,7 @@ def test_dynamics_function(model: MuZeroNet, model_config: ModelConfig):
         (batch_size, model_config.HIDDEN_STATE_DIM), device=device
     )
     # Test with batch of actions
-    dummy_actions = torch.randint(
-        0, model.action_dim, (batch_size,), device=device
-    )
+    dummy_actions = torch.randint(0, model.action_dim, (batch_size,), device=device)
 
     with torch.no_grad():
         next_hidden_state, reward_logits = model.dynamics(
@@ -96,7 +94,7 @@ def test_dynamics_function(model: MuZeroNet, model_config: ModelConfig):
 
 def test_dynamics_function_single_action(model: MuZeroNet, model_config: ModelConfig):
     """Test the dynamics function (g) with a single action."""
-    batch_size = 1 # Test with batch size 1
+    batch_size = 1  # Test with batch size 1
     device = torch.device("cpu")
     model.to(device)
     model.eval()

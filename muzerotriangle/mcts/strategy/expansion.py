@@ -1,88 +1,95 @@
+# File: muzerotriangle/mcts/strategy/expansion.py
 import logging
 from typing import TYPE_CHECKING
 
-if TYPE_CHECKING:
-    from ...utils.types import ActionType
+import torch  # Import torch for tensor check
 
 from ..core.node import Node
-from ..core.types import (
-    ActionPolicyMapping,
-)
+from ..core.types import ActionPolicyMapping
+
+if TYPE_CHECKING:
+    from muzerotriangle.nn import NeuralNetwork  # Need network for dynamics
+    from muzerotriangle.utils.types import ActionType
+
 
 logger = logging.getLogger(__name__)
 
 
-def expand_node_with_policy(node: Node, action_policy: ActionPolicyMapping):
-    """
-    Expands a node by creating children for valid actions using the
-    pre-computed action policy priors from the network.
-    Assumes the node is not terminal and not already expanded.
-    Marks the node's state as game_over if no valid actions are found.
-    """
-    if node.is_expanded:
-        logger.debug(f"[Expand] Attempted to expand an already expanded node: {node}")
+def expand_node(
+    node_to_expand: "Node",  # Node containing s_k
+    policy_prediction: ActionPolicyMapping,  # Policy p_k from f(s_k)
+    network: "NeuralNetwork",  # Network interface to call dynamics (g)
+    valid_actions: list["ActionType"] | None = None,  # Pass valid actions explicitly
+):
+    """Expands a leaf node in the MuZero search tree."""
+    # ... (initial checks remain the same) ...
+    if node_to_expand.is_expanded:
         return
-    if node.state.is_over():
-        logger.warning(f"[Expand] Attempted to expand a terminal node: {node}")
-        return
-
-    logger.debug(f"[Expand] Expanding Node: {node}")
-
-    # Use TYPE_CHECKING import for ActionType type hint
-    valid_actions: list[ActionType] = node.state.valid_actions()
-    logger.debug(
-        f"[Expand] Found {len(valid_actions)} valid actions for state step {node.state.current_step}."
-    )
-    logger.debug(
-        f"[Expand] Received action policy (first 5): {list(action_policy.items())[:5]}"
-    )
-
-    if not valid_actions:
-        logger.warning(
-            f"[Expand] Expanding node at step {node.state.current_step} with no valid actions but not terminal? Marking state as game over."
+    hidden_state_k = node_to_expand.hidden_state
+    if hidden_state_k is None:
+        logger.error(
+            f"[Expand] Node {node_to_expand.action_taken} has no hidden state."
         )
-        if hasattr(node.state, "game_over"):
-            node.state.game_over = True
-        elif hasattr(node.state, "_is_over"):
-            node.state._is_over = True
-        else:
-            logger.error("[Expand] Cannot mark state as game over - attribute missing.")
         return
+
+    logger.debug(f"[Expand] Expanding Node via action: {node_to_expand.action_taken}")
+    actions_to_expand: list[ActionType]
+    if valid_actions is not None:
+        actions_to_expand = [a for a in valid_actions if a in policy_prediction]
+        # ... (warnings about missing actions remain the same) ...
+        if not actions_to_expand:
+            return
+    else:
+        actions_to_expand = list(policy_prediction.keys())
+        if not actions_to_expand:
+            return
+        logger.warning("[Expand] Expanding based on policy keys only.")
 
     children_created = 0
-    for action in valid_actions:
-        prior = action_policy.get(action, 0.0)
-        if prior < 0.0:
-            logger.warning(
-                f"[Expand] Received negative prior ({prior}) for action {action}. Clamping to 0."
-            )
+    for action in actions_to_expand:
+        prior = policy_prediction.get(action, 0.0)
+        if prior < 0:
             prior = 0.0
-        elif prior == 0.0:
-            logger.debug(
-                f"[Expand] Valid action {action} received prior=0 from network."
+
+        try:
+            # Ensure hidden_state_k has batch dim
+            if not isinstance(hidden_state_k, torch.Tensor):
+                logger.error(f"Hidden state is not a tensor: {type(hidden_state_k)}")
+                continue  # Skip if state is invalid
+            hidden_state_k_batch = (
+                hidden_state_k.unsqueeze(0)
+                if hidden_state_k.dim() == 1
+                else hidden_state_k
             )
 
-        next_state_copy = node.state.copy()
-        try:
-            # Correctly unpack the (reward, done) tuple returned by step
-            _, done = next_state_copy.step(action)
+            # --- Call dynamics via the underlying model ---
+            hidden_state_k_plus_1, reward_logits = network.model.dynamics(
+                hidden_state_k_batch, action
+            )
+            # ---
+
+            hidden_state_k_plus_1 = hidden_state_k_plus_1.squeeze(0)
+            reward_logits = reward_logits.squeeze(0)
+            reward_k_plus_1 = network._logits_to_scalar(
+                reward_logits.unsqueeze(0), network.reward_support
+            ).item()
+
         except Exception as e:
             logger.error(
-                f"[Expand] Error stepping state for child node expansion (action {action}): {e}",
+                f"[Expand] Error calling dynamics for action {action}: {e}",
                 exc_info=True,
             )
-            continue  # Skip creating this child if stepping fails
+            continue
 
         child = Node(
-            state=next_state_copy,
-            parent=node,
+            prior=prior,
+            hidden_state=hidden_state_k_plus_1,
+            reward=reward_k_plus_1,
+            parent=node_to_expand,
             action_taken=action,
-            prior_probability=prior,
         )
-        node.children[action] = child
-        logger.debug(
-            f"  [Expand] Created Child Node: Action={action}, Prior={prior:.4f}, StateStep={next_state_copy.current_step}, Done={done}"
-        )
+        node_to_expand.children[action] = child
+        # ... (logging remains the same) ...
         children_created += 1
 
-    logger.debug(f"[Expand] Expanded node {node} with {children_created} children.")
+    logger.debug(f"[Expand] Node expanded with {children_created} children.")

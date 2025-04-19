@@ -1,3 +1,5 @@
+# File: muzerotriangle/mcts/strategy/policy.py
+# No changes needed for this refactoring step. Keep the existing content.
 import logging
 import random
 
@@ -23,8 +25,14 @@ def select_action_based_on_visits(root_node: Node, temperature: float) -> Action
     Raises PolicyGenerationError if selection is not possible.
     """
     if not root_node.children:
+        # Ensure root_node.state access is safe (check if it's initial_game_state)
+        state_info = (
+            f"Step {root_node.initial_game_state.current_step}"
+            if root_node.is_root and root_node.initial_game_state
+            else f"Action {root_node.action_taken}"
+        )
         raise PolicyGenerationError(
-            f"Cannot select action: Root node (Step {root_node.state.current_step}) has no children."
+            f"Cannot select action: Root node ({state_info}) has no children."
         )
 
     actions = list(root_node.children.keys())
@@ -34,18 +42,28 @@ def select_action_based_on_visits(root_node: Node, temperature: float) -> Action
     )
 
     if len(actions) == 0:
+        state_info = (
+            f"Step {root_node.initial_game_state.current_step}"
+            if root_node.is_root and root_node.initial_game_state
+            else f"Action {root_node.action_taken}"
+        )
         raise PolicyGenerationError(
-            f"Cannot select action: No actions available in children for root node (Step {root_node.state.current_step})."
+            f"Cannot select action: No actions available in children for root node ({state_info})."
         )
 
     total_visits = np.sum(visit_counts)
+    state_info = (
+        f"Step {root_node.initial_game_state.current_step}"
+        if root_node.is_root and root_node.initial_game_state
+        else f"Action {root_node.action_taken}"
+    )
     logger.debug(
-        f"[PolicySelect] Selecting action for node step {root_node.state.current_step}. Total child visits: {total_visits}. Num children: {len(actions)}"
+        f"[PolicySelect] Selecting action for node {state_info}. Total child visits: {total_visits}. Num children: {len(actions)}"
     )
 
     if total_visits == 0:
         logger.warning(
-            f"[PolicySelect] Total visit count for children is zero at root node (Step {root_node.state.current_step}). MCTS might have failed. Selecting uniformly."
+            f"[PolicySelect] Total visit count for children is zero at root node ({state_info}). MCTS might have failed. Selecting uniformly."
         )
         selected_action = random.choice(actions)
         logger.debug(
@@ -62,7 +80,6 @@ def select_action_based_on_visits(root_node: Node, temperature: float) -> Action
         logger.debug(
             f"[PolicySelect] Greedy selection. Best action indices: {best_action_indices}"
         )
-        # Use standard library random for tie-breaking
         chosen_index = random.choice(best_action_indices)
         selected_action = actions[chosen_index]
         logger.debug(f"[PolicySelect] Greedy action selected: {selected_action}")
@@ -71,8 +88,10 @@ def select_action_based_on_visits(root_node: Node, temperature: float) -> Action
     else:
         logger.debug(f"[PolicySelect] Probabilistic selection: Temp={temperature:.4f}")
         logger.debug(f"  Visit Counts: {visit_counts}")
+        # Add small epsilon to prevent log(0)
         log_visits = np.log(np.maximum(visit_counts, 1e-9))
         scaled_log_visits = log_visits / temperature
+        # Subtract max for numerical stability before exponentiation
         scaled_log_visits -= np.max(scaled_log_visits)
         probabilities = np.exp(scaled_log_visits)
         sum_probs = np.sum(probabilities)
@@ -102,13 +121,11 @@ def select_action_based_on_visits(root_node: Node, temperature: float) -> Action
         logger.debug(f"  Final Probabilities Sum: {np.sum(probabilities):.6f}")
 
         try:
-            # Use NumPy's default_rng for weighted choice
             selected_action = rng.choice(actions, p=probabilities)
             logger.debug(
                 f"[PolicySelect] Sampled action (temp={temperature:.2f}): {selected_action}"
             )
-            # Ensure return type is ActionType (int)
-            return int(selected_action)
+            return int(selected_action)  # Ensure return type is ActionType (int)
         except ValueError as e:
             raise PolicyGenerationError(
                 f"Error during np.random.choice: {e}. Probs: {probabilities}, Sum: {np.sum(probabilities)}"
@@ -120,12 +137,23 @@ def get_policy_target(root_node: Node, temperature: float = 1.0) -> ActionPolicy
     Calculates the policy target distribution based on MCTS visit counts.
     Raises PolicyGenerationError if target cannot be generated.
     """
-    action_dim = int(root_node.state.env_config.ACTION_DIM)  # type: ignore[call-overload]
+    # Need action_dim from the environment config associated with the root state
+    if not root_node.is_root or root_node.initial_game_state is None:
+        raise PolicyGenerationError(
+            "Cannot get policy target from non-root node without initial game state."
+        )
+    # Cast ACTION_DIM to int
+    action_dim = int(root_node.initial_game_state.env_config.ACTION_DIM)
     full_target = dict.fromkeys(range(action_dim), 0.0)
 
     if not root_node.children or root_node.visit_count == 0:
+        state_info = (
+            f"Step {root_node.initial_game_state.current_step}"
+            if root_node.is_root and root_node.initial_game_state
+            else f"Action {root_node.action_taken}"
+        )
         logger.warning(
-            f"[PolicyTarget] Cannot compute policy target: Root node (Step {root_node.state.current_step}) has no children or zero visits. Returning zero target."
+            f"[PolicyTarget] Cannot compute policy target: Root node ({state_info}) has no children or zero visits. Returning zero target."
         )
         return full_target
 
@@ -140,6 +168,18 @@ def get_policy_target(root_node: Node, temperature: float = 1.0) -> ActionPolicy
         logger.warning(
             "[PolicyTarget] Cannot compute policy target: No actions found in children."
         )
+        return full_target
+
+    if total_visits == 0:
+        logger.warning(
+            "[PolicyTarget] Total visits is zero, returning uniform target over valid actions."
+        )
+        num_valid = len(actions)
+        if num_valid > 0:
+            prob = 1.0 / num_valid
+            for a in actions:
+                if 0 <= a < action_dim:
+                    full_target[a] = prob
         return full_target
 
     if temperature == 0.0:

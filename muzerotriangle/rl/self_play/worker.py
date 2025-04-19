@@ -1,16 +1,12 @@
 # File: muzerotriangle/rl/self_play/worker.py
 import logging
 import random
-import time
-from collections import deque
 from typing import TYPE_CHECKING
 
 import numpy as np
 import ray
-import torch  # Import torch
 
-from ...config import MCTSConfig, ModelConfig, TrainConfig
-from ...environment import EnvConfig, GameState
+from ...environment import GameState
 from ...features import extract_state_features
 from ...mcts import (
     MCTSExecutionError,
@@ -21,46 +17,36 @@ from ...mcts import (
 )
 from ...nn import NeuralNetwork
 from ...utils import get_device, set_random_seeds
-
-# --- REMOVED: Type imports moved below ---
-# from ...utils.types import Experience, PolicyTargetMapping, StateType, StepInfo
-# --- END REMOVED ---
+from ..types import SelfPlayResult
 
 if TYPE_CHECKING:
-    from ...stats import StatsCollectorActor
+    import torch
 
-    # --- ADDED: Type imports moved here ---
-    from ...utils.types import Experience, PolicyTargetMapping, StateType, StepInfo
-
-    # --- END ADDED ---
-
-
-from ..types import SelfPlayResult
+    from ...utils.types import (
+        StepInfo,
+        Trajectory,
+        TrajectoryStep,
+    )
 
 logger = logging.getLogger(__name__)
 
 
 @ray.remote
 class SelfPlayWorker:
-    """
-    A Ray actor responsible for running self-play episodes using MCTS and a NN.
-    Implements MCTS tree reuse between steps.
-    Stores extracted features (StateType) and the N-STEP RETURN in the experience buffer.
-    Returns a SelfPlayResult Pydantic model including aggregated stats.
-    Reports current state and step stats asynchronously using StepInfo including game_step and trainer_step.
-    """
+    """MuZero self-play worker."""
 
+    # ... (init, set_weights, set_current_trainer_step, _report_current_state, _log_step_stats_async remain the same) ...
     def __init__(
         self,
-        actor_id: int,
-        env_config: EnvConfig,
-        mcts_config: MCTSConfig,
-        model_config: ModelConfig,
-        train_config: TrainConfig,
-        stats_collector_actor: "StatsCollectorActor",
-        initial_weights: dict | None = None,
-        seed: int | None = None,
-        worker_device_str: str = "cpu",
+        actor_id,
+        env_config,
+        mcts_config,
+        model_config,
+        train_config,
+        stats_collector_actor,
+        initial_weights,
+        seed,
+        worker_device_str,
     ):
         self.actor_id = actor_id
         self.env_config = env_config
@@ -70,15 +56,7 @@ class SelfPlayWorker:
         self.stats_collector_actor = stats_collector_actor
         self.seed = seed if seed is not None else random.randint(0, 1_000_000)
         self.worker_device_str = worker_device_str
-
-        # --- N-Step Config ---
-        self.n_step = self.train_config.N_STEP_RETURNS
-        self.gamma = self.train_config.GAMMA
-
-        # Store the global step of the current weights
         self.current_trainer_step = 0
-
-        # Configure logging for the worker process
         worker_log_level = logging.INFO
         log_format = (
             f"%(asctime)s [%(levelname)s] [W{self.actor_id}] %(name)s: %(message)s"
@@ -86,364 +64,193 @@ class SelfPlayWorker:
         logging.basicConfig(level=worker_log_level, format=log_format, force=True)
         global logger
         logger = logging.getLogger(__name__)
-
-        mcts_log_level = logging.WARNING
-        nn_log_level = logging.WARNING
-        logging.getLogger("muzerotriangle.mcts").setLevel(mcts_log_level)
-        logging.getLogger("muzerotriangle.nn").setLevel(nn_log_level)
-
+        logging.getLogger("muzerotriangle.mcts").setLevel(logging.WARNING)
+        logging.getLogger("muzerotriangle.nn").setLevel(logging.WARNING)
         set_random_seeds(self.seed)
-
         self.device = get_device(self.worker_device_str)
-
-        if self.device.type == "cuda":
-            try:
-                torch.cuda.set_device(self.device)
-                logger.info(
-                    f"Successfully set default CUDA device for worker {self.actor_id} to {self.device} (Index: {torch.cuda.current_device()})."
-                )
-                count = torch.cuda.device_count()
-                if count != 1:
-                    logger.warning(
-                        f"Worker {self.actor_id} sees {count} CUDA devices, expected 1 after Ray assignment. This might indicate an issue."
-                    )
-                else:
-                    logger.info(
-                        f"Worker {self.actor_id} sees 1 CUDA device as expected."
-                    )
-
-            except Exception as cuda_set_err:
-                logger.error(
-                    f"Failed to set default CUDA device for worker {self.actor_id} to {self.device}: {cuda_set_err}. "
-                    f"Compilation or CUDA operations might fail.",
-                    exc_info=True,
-                )
-
         self.nn_evaluator = NeuralNetwork(
-            model_config=self.model_config,
-            env_config=self.env_config,
-            train_config=self.train_config,
-            device=self.device,
+            model_config, env_config, train_config, self.device
         )
-
         if initial_weights:
             self.set_weights(initial_weights)
         else:
             self.nn_evaluator.model.eval()
-
-        logger.debug(f"INIT: MCTS Config: {self.mcts_config.model_dump()}")
         logger.info(
-            f"Worker initialized on device {self.device}. Seed: {self.seed}. LogLevel: {logging.getLevelName(logger.getEffectiveLevel())}"
+            f"Worker {actor_id} initialized on device {self.device}. Seed: {self.seed}."
         )
-        logger.debug("Worker init complete.")
 
-    def set_weights(self, weights: dict):
-        """Updates the neural network weights."""
+    def set_weights(self, weights):
         try:
-            # Removed attempt to get step from weights dict
             self.nn_evaluator.set_weights(weights)
-            logger.debug("Weights updated.")
+            logger.debug(f"W{self.actor_id}: Weights updated.")
         except Exception as e:
-            logger.error(f"Failed to set weights: {e}", exc_info=True)
+            logger.error(f"W{self.actor_id}: Failed set weights: {e}", exc_info=True)
 
-    def set_current_trainer_step(self, global_step: int):
-        """Sets the global step corresponding to the current network weights."""
+    def set_current_trainer_step(self, global_step):
         self.current_trainer_step = global_step
-        logger.debug(f"Worker {self.actor_id} trainer step set to {global_step}")
+        logger.debug(f"W{self.actor_id}: Trainer step set {global_step}")
 
-    def _report_current_state(self, game_state: GameState):
-        """Asynchronously sends the current game state to the collector."""
+    def _report_current_state(self, game_state):
         if self.stats_collector_actor:
             try:
                 state_copy = game_state.copy()
-                self.stats_collector_actor.update_worker_game_state.remote(  # type: ignore
+                self.stats_collector_actor.update_worker_game_state.remote(
                     self.actor_id, state_copy
-                )
-                logger.debug(
-                    f"Reported state step {state_copy.current_step} to collector."
-                )
+                )  # type: ignore
             except Exception as e:
-                logger.error(f"Failed to report game state to collector: {e}")
+                logger.error(f"W{self.actor_id}: Failed report state: {e}")
 
-    def _log_step_stats_async(
-        self,
-        game_state: GameState,
-        mcts_visits: int,
-        mcts_depth: int,
-        step_reward: float,
-    ):
-        """
-        Asynchronously logs per-step stats to the collector using StepInfo,
-        including the current game_step_index and the stored current_trainer_step.
-        """
+    def _log_step_stats_async(self, game_step, mcts_visits, mcts_depth, step_reward):
         if self.stats_collector_actor:
             try:
-                # Include current_trainer_step
                 step_info: StepInfo = {
-                    "game_step_index": game_state.current_step,
-                    "global_step": self.current_trainer_step,  # Add trainer step context
+                    "game_step_index": game_step,
+                    "global_step": self.current_trainer_step,
                 }
                 step_stats: dict[str, tuple[float, StepInfo]] = {
-                    "RL/Current_Score": (game_state.game_score, step_info),
                     "MCTS/Step_Visits": (float(mcts_visits), step_info),
                     "MCTS/Step_Depth": (float(mcts_depth), step_info),
                     "RL/Step_Reward": (step_reward, step_info),
                 }
-                logger.debug(f"Sending step stats to collector: {step_stats}")
                 self.stats_collector_actor.log_batch.remote(step_stats)  # type: ignore
             except Exception as e:
-                logger.error(f"Failed to log step stats to collector: {e}")
+                logger.error(f"W{self.actor_id}: Failed log step stats: {e}")
 
     def run_episode(self) -> SelfPlayResult:
-        """
-        Runs a single episode of self-play using MCTS and the internal neural network.
-        Implements MCTS tree reuse.
-        Stores extracted features (StateType) and the N-STEP RETURN in the experience buffer.
-        Returns a SelfPlayResult Pydantic model including aggregated stats.
-        Reports current state and step stats asynchronously.
-        """
+        """Runs a single MuZero self-play episode."""
         self.nn_evaluator.model.eval()
         episode_seed = self.seed + random.randint(0, 1000)
         game = GameState(self.env_config, initial_seed=episode_seed)
-
-        if game.is_over():
-            logger.error(
-                f"Game is over immediately after reset with seed {episode_seed}. Returning empty result."
-            )
-            return SelfPlayResult(
-                episode_experiences=[],
-                final_score=0.0,
-                episode_steps=0,
-                total_simulations=0,
-                avg_root_visits=0.0,
-                avg_tree_depth=0.0,
-            )
-
-        n_step_state_policy_buffer: deque[tuple[StateType, PolicyTargetMapping]] = (
-            deque(maxlen=self.n_step)
-        )
-        n_step_reward_buffer: deque[float] = deque(maxlen=self.n_step)
-        episode_experiences: list[Experience] = []
-
+        trajectory: Trajectory = []
         step_root_visits: list[int] = []
         step_tree_depths: list[int] = []
         step_simulations: list[int] = []
+        current_hidden_state: torch.Tensor | None = None
 
-        logger.info(f"Starting episode with seed {episode_seed}")
+        logger.info(f"W{self.actor_id}: Starting episode seed {episode_seed}")
         self._report_current_state(game)
 
-        root_node: Node | None = Node(state=game.copy())
-
         while not game.is_over():
-            step_start_time = time.monotonic()
-            if root_node is None:
+            game_step = game.current_step
+            try:
+                observation = extract_state_features(game, self.model_config)
+                valid_actions = game.valid_actions()
+                if not valid_actions:
+                    logger.warning(
+                        f"W{self.actor_id}: No valid actions step {game_step}"
+                    )
+                    break
+            except Exception as e:
                 logger.error(
-                    "MCTS root node became None unexpectedly. Aborting episode."
+                    f"W{self.actor_id}: Feat/Action error step {game_step}: {e}",
+                    exc_info=True,
                 )
                 break
 
-            if root_node.state.is_over():
-                logger.warning(
-                    f"MCTS root node state (Step {root_node.state.current_step}) is already terminal before running simulations. Ending episode."
+            if current_hidden_state is None:
+                _, _, _, hidden_state_tensor = self.nn_evaluator.initial_inference(
+                    observation
                 )
-                break
+                current_hidden_state = hidden_state_tensor.squeeze(0)
+                root_node = Node(
+                    hidden_state=current_hidden_state, initial_game_state=game.copy()
+                )
+            else:
+                root_node = Node(
+                    hidden_state=current_hidden_state, initial_game_state=game.copy()
+                )
 
-            logger.info(
-                f"Step {game.current_step}: Running MCTS simulations ({self.mcts_config.num_simulations}) on state from step {root_node.state.current_step}..."
-            )
-            mcts_start_time = time.monotonic()
             mcts_max_depth = 0
             try:
                 mcts_max_depth = run_mcts_simulations(
-                    root_node, self.mcts_config, self.nn_evaluator
+                    root_node, self.mcts_config, self.nn_evaluator, valid_actions
                 )
+                step_root_visits.append(root_node.visit_count)
+                step_tree_depths.append(mcts_max_depth)
+                step_simulations.append(self.mcts_config.num_simulations)
             except MCTSExecutionError as mcts_err:
                 logger.error(
-                    f"Step {game.current_step}: MCTS simulation failed critically: {mcts_err}",
-                    exc_info=False,
-                )
-                break
-            except Exception as mcts_err:
-                logger.error(
-                    f"Step {game.current_step}: MCTS simulation failed unexpectedly: {mcts_err}",
-                    exc_info=True,
+                    f"W{self.actor_id} Step {game_step}: MCTS failed: {mcts_err}"
                 )
                 break
 
-            mcts_duration = time.monotonic() - mcts_start_time
-            logger.info(
-                f"Step {game.current_step}: MCTS finished ({mcts_duration:.3f}s). Max Depth: {mcts_max_depth}, Root Visits: {root_node.visit_count}"
-            )
-
-            # Log stats *before* taking the step
-            self._log_step_stats_async(
-                game, root_node.visit_count, mcts_max_depth, step_reward=0.0
-            )
-
-            action_selection_start_time = time.monotonic()
-            temp = (
-                self.mcts_config.temperature_initial
-                if game.current_step < self.mcts_config.temperature_anneal_steps
-                else self.mcts_config.temperature_final
-            )
             try:
-                policy_target = get_policy_target(root_node, temperature=1.0)
+                temp = (
+                    self.mcts_config.temperature_initial
+                    if game_step < self.mcts_config.temperature_anneal_steps
+                    else self.mcts_config.temperature_final
+                )
                 action = select_action_based_on_visits(root_node, temperature=temp)
+                policy_target = get_policy_target(root_node, temperature=1.0)
+                value_target = root_node.value_estimate
             except Exception as policy_err:
                 logger.error(
-                    f"Step {game.current_step}: MCTS policy/action selection failed: {policy_err}",
+                    f"W{self.actor_id} Step {game_step}: Policy/Action failed: {policy_err}",
                     exc_info=True,
                 )
                 break
 
-            action_selection_duration = time.monotonic() - action_selection_start_time
+            step_data_partial = {
+                "observation": observation,
+                "action": action,
+                "policy_target": policy_target,
+                "value_target": value_target,
+            }
+            real_reward, done = game.step(action)
 
-            logger.info(
-                f"Step {game.current_step}: Selected Action {action} (Temp={temp:.3f}). Selection time: {action_selection_duration:.4f}s"
-            )
+            step_data_complete: TrajectoryStep = {
+                **step_data_partial,
+                "reward": real_reward,
+                "hidden_state": current_hidden_state.cpu().numpy()
+                if current_hidden_state is not None
+                else None,
+            }  # type: ignore
+            trajectory.append(step_data_complete)
 
-            feature_start_time = time.monotonic()
-            try:
-                state_features: StateType = extract_state_features(
-                    game, self.model_config
-                )
-            except Exception as e:
-                logger.error(
-                    f"Error extracting features at step {game.current_step}: {e}",
-                    exc_info=True,
-                )
-                break
-
-            feature_duration = time.monotonic() - feature_start_time
-            logger.debug(
-                f"Step {game.current_step}: Feature extraction time: {feature_duration:.4f}s"
-            )
-
-            n_step_state_policy_buffer.append((state_features, policy_target))
-
-            step_simulations.append(self.mcts_config.num_simulations)
-            step_root_visits.append(root_node.visit_count)
-            step_tree_depths.append(mcts_max_depth)
-
-            game_step_start_time = time.monotonic()
-            step_reward = 0.0
-            try:
-                step_reward, done = game.step(action)
-            except Exception as step_err:
-                logger.error(
-                    f"Error executing game step for action {action}: {step_err}",
-                    exc_info=True,
-                )
-                break
-
-            game_step_duration = time.monotonic() - game_step_start_time
-            logger.info(
-                f"Step {game.current_step}: Action {action} taken. Reward: {step_reward:.3f}, Done: {done}. Game step time: {game_step_duration:.4f}s"
-            )
-
-            n_step_reward_buffer.append(step_reward)
-
-            if len(n_step_reward_buffer) == self.n_step:
-                discounted_reward_sum = 0.0
-                for i in range(self.n_step):
-                    discounted_reward_sum += (self.gamma**i) * n_step_reward_buffer[i]
-
-                bootstrap_value = 0.0
-                if not done:
-                    try:
-                        _, bootstrap_value = self.nn_evaluator.evaluate(game)
-                    except Exception as eval_err:
-                        logger.error(
-                            f"Error evaluating bootstrap state S_{game.current_step}: {eval_err}",
-                            exc_info=True,
+            if not done:
+                try:
+                    if current_hidden_state is not None:
+                        # --- Call dynamics via underlying model ---
+                        next_hidden_state_tensor, _ = self.nn_evaluator.model.dynamics(
+                            current_hidden_state.unsqueeze(0), action
                         )
-                        bootstrap_value = 0.0
-
-                n_step_return = (
-                    discounted_reward_sum + (self.gamma**self.n_step) * bootstrap_value
-                )
-
-                state_features_t_minus_n, policy_target_t_minus_n = (
-                    n_step_state_policy_buffer[0]
-                )
-
-                episode_experiences.append(
-                    (
-                        state_features_t_minus_n,
-                        policy_target_t_minus_n,
-                        n_step_return,
+                        current_hidden_state = next_hidden_state_tensor.squeeze(0)
+                    else:
+                        logger.error(
+                            f"W{self.actor_id} Step {game_step}: hidden_state is None"
+                        )
+                        break
+                except Exception as dyn_err:
+                    logger.error(
+                        f"W{self.actor_id} Step {game_step}: Dynamics error: {dyn_err}",
+                        exc_info=True,
                     )
-                )
+                    break
+            else:
+                current_hidden_state = None
 
             self._report_current_state(game)
-            # Log stats *after* taking the step
             self._log_step_stats_async(
-                game,
-                root_node.visit_count if root_node else 0,
-                mcts_max_depth,
-                step_reward=step_reward,
+                game_step, root_node.visit_count, mcts_max_depth, real_reward
             )
-
-            tree_reuse_start_time = time.monotonic()
-            if not done:
-                if root_node and action in root_node.children:  # Check root_node exists
-                    root_node = root_node.children[action]
-                    root_node.parent = None
-                    logger.debug(
-                        f"Reused MCTS subtree for action {action}. New root step: {root_node.state.current_step}"
-                    )
-                else:
-                    logger.error(
-                        f"Child node for selected action {action} not found in MCTS tree children: {list(root_node.children.keys()) if root_node else 'No Root'}. Resetting MCTS root to current game state."
-                    )
-                    root_node = Node(state=game.copy())
-            else:
-                root_node = None
-
-            tree_reuse_duration = time.monotonic() - tree_reuse_start_time
-            logger.debug(
-                f"Step {game.current_step}: Tree reuse/reset time: {tree_reuse_duration:.4f}s"
-            )
-
-            step_duration = time.monotonic() - step_start_time
-            logger.info(
-                f"Step {game.current_step} total duration: {step_duration:.3f}s"
-            )
-
             if done:
                 break
-
+        # --- Episode End ---
         final_score = game.game_score
+        total_steps_episode = game.current_step
         logger.info(
-            f"Episode finished. Final Score: {final_score:.2f}, Steps: {game.current_step}"
+            f"W{self.actor_id}: Episode finished. Score: {final_score:.2f}, Steps: {total_steps_episode}"
         )
-
-        remaining_steps = len(n_step_reward_buffer)
-        for k in range(remaining_steps):
-            discounted_reward_sum = 0.0
-            for i in range(remaining_steps - k):
-                discounted_reward_sum += (self.gamma**i) * n_step_reward_buffer[k + i]
-
-            n_step_return = discounted_reward_sum
-            state_features_t, policy_target_t = n_step_state_policy_buffer[k]
-            episode_experiences.append(
-                (state_features_t, policy_target_t, n_step_return)
-            )
-
-        total_sims_episode = sum(step_simulations)
-        avg_visits_episode = np.mean(step_root_visits) if step_root_visits else 0.0
-        avg_depth_episode = np.mean(step_tree_depths) if step_tree_depths else 0.0
-
-        if not episode_experiences:
-            logger.warning(
-                f"Episode finished with 0 experiences collected. Final score: {final_score}, Steps: {game.current_step}"
-            )
-
+        total_sims = sum(step_simulations)
+        avg_visits = np.mean(step_root_visits) if step_root_visits else 0.0
+        avg_depth = np.mean(step_tree_depths) if step_tree_depths else 0.0
+        if not trajectory:
+            logger.warning(f"W{self.actor_id}: Episode finished empty trajectory.")
         return SelfPlayResult(
-            episode_experiences=episode_experiences,
+            trajectory=trajectory,
             final_score=final_score,
-            episode_steps=game.current_step,
-            total_simulations=total_sims_episode,
-            avg_root_visits=float(avg_visits_episode),
-            avg_tree_depth=float(avg_depth_episode),
+            episode_steps=total_steps_episode,
+            total_simulations=total_sims,
+            avg_root_visits=float(avg_visits),
+            avg_tree_depth=float(avg_depth),
         )

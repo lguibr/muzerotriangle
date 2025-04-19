@@ -5,66 +5,65 @@ from collections.abc import Mapping
 import numpy as np
 from typing_extensions import TypedDict
 
+# --- Core State & Action ---
+
 
 class StateType(TypedDict):
     grid: np.ndarray  # (C, H, W) float32
     other_features: np.ndarray  # (OtherFeatDim,) float32
 
 
-# Action representation (integer index)
 ActionType = int
 
-# Policy target from MCTS (visit counts distribution)
-# Mapping from action index to its probability (normalized visit count)
+# --- MCTS & Policy ---
+
 PolicyTargetMapping = Mapping[ActionType, float]
+PolicyValueOutput = tuple[
+    Mapping[ActionType, float], float
+]  # (Policy Map, Expected Scalar Value)
+
+# --- MuZero Trajectory Data ---
 
 
-# --- ADDED: Step Information Dictionary ---
+class TrajectoryStep(TypedDict):
+    """Data stored for a single step in a game trajectory."""
+
+    observation: StateType  # Observation o_t from the environment
+    action: ActionType  # Action a_{t+1} taken after observation
+    reward: float  # Actual reward r_{t+1} received from environment
+    policy_target: PolicyTargetMapping  # MCTS policy target pi_t at step t
+    value_target: float  # MCTS value target z_t (e.g., root value) at step t
+    hidden_state: (
+        np.ndarray | None
+    )  # Optional: Store hidden state s_t from NN for debugging/analysis
+
+
+# A complete game trajectory
+Trajectory = list[TrajectoryStep]
+
+# --- Training Data ---
+
+# A sequence sampled from a trajectory for training
+# Contains K unroll steps + 1 initial step = K+1 steps total
+SampledSequence = list[TrajectoryStep]
+SampledBatch = list[SampledSequence]  # Batch of sequences
+
+# --- Statistics ---
+
+
 class StepInfo(TypedDict, total=False):
     """Dictionary to hold various step counters associated with a metric."""
 
     global_step: int
-    buffer_size: int
-    game_step_index: int  # Index within an episode or similar sequence
+    buffer_size: int  # Can now represent total steps or trajectories in buffer
+    game_step_index: int
     # Add other relevant step types if needed
 
 
-# --- END ADDED ---
-
-
-# Experience tuple stored in buffer
-# NOW stores the extracted StateType (features) instead of the raw GameState object.
-# Kept as Tuple for performance in buffer operations.
-# The third element (float) represents the calculated n-step return (G_t^n)
-# starting from the state represented by the first element (StateType).
-# This G_t^n is used by the Trainer to construct the target value distribution.
-Experience = tuple[StateType, PolicyTargetMapping, float]
-
-
-# Batch of experiences for training
-ExperienceBatch = list[Experience]
-
-# Output type from the neural network's evaluate method
-# (Policy Mapping, Value Estimate)
-# Kept as Tuple for performance.
-# The second element (float) is the EXPECTED value calculated from the
-# predicted value distribution (used for MCTS). The Trainer uses the raw logits.
-PolicyValueOutput = tuple[Mapping[ActionType, float], float]
-
-
-# Type alias for the data structure holding collected statistics
-# --- CHANGED: Stores StepInfo dict instead of single step int ---
-# Maps metric name to a deque of (step_info_dict, value) tuples
 StatsCollectorData = dict[str, deque[tuple[StepInfo, float]]]
-# --- END CHANGED ---
 
-# --- Pydantic Models for Data Transfer ---
-# SelfPlayResult moved to muzerotriangle/rl/types.py to resolve circular import
-
-
-# --- Prioritized Experience Replay Types ---
-# TypedDict for the output of the PER buffer's sample method
-class PERBatchSample(TypedDict):
-    batch: ExperienceBatch
-    indices: np.ndarray
-    weights: np.ndarray
+# --- REMOVED: PER Types (temporarily disabled) ---
+# class PERBatchSample(TypedDict):
+#    batch: ExperienceBatch # This would need changing to SampledBatch
+#    indices: np.ndarray
+#    weights: np.ndarray

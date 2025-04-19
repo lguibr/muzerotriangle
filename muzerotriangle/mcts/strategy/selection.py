@@ -1,3 +1,4 @@
+# File: muzerotriangle/mcts/strategy/selection.py
 import logging
 import math
 
@@ -17,27 +18,37 @@ class SelectionError(Exception):
 
 
 def calculate_puct_score(
-    child_node: Node,
-    parent_visit_count: int,
+    parent_node: "Node",  # The node *from* which we are selecting a child
+    child_node: "Node",  # The child node being evaluated
     config: MCTSConfig,
 ) -> tuple[float, float, float]:
-    """Calculates the PUCT score and its components for a child node."""
+    """
+    Calculates the PUCT score for a child node, used for selection from the parent.
+    Score = Q(parent, action_to_child) + U(parent, action_to_child)
+    Q value is the average value derived from simulations passing through the child.
+    U value is the exploration bonus based on the child's prior and visit counts.
+    """
+    # Q(s, a) is the value estimate of the child node itself
+    # It represents the expected return *after* taking 'action_taken' from the parent.
     q_value = child_node.value_estimate
-    prior = child_node.prior_probability
-    child_visits = child_node.visit_count
-    # Use parent_visit_count directly; sqrt comes later if needed (original AlphaGo used N(s), not sqrt(N(s)))
-    # Let's use sqrt(parent_visit_count) for UCB1-like exploration bonus scaling
-    parent_visits_sqrt = math.sqrt(max(1, parent_visit_count))
 
+    # P(a|s) is the prior probability stored in the child node
+    prior = child_node.prior_probability
+    parent_visits = parent_node.visit_count
+    child_visits = child_node.visit_count
+
+    # Exploration bonus U(s, a)
     exploration_term = (
-        config.puct_coefficient * prior * (parent_visits_sqrt / (1 + child_visits))
+        config.puct_coefficient
+        * prior
+        * (math.sqrt(max(1, parent_visits)) / (1 + child_visits))
     )
     score = q_value + exploration_term
 
-    # Ensure score is finite, default to Q-value if exploration term explodes
+    # Ensure score is finite
     if not np.isfinite(score):
         logger.warning(
-            f"Non-finite PUCT score calculated (Q={q_value}, P={prior}, ChildN={child_visits}, ParentN={parent_visit_count}, Exp={exploration_term}). Defaulting to Q-value."
+            f"Non-finite PUCT score calculated (Q={q_value}, P={prior}, ChildN={child_visits}, ParentN={parent_visits}, Exp={exploration_term}). Defaulting to Q-value."
         )
         score = q_value
         exploration_term = 0.0
@@ -56,7 +67,6 @@ def add_dirichlet_noise(node: Node, config: MCTSConfig):
         return
 
     actions = list(node.children.keys())
-    # Use the module-level rng generator
     noise = rng.dirichlet([config.dirichlet_alpha] * len(actions))
     eps = config.dirichlet_epsilon
 
@@ -70,23 +80,20 @@ def add_dirichlet_noise(node: Node, config: MCTSConfig):
             f"  [Noise] Action {action}: OrigP={original_prior:.4f}, Noise={noise[i]:.4f} -> NewP={child.prior_probability:.4f}"
         )
 
-    # Re-normalize priors after adding noise to ensure they sum to 1
+    # Re-normalize priors
     if abs(noisy_priors_sum - 1.0) > 1e-6:
         logger.debug(
             f"Re-normalizing priors after Dirichlet noise (Sum={noisy_priors_sum:.6f})"
         )
+        norm_factor = noisy_priors_sum if noisy_priors_sum > 1e-9 else 1.0
         for action in actions:
-            if noisy_priors_sum > 1e-9:
-                node.children[action].prior_probability /= noisy_priors_sum
+            if norm_factor > 1e-9:
+                node.children[action].prior_probability /= norm_factor
             else:
-                # Handle case where sum is zero - distribute equally? Or leave as 0?
-                # Leaving as 0 might be safer if original priors were also 0.
-                # Distributing equally might introduce unintended exploration.
-                # Let's log a warning and leave them as potentially 0.
                 logger.warning(
                     "Sum of priors after noise is near zero. Cannot normalize."
                 )
-                node.children[action].prior_probability = 0.0  # Or 1.0 / len(actions) ?
+                node.children[action].prior_probability = 0.0
 
     logger.debug(
         f"[Noise] Added Dirichlet noise (alpha={config.dirichlet_alpha}, eps={eps}) to {len(actions)} root node priors."
@@ -97,7 +104,6 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
     """
     Selects the child node with the highest PUCT score. Assumes noise already added if root.
     Raises SelectionError if no valid child can be selected.
-    Includes detailed logging of all child scores if DEBUG level is enabled.
     """
     if not node.children:
         raise SelectionError(f"Cannot select child from node {node} with no children.")
@@ -107,16 +113,19 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
     child_scores_log = []
 
     if logger.isEnabledFor(logging.DEBUG):
+        # Check if root node to display step correctly
+        state_info = (
+            f"Step={node.initial_game_state.current_step}"
+            if node.is_root and node.initial_game_state
+            else f"Action={node.action_taken}"
+        )
         logger.debug(
-            f"  [Select] Selecting child for Node (Visits={node.visit_count}, Children={len(node.children)}, StateStep={node.state.current_step}):"
+            f"  [Select] Selecting child for Node (Visits={node.visit_count}, Children={len(node.children)}, {state_info}):"
         )
 
-    # Use parent_visit_count from the node being considered for selection
-    parent_visit_count = node.visit_count
-
     for action, child in node.children.items():
-        # Pass the correct parent_visit_count for PUCT calculation
-        score, q, exp_term = calculate_puct_score(child, parent_visit_count, config)
+        # Pass the parent (current node) and the child being evaluated
+        score, q, exp_term = calculate_puct_score(node, child, config)
 
         if logger.isEnabledFor(logging.DEBUG):
             log_entry = (
@@ -124,7 +133,6 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
                 f"(Q={q:.3f}, P={child.prior_probability:.4f}, N={child.visit_count}, Exp={exp_term:.4f})"
             )
             child_scores_log.append(log_entry)
-            # Removed per-child log line here to reduce verbosity, summary below is sufficient
 
         if not np.isfinite(score):
             logger.warning(
@@ -132,12 +140,12 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
             )
             continue
 
-        # Tie-breaking: add small random value? Or just take first max? Taking first max is simpler.
         if score > best_score:
             best_score = score
             best_child = child
 
     if logger.isEnabledFor(logging.DEBUG) and child_scores_log:
+        # Sort and log logic remains the same
         try:
 
             def get_score_from_log(log_str):
@@ -151,20 +159,24 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
         except Exception as sort_err:
             logger.warning(f"Could not sort child score logs: {sort_err}")
         logger.debug("    [Select] All Child Scores Considered (Top 5):")
-        for log_line in child_scores_log[:5]:  # Log only top 5 scores
+        for log_line in child_scores_log[:5]:
             logger.debug(f"      {log_line}")
 
     if best_child is None:
-        # Log available children details for debugging
         child_details = [
             f"Act={a}, N={c.visit_count}, P={c.prior_probability:.4f}, Q={c.value_estimate:.3f}"
             for a, c in node.children.items()
         ]
+        state_info = (
+            f"Root Step {node.initial_game_state.current_step}"
+            if node.is_root and node.initial_game_state
+            else f"Node Action {node.action_taken}"
+        )
         logger.error(
-            f"Could not select best child for node step {node.state.current_step}. Child details: {child_details}"
+            f"Could not select best child for {state_info}. Child details: {child_details}"
         )
         raise SelectionError(
-            f"Could not select best child for node step {node.state.current_step}. Check scores and children."
+            f"Could not select best child for {state_info}. Check scores and children."
         )
 
     logger.debug(
@@ -176,41 +188,40 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
 def traverse_to_leaf(root_node: Node, config: MCTSConfig) -> tuple[Node, int]:
     """
     Traverses the tree from root to a leaf node using PUCT selection.
-    A leaf is defined as a node that is not expanded OR is terminal.
+    A leaf is defined as a node that has not been expanded.
     Stops also if the maximum search depth has been reached.
+    Note: Terminal state check now happens during expansion/prediction.
     Raises SelectionError if child selection fails during traversal.
     Returns the leaf node and the depth reached.
     """
     current_node = root_node
     depth = 0
-    logger.debug(f"[Traverse] --- Start Traverse (Root Node: {root_node}) ---")
+    state_info = (
+        f"Root Step {root_node.initial_game_state.current_step}"
+        if root_node.is_root and root_node.initial_game_state
+        else f"Node Action {root_node.action_taken}"
+    )
+    logger.debug(f"[Traverse] --- Start Traverse (Start Node: {state_info}) ---")
     stop_reason = "Unknown"
 
-    while True:
+    while current_node.is_expanded:  # Traverse while node has children
+        state_info = (
+            f"Root Step {current_node.initial_game_state.current_step}"
+            if current_node.is_root and current_node.initial_game_state
+            else f"Node Action {current_node.action_taken}"
+        )
         logger.debug(
-            f"  [Traverse] Depth {depth}: Considering Node: {current_node} (Expanded={current_node.is_expanded}, Terminal={current_node.state.is_over()})"
+            f"  [Traverse] Depth {depth}: Considering Node {state_info} (Expanded={current_node.is_expanded})"
         )
 
-        if current_node.state.is_over():
-            stop_reason = "Terminal State"
-            logger.debug(  # Changed level from INFO to DEBUG
-                f"  [Traverse] Depth {depth}: Node is TERMINAL. Stopping traverse."
-            )
-            break
-        if not current_node.is_expanded:
-            stop_reason = "Unexpanded Leaf"
-            logger.debug(  # Changed level from INFO to DEBUG
-                f"  [Traverse] Depth {depth}: Node is LEAF (not expanded). Stopping traverse."
-            )
-            break
         if config.max_search_depth is not None and depth >= config.max_search_depth:
             stop_reason = "Max Depth Reached"
-            logger.debug(  # Changed level from INFO to DEBUG
+            logger.debug(
                 f"  [Traverse] Depth {depth}: Hit MAX DEPTH ({config.max_search_depth}). Stopping traverse."
             )
             break
 
-        # Node is expanded, non-terminal, and below max depth - select child
+        # Node is expanded and below max depth - select child
         try:
             selected_child = select_child_node(current_node, config)
             logger.debug(
@@ -222,12 +233,10 @@ def traverse_to_leaf(root_node: Node, config: MCTSConfig) -> tuple[Node, int]:
             stop_reason = f"Child Selection Error: {e}"
             logger.error(
                 f"  [Traverse] Depth {depth}: Error during child selection: {e}. Breaking traverse.",
-                exc_info=False,  # Avoid full traceback for selection errors unless needed
+                exc_info=False,
             )
-            # It's better to return the current node where selection failed than raise an exception
-            # The MCTS search loop can then handle this (e.g., backpropagate current value)
             logger.warning(
-                f"  [Traverse] Returning node {current_node} due to SelectionError."
+                f"  [Traverse] Returning current node {current_node.action_taken} due to SelectionError."
             )
             break
         except Exception as e:
@@ -236,13 +245,28 @@ def traverse_to_leaf(root_node: Node, config: MCTSConfig) -> tuple[Node, int]:
                 f"  [Traverse] Depth {depth}: Unexpected error during child selection: {e}. Breaking traverse.",
                 exc_info=True,
             )
-            # Also return current node here instead of raising
             logger.warning(
-                f"  [Traverse] Returning node {current_node} due to Unexpected Error."
+                f"  [Traverse] Returning current node {current_node.action_taken} due to Unexpected Error."
             )
             break
+    else:
+        # Loop finished because node is not expanded (it's a leaf)
+        stop_reason = "Unexpanded Leaf"
+        state_info = (
+            f"Root Step {current_node.initial_game_state.current_step}"
+            if current_node.is_root and current_node.initial_game_state
+            else f"Node Action {current_node.action_taken}"
+        )
+        logger.debug(
+            f"  [Traverse] Depth {depth}: Node {state_info} is LEAF (not expanded). Stopping traverse."
+        )
 
-    logger.debug(  # Changed level from INFO to DEBUG
-        f"[Traverse] --- End Traverse: Reached Node at Depth {depth}. Reason: {stop_reason}. Final Node: {current_node} ---"
+    state_info_final = (
+        f"Root Step {current_node.initial_game_state.current_step}"
+        if current_node.is_root and current_node.initial_game_state
+        else f"Node Action {current_node.action_taken}"
+    )
+    logger.debug(
+        f"[Traverse] --- End Traverse: Reached Node {state_info_final} at Depth {depth}. Reason: {stop_reason} ---"
     )
     return current_node, depth

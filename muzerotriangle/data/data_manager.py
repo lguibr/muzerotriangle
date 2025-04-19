@@ -1,15 +1,18 @@
 # File: muzerotriangle/data/data_manager.py
-# No changes needed, already expects ActorHandle | None
 import logging
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import mlflow
-import ray  # Import ray
+import ray
 from pydantic import ValidationError
 
 from .path_manager import PathManager
-from .schemas import CheckpointData, LoadedTrainingState
+from .schemas import (  # Import BufferData
+    BufferData,
+    CheckpointData,
+    LoadedTrainingState,
+)
 from .serializer import Serializer
 
 if TYPE_CHECKING:
@@ -25,7 +28,7 @@ logger = logging.getLogger(__name__)
 class DataManager:
     """
     Orchestrates loading and saving of training artifacts using PathManager and Serializer.
-    Handles MLflow artifact logging.
+    Handles MLflow artifact logging. Adapted for MuZero buffer format.
     """
 
     def __init__(
@@ -33,7 +36,6 @@ class DataManager:
     ):
         self.persist_config = persist_config
         self.train_config = train_config
-        # Ensure PersistenceConfig reflects the current run name from TrainConfig
         self.persist_config.RUN_NAME = self.train_config.RUN_NAME
 
         self.path_manager = PathManager(self.persist_config)
@@ -41,13 +43,12 @@ class DataManager:
 
         self.path_manager.create_run_directories()
         logger.info(
-            f"DataManager initialized. Current Run Name: {self.persist_config.RUN_NAME}. Run directory: {self.path_manager.run_base_dir}"
+            f"DataManager initialized for run '{self.persist_config.RUN_NAME}'."
         )
 
     def load_initial_state(self) -> LoadedTrainingState:
         """
-        Loads the initial training state using PathManager and Serializer.
-        Returns a LoadedTrainingState object containing the deserialized data.
+        Loads the initial training state (checkpoint and MuZero buffer).
         Handles AUTO_RESUME_LATEST logic.
         """
         loaded_state = LoadedTrainingState()
@@ -57,7 +58,7 @@ class DataManager:
         )
         checkpoint_run_name: str | None = None
 
-        # --- Load Checkpoint (Model + Optimizer + Stats) ---
+        # --- Load Checkpoint ---
         if checkpoint_path:
             logger.info(f"Loading checkpoint: {checkpoint_path}")
             try:
@@ -66,47 +67,40 @@ class DataManager:
                 )
                 if loaded_checkpoint_model:
                     loaded_state.checkpoint_data = loaded_checkpoint_model
-                    checkpoint_run_name = (
-                        loaded_state.checkpoint_data.run_name
-                    )  # Store run name
+                    checkpoint_run_name = loaded_state.checkpoint_data.run_name
                     logger.info(
-                        f"Checkpoint loaded and validated (Run: {loaded_state.checkpoint_data.run_name}, Step: {loaded_state.checkpoint_data.global_step})"
+                        f"Checkpoint loaded (Run: {cpd.run_name}, Step: {cpd.global_step})"
+                        if (cpd := loaded_state.checkpoint_data)
+                        else "Checkpoint data invalid"
+                    )  # Use walrus
+                else:
+                    logger.error(f"Loading checkpoint failed: {checkpoint_path}")
+            except Exception as e:
+                logger.error(f"Error loading checkpoint: {e}", exc_info=True)
+
+        # --- Load MuZero Buffer ---
+        # Buffer saving logic uses config, no specific flag check needed here
+        buffer_path = self.path_manager.determine_buffer_to_load(
+            self.train_config.LOAD_BUFFER_PATH,
+            self.train_config.AUTO_RESUME_LATEST,
+            checkpoint_run_name,  # Pass run name from loaded checkpoint
+        )
+        if buffer_path:
+            logger.info(f"Loading MuZero buffer: {buffer_path}")
+            try:
+                # Use the updated serializer method
+                loaded_buffer_model: BufferData | None = self.serializer.load_buffer(
+                    buffer_path
+                )
+                if loaded_buffer_model:
+                    loaded_state.buffer_data = loaded_buffer_model
+                    logger.info(
+                        f"MuZero Buffer loaded. Trajectories: {len(loaded_buffer_model.trajectories)}, Total Steps: {loaded_buffer_model.total_steps}"
                     )
                 else:
-                    logger.error(
-                        f"Loading checkpoint from {checkpoint_path} failed or returned None."
-                    )
-            except (ValidationError, Exception) as e:
-                logger.error(
-                    f"Error loading/validating checkpoint from {checkpoint_path}: {e}",
-                    exc_info=True,
-                )
-
-        # --- Load Buffer ---
-        if self.persist_config.SAVE_BUFFER:
-            buffer_path = self.path_manager.determine_buffer_to_load(
-                self.train_config.LOAD_BUFFER_PATH,
-                self.train_config.AUTO_RESUME_LATEST,
-                checkpoint_run_name,  # Pass run name from loaded checkpoint
-            )
-            if buffer_path:
-                logger.info(f"Loading buffer: {buffer_path}")
-                try:
-                    loaded_buffer_model = self.serializer.load_buffer(buffer_path)
-                    if loaded_buffer_model:
-                        loaded_state.buffer_data = loaded_buffer_model
-                        logger.info(
-                            f"Buffer loaded and validated. Size: {len(loaded_state.buffer_data.buffer_list)}"
-                        )
-                    else:
-                        logger.error(
-                            f"Loading buffer from {buffer_path} failed or returned None."
-                        )
-                except (ValidationError, Exception) as e:
-                    logger.error(
-                        f"Failed to load/validate experience buffer from {buffer_path}: {e}",
-                        exc_info=True,
-                    )
+                    logger.error(f"Loading buffer failed: {buffer_path}")
+            except Exception as e:
+                logger.error(f"Failed to load MuZero buffer: {e}", exc_info=True)
 
         if not loaded_state.checkpoint_data and not loaded_state.buffer_data:
             logger.info("No checkpoint or buffer loaded. Starting fresh.")
@@ -118,14 +112,14 @@ class DataManager:
         nn: "NeuralNetwork",
         optimizer: "Optimizer",
         stats_collector_actor: ray.actor.ActorHandle | None,
-        buffer: "ExperienceBuffer",
+        buffer: "ExperienceBuffer",  # Type hint remains the same
         global_step: int,
         episodes_played: int,
         total_simulations_run: int,
         is_best: bool = False,
         is_final: bool = False,
     ):
-        """Saves the training state using Serializer and PathManager."""
+        """Saves the training state (checkpoint and MuZero buffer)."""
         run_name = self.persist_config.RUN_NAME
         logger.info(
             f"Saving training state for run '{run_name}' at step {global_step}. Final={is_final}, Best={is_best}"
@@ -134,13 +128,11 @@ class DataManager:
         stats_collector_state = {}
         if stats_collector_actor is not None:
             try:
-                # Call remote method on the handle
                 stats_state_ref = stats_collector_actor.get_state.remote()
                 stats_collector_state = ray.get(stats_state_ref, timeout=5.0)
             except Exception as e:
                 logger.error(
-                    f"Error fetching state from StatsCollectorActor for saving: {e}",
-                    exc_info=True,
+                    f"Error fetching StatsCollectorActor state: {e}", exc_info=True
                 )
 
         # --- Save Checkpoint ---
@@ -161,48 +153,46 @@ class DataManager:
                 step=global_step, is_final=is_final
             )
             self.serializer.save_checkpoint(checkpoint_data, step_checkpoint_path)
-            saved_checkpoint_path = step_checkpoint_path  # Store path if save succeeded
-
-            # Update latest/best links
+            saved_checkpoint_path = step_checkpoint_path
             self.path_manager.update_checkpoint_links(
                 step_checkpoint_path, is_best=is_best
             )
-
         except ValidationError as e:
-            logger.error(f"Failed to create CheckpointData model: {e}", exc_info=True)
+            logger.error(f"CheckpointData validation failed: {e}", exc_info=True)
         except Exception as e:
             logger.error(f"Failed to save checkpoint: {e}", exc_info=True)
 
-        # --- Save Buffer ---
+        # --- Save MuZero Buffer ---
         saved_buffer_path: Path | None = None
-        if self.persist_config.SAVE_BUFFER:
-            try:
-                buffer_data = self.serializer.prepare_buffer_data(buffer)
-                if buffer_data:
-                    buffer_path = self.path_manager.get_buffer_path(
-                        step=global_step, is_final=is_final
-                    )
-                    self.serializer.save_buffer(buffer_data, buffer_path)
-                    saved_buffer_path = buffer_path  # Store path if save succeeded
-                    # Update default buffer link
-                    self.path_manager.update_buffer_link(buffer_path)
-                else:
-                    logger.warning("Buffer data preparation failed, buffer not saved.")
-            except ValidationError as e:
-                logger.error(f"Failed to create BufferData model: {e}", exc_info=True)
-            except Exception as e:
-                logger.error(f"Failed to save buffer: {e}", exc_info=True)
+        # Use config flag if explicit control is desired, otherwise always save if buffer exists
+        # if self.persist_config.SAVE_BUFFER:
+        try:
+            # prepare_buffer_data handles MuZero format now
+            buffer_data_model: BufferData | None = self.serializer.prepare_buffer_data(
+                buffer
+            )
+            if buffer_data_model:
+                buffer_path = self.path_manager.get_buffer_path(
+                    step=global_step, is_final=is_final
+                )
+                self.serializer.save_buffer(
+                    buffer_data_model, buffer_path
+                )  # save_buffer handles MuZero format
+                saved_buffer_path = buffer_path
+                self.path_manager.update_buffer_link(buffer_path)
+            else:
+                logger.warning("Buffer data preparation failed, buffer not saved.")
+        except Exception as e:
+            logger.error(f"Failed to save MuZero buffer: {e}", exc_info=True)
 
-        # --- Log Artifacts to MLflow ---
+        # --- Log Artifacts ---
         self._log_artifacts(saved_checkpoint_path, saved_buffer_path, is_best)
 
     def _log_artifacts(
-        self,
-        checkpoint_path: Path | None,
-        buffer_path: Path | None,
-        is_best: bool,
+        self, checkpoint_path: Path | None, buffer_path: Path | None, is_best: bool
     ):
         """Logs saved checkpoint and buffer files to MLflow."""
+        # Logic remains the same, paths point to saved files
         try:
             if checkpoint_path and checkpoint_path.exists():
                 ckpt_artifact_path = self.persist_config.CHECKPOINT_SAVE_DIR_NAME
@@ -223,6 +213,7 @@ class DataManager:
                 logger.info(
                     f"Logged checkpoint artifacts to MLflow path: {ckpt_artifact_path}"
                 )
+
             if buffer_path and buffer_path.exists():
                 buffer_artifact_path = self.persist_config.BUFFER_SAVE_DIR_NAME
                 mlflow.log_artifact(
@@ -234,7 +225,7 @@ class DataManager:
                         str(default_buffer_path), artifact_path=buffer_artifact_path
                     )
                 logger.info(
-                    f"Logged buffer artifacts to MLflow path: {buffer_artifact_path}"
+                    f"Logged MuZero buffer artifacts to MLflow path: {buffer_artifact_path}"
                 )
         except Exception as e:
             logger.error(f"Failed to log artifacts to MLflow: {e}", exc_info=True)
@@ -249,7 +240,7 @@ class DataManager:
         except Exception as e:
             logger.error(f"Failed to save/log run config JSON: {e}", exc_info=True)
 
-    # --- Expose PathManager methods if needed ---
+    # PathManager getters remain the same
     def get_checkpoint_path(
         self,
         run_name: str | None = None,
