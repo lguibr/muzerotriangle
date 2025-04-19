@@ -3,7 +3,7 @@
 
 ## Purpose and Architecture
 
-This module provides common utility functions and type definitions used across various parts of the AlphaTriangle project. Its goal is to avoid code duplication and provide central definitions for shared concepts.
+This module provides common utility functions and type definitions used across various parts of the MuZeroTriangle project. Its goal is to avoid code duplication and provide central definitions for shared concepts.
 
 -   **Helper Functions ([`helpers.py`](helpers.py)):** Contains miscellaneous helper functions like `get_device`, `set_random_seeds`, `format_eta`, `normalize_color_for_matplotlib`.
 -   **Type Definitions ([`types.py`](types.py)):** Defines common type aliases and `TypedDict`s used throughout the codebase. Key types include:

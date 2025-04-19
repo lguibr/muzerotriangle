@@ -12,7 +12,7 @@ from ..config import EnvConfig, ModelConfig, TrainConfig
 from ..environment import GameState
 from ..features import extract_state_features
 from ..utils.types import ActionType, PolicyValueOutput, StateType
-from .model import MuZeroNet  # Import MuZeroNet
+from .model import MuZeroNet
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -49,7 +49,6 @@ class NeuralNetwork:
         self.action_dim = env_config.ACTION_DIM
         self.model.eval()
 
-        # Distributional Value Head parameters
         self.num_value_atoms = model_config.NUM_VALUE_ATOMS
         self.v_min = model_config.VALUE_MIN
         self.v_max = model_config.VALUE_MAX
@@ -60,19 +59,16 @@ class NeuralNetwork:
             self.v_min, self.v_max, self.num_value_atoms, device=self.device
         )
 
-        # Distributional Reward Head parameters (assuming symmetric support around 0)
         self.num_reward_atoms = model_config.REWARD_SUPPORT_SIZE
         if self.num_reward_atoms <= 1:
             raise ValueError("REWARD_SUPPORT_SIZE must be greater than 1")
-        # Calculate reward min/max based on support size (e.g., size 21 -> -10 to 10)
         self.r_max = float((self.num_reward_atoms - 1) // 2)
         self.r_min = -self.r_max
-        self.delta_r = 1.0  # Assuming integer steps for reward support
+        self.delta_r = 1.0
         self.reward_support = torch.linspace(
             self.r_min, self.r_max, self.num_reward_atoms, device=self.device
         )
 
-        # Compile model if requested and compatible
         self._try_compile_model()
 
     def _try_compile_model(self):
@@ -95,7 +91,6 @@ class NeuralNetwork:
             logger.info(
                 f"Attempting to compile model with torch.compile() on device '{self.device}'..."
             )
-            # Compile the underlying MuZeroNet instance
             self.model = torch.compile(self.model)  # type: ignore
             logger.info(f"Model compiled successfully on device '{self.device}'.")
         except Exception as e:
@@ -162,7 +157,6 @@ class NeuralNetwork:
     ) -> torch.Tensor:
         """Calculates the expected scalar value from distribution logits."""
         probs = self._logits_to_probs(logits)
-        # Expand support to match batch size if needed
         support_expanded = support.expand_as(probs)
         scalar = torch.sum(probs * support_expanded, dim=-1)
         return scalar
@@ -187,7 +181,6 @@ class NeuralNetwork:
             observation["other_features"], dtype=torch.float32, device=self.device
         )
 
-        # Add batch dimension if necessary
         if grid_tensor.dim() == 3:
             grid_tensor = grid_tensor.unsqueeze(0)
         if other_features_tensor.dim() == 1:
@@ -197,8 +190,6 @@ class NeuralNetwork:
             grid_tensor, other_features_tensor
         )
 
-        # Create dummy reward logits (batch_size, num_reward_atoms)
-        # Initial state doesn't have a predicted reward from dynamics
         dummy_reward_logits = torch.zeros(
             (1, self.num_reward_atoms), device=self.device
         )
@@ -221,44 +212,52 @@ class NeuralNetwork:
                    All tensors will have a batch dimension.
         """
         self.model.eval()
-        # Ensure hidden_state has a batch dimension
         if hidden_state.dim() == 1:
             hidden_state = hidden_state.unsqueeze(0)
 
-        # Ensure action is a tensor with a batch dimension
         if isinstance(action, int):
             action_tensor = torch.tensor([action], dtype=torch.long, device=self.device)
         elif isinstance(action, torch.Tensor):
-            if action.dim() == 0:  # Scalar tensor
+            if action.dim() == 0:
                 action_tensor = action.unsqueeze(0).to(self.device)
-            elif action.dim() == 1:  # Already a batch of actions
+            elif action.dim() == 1:
                 action_tensor = action.to(self.device)
             else:
                 raise ValueError(f"Unsupported action tensor shape: {action.shape}")
         else:
             raise TypeError(f"Unsupported action type: {type(action)}")
 
-        # Ensure action_tensor has the same batch size as hidden_state
         if action_tensor.shape[0] != hidden_state.shape[0]:
             if hidden_state.shape[0] == 1 and action_tensor.shape[0] > 1:
-                # Repeat hidden state if it's a single state for a batch of actions
                 hidden_state = hidden_state.expand(action_tensor.shape[0], -1)
             elif action_tensor.shape[0] == 1 and hidden_state.shape[0] > 1:
-                # Repeat action if it's a single action for a batch of states
                 action_tensor = action_tensor.expand(hidden_state.shape[0])
             else:
                 raise ValueError(
                     f"Batch size mismatch between hidden_state ({hidden_state.shape[0]}) and action ({action_tensor.shape[0]})"
                 )
 
+        # hs_finite = torch.all(torch.isfinite(hidden_state)).item() # Removed log
+        # logger.debug(f"[Recurrent Inference] Input HS shape: {hidden_state.shape}, isfinite: {hs_finite}") # Removed log
+        # if not hs_finite: logger.warning("[Recurrent Inference] Input hidden_state contains non-finite values!") # Removed log
+
         next_hidden_state, reward_logits = self.model.dynamics(
             hidden_state, action_tensor
         )
         policy_logits, value_logits = self.model.predict(next_hidden_state)
-        return policy_logits, value_logits, reward_logits, next_hidden_state
 
-    # --- Compatibility methods for MCTS/Workers expecting PolicyValueOutput ---
-    # These now perform initial inference.
+        # nhs_finite = torch.all(torch.isfinite(next_hidden_state)).item() # Removed log
+        # rl_finite = torch.all(torch.isfinite(reward_logits)).item() # Removed log
+        # pl_finite = torch.all(torch.isfinite(policy_logits)).item() # Removed log
+        # vl_finite = torch.all(torch.isfinite(value_logits)).item() # Removed log
+        # logger.debug(f"[Recurrent Inference] Output NHS shape: {next_hidden_state.shape}, isfinite: {nhs_finite}") # Removed log
+        # logger.debug(f"[Recurrent Inference] Output RewardLogits shape: {reward_logits.shape}, isfinite: {rl_finite}") # Removed log
+        # logger.debug(f"[Recurrent Inference] Output PolicyLogits shape: {policy_logits.shape}, isfinite: {pl_finite}") # Removed log
+        # logger.debug(f"[Recurrent Inference] Output ValueLogits shape: {value_logits.shape}, isfinite: {vl_finite}") # Removed log
+        # if not (nhs_finite and rl_finite and pl_finite and vl_finite): # Removed log
+        #      logger.warning("[Recurrent Inference] Output contains non-finite values!") # Removed log
+
+        return policy_logits, value_logits, reward_logits, next_hidden_state
 
     @torch.inference_mode()
     def evaluate(self, state: GameState) -> PolicyValueOutput:
@@ -268,16 +267,12 @@ class NeuralNetwork:
         """
         self.model.eval()
         try:
-            # 1. Feature Extraction
             state_dict: StateType = extract_state_features(state, self.model_config)
-            # 2. Initial Inference
             policy_logits, value_logits, _, _ = self.initial_inference(state_dict)
 
-            # 3. Process Outputs
             policy_probs_tensor = self._logits_to_probs(policy_logits)
             expected_value_tensor = self._logits_to_scalar(value_logits, self.support)
 
-            # Validate and normalize policy probabilities
             policy_probs = policy_probs_tensor.squeeze(0).cpu().numpy()
             if not np.all(np.isfinite(policy_probs)):
                 raise NetworkEvaluationError(
@@ -294,7 +289,6 @@ class NeuralNetwork:
                 else:
                     policy_probs /= prob_sum
 
-            # Convert to expected output format
             action_policy: Mapping[ActionType, float] = {
                 i: float(p) for i, p in enumerate(policy_probs)
             }
@@ -318,19 +312,15 @@ class NeuralNetwork:
             return []
         self.model.eval()
         try:
-            # 1. Batch Feature Extraction
             grid_tensor, other_features_tensor = self._batch_states_to_tensors(states)
 
-            # 2. Batch Initial Inference (using model's forward)
             policy_logits, value_logits, _ = self.model(
                 grid_tensor, other_features_tensor
             )
 
-            # 3. Batch Process Outputs
             policy_probs_tensor = self._logits_to_probs(policy_logits)
             expected_values_tensor = self._logits_to_scalar(value_logits, self.support)
 
-            # Validate and normalize policies
             policy_probs = policy_probs_tensor.cpu().numpy()
             expected_values = expected_values_tensor.cpu().numpy()
 
@@ -375,7 +365,7 @@ class NeuralNetwork:
             weights_on_device = {k: v.to(self.device) for k, v in weights.items()}
             model_to_load = getattr(self.model, "_orig_mod", self.model)
             model_to_load.load_state_dict(weights_on_device)
-            self.model.eval()  # Ensure model is in eval mode after loading weights
+            self.model.eval()
             logger.debug("NN weights set successfully.")
         except Exception as e:
             logger.error(f"Error setting weights on NN instance: {e}", exc_info=True)

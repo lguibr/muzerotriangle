@@ -52,7 +52,7 @@ This module provides utilities for collecting, storing, and visualizing time-ser
 ## Integration
 
 -   The `TrainingLoop` ([`muzerotriangle.training.loop`](../training/loop.py)) instantiates `StatsCollectorActor` and calls its remote `log` or `log_batch` methods, **passing `StepInfo` dictionaries**. It logs the `WEIGHT_UPDATE_METRIC_KEY` when worker weights are updated.
--   The `SelfPlayWorker` ([`muzerotriangle.rl.self_play.worker`](../rl/self_play/worker.py)) calls `log_batch` **passing `StepInfo` dictionaries containing `game_step_index` and `global_step` (of its current weights). It now logs `RL/Current_Score` in addition to `RL/Step_Reward`.**
+-   The `SelfPlayWorker` ([`muzerotriangle.rl.self_play.worker`](../rl/self_play/worker.py)) calls `log.remote` individually for each metric **passing `StepInfo` dictionaries containing `game_step_index` and `global_step` (of its current weights). It logs `RL/Current_Score` (Plot 0) in addition to `RL/Step_Reward` (Plot 3), `MCTS/Step_Visits` (Plot 6), and `MCTS/Step_Depth` (Plot 9).**
 -   The `DashboardRenderer` ([`muzerotriangle.visualization.core.dashboard_renderer`](../visualization/core/dashboard_renderer.py)) holds a handle to the `StatsCollectorActor` and calls `get_data.remote()` periodically to fetch data for plotting.
 -   The `DashboardRenderer` instantiates `Plotter` and calls `get_plot_surface` using the fetched stats data and the target plot area dimensions. It then blits the returned surface.
 -   The `DataManager` ([`muzerotriangle.data.data_manager`](../data/data_manager.py)) interacts with the `StatsCollectorActor` via `get_state.remote()` and `set_state.remote()` during checkpoint saving and loading.

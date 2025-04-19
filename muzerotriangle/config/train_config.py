@@ -1,5 +1,4 @@
 # File: muzerotriangle/config/train_config.py
-# File: muzerotriangle/config/train_config.py
 import logging
 import time
 from typing import Literal
@@ -12,6 +11,8 @@ logger = logging.getLogger(__name__)
 class TrainConfig(BaseModel):
     """
     Configuration for the MuZero training process (Pydantic model).
+    Defaults tuned for a longer training run (~48h) on capable hardware.
+    Worker count is dynamically adjusted based on detected cores during setup.
     """
 
     RUN_NAME: str = Field(
@@ -24,20 +25,33 @@ class TrainConfig(BaseModel):
     RANDOM_SEED: int = Field(default=42)
 
     # --- Training Loop ---
-    MAX_TRAINING_STEPS: int | None = Field(default=100_000, ge=1)
+    MAX_TRAINING_STEPS: int | None = Field(
+        default=500_000, ge=1, description="Target number of training steps."
+    )
 
     # --- Workers & Batching ---
-    NUM_SELF_PLAY_WORKERS: int = Field(default=8, ge=1)
-    WORKER_DEVICE: Literal["auto", "cuda", "cpu", "mps"] = Field(default="cpu")
-    BATCH_SIZE: int = Field(default=64, ge=1)  # Batches of sequences
-    BUFFER_CAPACITY: int = Field(
-        default=100_000, ge=1
-    )  # Total steps across trajectories
-    MIN_BUFFER_SIZE_TO_TRAIN: int = Field(
-        default=10_000,
-        ge=1,  # Minimum total steps
+    NUM_SELF_PLAY_WORKERS: int = Field(
+        default=8,
+        ge=1,
+        description="Default number of parallel self-play actors (adjusted dynamically).",
     )
-    WORKER_UPDATE_FREQ_STEPS: int = Field(default=500, ge=1)
+    WORKER_DEVICE: Literal["auto", "cuda", "cpu", "mps"] = Field(
+        default="cpu", description="Device for self-play workers (usually CPU)."
+    )
+    BATCH_SIZE: int = Field(
+        default=128, ge=1, description="Batch size for training steps."
+    )
+    BUFFER_CAPACITY: int = Field(
+        default=1_000_000, ge=1, description="Total steps capacity across trajectories."
+    )
+    MIN_BUFFER_SIZE_TO_TRAIN: int = Field(
+        default=50_000,
+        ge=1,
+        description="Minimum total steps in buffer before training starts.",
+    )
+    WORKER_UPDATE_FREQ_STEPS: int = Field(
+        default=1000, ge=1, description="How often to send new weights to workers."
+    )
 
     # --- MuZero Specific ---
     MUZERO_UNROLL_STEPS: int = Field(
@@ -71,24 +85,29 @@ class TrainConfig(BaseModel):
         default="CosineAnnealingLR"
     )
     LR_SCHEDULER_T_MAX: int | None = Field(
-        default=None
-    )  # Auto-set from MAX_TRAINING_STEPS
+        default=None, description="Auto-set from MAX_TRAINING_STEPS for Cosine."
+    )
     LR_SCHEDULER_ETA_MIN: float = Field(default=1e-6, ge=0)
 
     # --- Checkpointing ---
-    CHECKPOINT_SAVE_FREQ_STEPS: int = Field(default=2500, ge=1)
+    CHECKPOINT_SAVE_FREQ_STEPS: int = Field(
+        default=10000, ge=1, description="Frequency to save model checkpoints."
+    )
 
     # --- Prioritized Experience Replay (PER) ---
-    # --- RE-ENABLED ---
     USE_PER: bool = Field(default=True)
     PER_ALPHA: float = Field(default=0.6, ge=0)
     PER_BETA_INITIAL: float = Field(default=0.4, ge=0, le=1.0)
     PER_BETA_FINAL: float = Field(default=1.0, ge=0, le=1.0)
-    PER_BETA_ANNEAL_STEPS: int | None = Field(default=None)  # Auto-set
+    PER_BETA_ANNEAL_STEPS: int | None = Field(
+        default=None, description="Auto-set from MAX_TRAINING_STEPS."
+    )
     PER_EPSILON: float = Field(default=1e-5, gt=0)
 
     # --- Model Compilation ---
-    COMPILE_MODEL: bool = Field(default=True)
+    COMPILE_MODEL: bool = Field(
+        default=True, description="Use torch.compile() if available."
+    )
 
     @model_validator(mode="after")
     def check_buffer_sizes(self) -> "TrainConfig":
@@ -114,7 +133,8 @@ class TrainConfig(BaseModel):
             self.LR_SCHEDULER_T_MAX is None
             and self.LR_SCHEDULER_TYPE == "CosineAnnealingLR"
         ):
-            self.LR_SCHEDULER_T_MAX = 100_000  # Fallback if MAX_TRAINING_STEPS is None
+            # Fallback if MAX_TRAINING_STEPS is None (e.g., running indefinitely)
+            self.LR_SCHEDULER_T_MAX = 1_000_000
             logger.warning(
                 f"MAX_TRAINING_STEPS is None, using fallback T_max {self.LR_SCHEDULER_T_MAX}"
             )
@@ -132,9 +152,10 @@ class TrainConfig(BaseModel):
                     f"Set PER_BETA_ANNEAL_STEPS to MAX_TRAINING_STEPS ({self.MAX_TRAINING_STEPS})"
                 )
             else:
-                self.PER_BETA_ANNEAL_STEPS = 100_000  # Fallback
+                # Fallback if MAX_TRAINING_STEPS is None
+                self.PER_BETA_ANNEAL_STEPS = 1_000_000
                 logger.warning(
-                    f"MAX_TRAINING_STEPS invalid, using fallback PER_BETA_ANNEAL_STEPS {self.PER_BETA_ANNEAL_STEPS}"
+                    f"MAX_TRAINING_STEPS invalid or None, using fallback PER_BETA_ANNEAL_STEPS {self.PER_BETA_ANNEAL_STEPS}"
                 )
 
         if (

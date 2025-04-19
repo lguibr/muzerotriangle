@@ -1,1 +1,1 @@
-APP_NAME: str = "AlphaTriangle"
+APP_NAME: str = "MuZeroTriangle"

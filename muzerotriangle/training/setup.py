@@ -50,8 +50,13 @@ def setup_training_components(
         # --- Detect Cores (proceed even if Ray was already initialized) ---
         try:
             resources = ray.cluster_resources()
-            detected_cpu_cores = int(resources.get("CPU", 0)) - 2
-            logger.info(f"Ray detected {detected_cpu_cores} CPU cores.")
+            # Leave 1-2 cores for the main process, GPU communication, etc.
+            num_cpus_available = int(resources.get("CPU", 1))
+            cores_to_use = max(1, num_cpus_available - 2)  # Ensure at least 1 worker
+            detected_cpu_cores = cores_to_use
+            logger.info(
+                f"Ray detected {num_cpus_available} total CPU cores. Will attempt to use {detected_cpu_cores} for workers."
+            )
         except Exception as e:
             logger.error(f"Could not get Ray cluster resources: {e}")
             # Continue without detected cores, will use configured value
@@ -64,26 +69,25 @@ def setup_training_components(
         mcts_config = config.MCTSConfig()
 
         # --- Adjust Worker Count based on Detected Cores ---
-        requested_workers = train_config.NUM_SELF_PLAY_WORKERS
-        actual_workers = requested_workers  # Start with configured value
+        configured_workers = train_config.NUM_SELF_PLAY_WORKERS
+        actual_workers = configured_workers  # Start with configured value
 
         if detected_cpu_cores is not None and detected_cpu_cores > 0:
-            # --- CHANGED: Prioritize detected cores ---
-            actual_workers = detected_cpu_cores  # Use detected cores
-            if actual_workers != requested_workers:
+            # Use detected cores if different from configured default
+            if detected_cpu_cores != configured_workers:
                 logger.info(
-                    f"Overriding configured workers ({requested_workers}) with detected CPU cores ({actual_workers})."
+                    f"Overriding configured workers ({configured_workers}) with detected available cores ({detected_cpu_cores})."
                 )
+                actual_workers = detected_cpu_cores
             else:
                 logger.info(
                     f"Using {actual_workers} self-play workers (matches detected cores)."
                 )
-            # --- END CHANGED ---
         else:
             logger.warning(
-                f"Could not detect valid CPU cores ({detected_cpu_cores}). Using configured NUM_SELF_PLAY_WORKERS: {requested_workers}"
+                f"Could not detect valid CPU cores ({detected_cpu_cores}). Using configured NUM_SELF_PLAY_WORKERS: {configured_workers}"
             )
-            actual_workers = requested_workers  # Fallback to configured value
+            actual_workers = configured_workers  # Fallback to configured value
 
         # Update the config object with the final determined number
         train_config.NUM_SELF_PLAY_WORKERS = actual_workers

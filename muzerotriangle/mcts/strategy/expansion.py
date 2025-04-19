@@ -2,13 +2,12 @@
 import logging
 from typing import TYPE_CHECKING
 
-import torch  # Import torch for tensor check
+import torch
 
 from ..core.node import Node
 from ..core.types import ActionPolicyMapping
 
 if TYPE_CHECKING:
-    # Use NeuralNetwork interface type hint
     from muzerotriangle.nn import NeuralNetwork
     from muzerotriangle.utils.types import ActionType
 
@@ -17,73 +16,98 @@ logger = logging.getLogger(__name__)
 
 
 def expand_node(
-    node_to_expand: "Node",  # Node containing s_k
-    policy_prediction: ActionPolicyMapping,  # Policy p_k from f(s_k)
-    network: "NeuralNetwork",  # Network interface to call dynamics (g)
-    valid_actions: list["ActionType"] | None = None,  # Pass valid actions explicitly
+    node_to_expand: "Node",
+    policy_prediction: ActionPolicyMapping,
+    network: "NeuralNetwork",
+    valid_actions: list["ActionType"] | None = None,
 ):
     """
     Expands a leaf node in the MuZero search tree.
     If valid_actions is provided, only those actions are considered for expansion.
     Otherwise, actions with non-zero prior probability in policy_prediction are considered.
     """
+    parent_action = (
+        node_to_expand.action_taken
+        if node_to_expand.action_taken is not None
+        else "Root"
+    )
+    depth = 0
+    temp_node = node_to_expand
+    while temp_node.parent:
+        depth += 1
+        temp_node = temp_node.parent
+
+    logger.debug(
+        f"[Expand] Attempting expansion for Node (Action={parent_action}, Depth={depth}, Visits={node_to_expand.visit_count})"
+    )
+
     if node_to_expand.is_expanded:
-        logger.debug(f"Node {node_to_expand.action_taken} already expanded. Skipping.")
+        logger.debug(
+            f"[Expand] Node (Action={parent_action}) already expanded. Skipping."
+        )
         return
     hidden_state_k = node_to_expand.hidden_state
     if hidden_state_k is None:
         logger.error(
-            f"[Expand] Node {node_to_expand.action_taken} has no hidden state."
+            f"[Expand] Node (Action={parent_action}) has no hidden state. Cannot expand."
         )
         return
 
-    logger.debug(f"[Expand] Expanding Node via action: {node_to_expand.action_taken}")
-
-    # --- MODIFIED: Determine actions to expand based on valid_actions first ---
     if valid_actions is not None:
-        # If valid_actions are provided (e.g., for root), only expand these
         actions_to_expand_set = set(valid_actions)
+        logger.debug(
+            f"[Expand] Using provided valid_actions: {len(actions_to_expand_set)} actions."
+        )
         if not actions_to_expand_set:
             logger.warning(
-                f"[Expand] No valid actions provided for node {node_to_expand.action_taken}. Node will remain unexpanded."
-            )
-            return  # Do not create children if valid_actions is empty
-    else:
-        # If valid_actions not provided, use policy prediction keys (for internal nodes)
-        # Filter by non-zero prior? Optional, but can reduce unnecessary dynamics calls.
-        # Let's keep expanding all actions predicted by the policy for now.
-        actions_to_expand_set = set(policy_prediction.keys())
-        if not actions_to_expand_set:
-            logger.warning(
-                f"[Expand] No actions found in policy prediction for node {node_to_expand.action_taken}. Node will remain unexpanded."
+                f"[Expand] No valid actions provided for node {parent_action}. Node will remain unexpanded."
             )
             return
-    # --- END MODIFIED ---
+    else:
+        # Expand based on policy prediction keys (actions with non-zero prior)
+        actions_to_expand_set = {
+            a for a, p in policy_prediction.items() if p > 0
+        }  # Filter zero priors
+        # Log the policy map being used
+        policy_log_str = ", ".join(
+            f"{a}:{p:.3f}" for a, p in sorted(policy_prediction.items()) if p > 1e-4
+        )
+        logger.debug(
+            f"[Expand] Using policy prediction keys ({len(actions_to_expand_set)} actions with >0 prior). Policy: {{{policy_log_str}}}"
+        )
+        if not actions_to_expand_set:
+            logger.warning(
+                f"[Expand] No actions found with non-zero prior in policy prediction for node {parent_action}. Node will remain unexpanded."
+            )
+            return
 
     children_created = 0
     for action in actions_to_expand_set:
-        # Get prior probability for this action from the prediction
         prior = policy_prediction.get(action, 0.0)
         if prior < 0:
-            logger.warning(f"Negative prior {prior} for action {action}. Clamping.")
+            logger.warning(
+                f"[Expand] Negative prior {prior} for action {action}. Clamping to 0."
+            )
             prior = 0.0
-        # Optional: Skip expansion if prior is zero?
-        # if prior <= 1e-6:
-        #     continue
+        # Skip actions with zero prior unless they were explicitly provided as valid
+        if prior == 0.0 and valid_actions is None:
+            continue
 
+        logger.debug(
+            f"  [Expand Child] Action={action}, Prior={prior:.4f}. Calling dynamics..."
+        )
         try:
             if not isinstance(hidden_state_k, torch.Tensor):
-                logger.error(f"Hidden state is not a tensor: {type(hidden_state_k)}")
+                logger.error(
+                    f"  [Expand Child] Hidden state is not a tensor: {type(hidden_state_k)}"
+                )
                 continue
-            # Ensure hidden state is batched for dynamics call
             hidden_state_k_batch = (
                 hidden_state_k.unsqueeze(0)
                 if hidden_state_k.dim() == 1
                 else hidden_state_k
             )
 
-            # Call dynamics on the underlying model
-            # Ensure action is a tensor for the model
             action_tensor = torch.tensor(
                 [action], dtype=torch.long, device=network.device
             )
@@ -91,14 +115,14 @@ def expand_node(
                 hidden_state_k_batch, action_tensor
             )
 
-            # Remove batch dimension and calculate scalar reward
-            hidden_state_k_plus_1 = hidden_state_k_plus_1.squeeze(
-                0
-            ).detach()  # Detach here
+            hidden_state_k_plus_1 = hidden_state_k_plus_1.squeeze(0).detach()
             reward_logits = reward_logits.squeeze(0)
             reward_k_plus_1 = network._logits_to_scalar(
                 reward_logits.unsqueeze(0), network.reward_support
             ).item()
+            logger.debug(
+                f"  [Expand Child] Dynamics success. Action={action}, Reward={reward_k_plus_1:.3f}"
+            )
 
         except Exception as e:
             logger.error(
@@ -107,7 +131,6 @@ def expand_node(
             )
             continue
 
-        # Create the child node
         child = Node(
             prior=prior,
             hidden_state=hidden_state_k_plus_1,
@@ -116,9 +139,8 @@ def expand_node(
             action_taken=action,
         )
         node_to_expand.children[action] = child
-        logger.debug(
-            f"  [Expand] Created child for action {action}: Prior={prior:.4f}, Reward={reward_k_plus_1:.3f}"
-        )
         children_created += 1
 
-    logger.debug(f"[Expand] Node expanded with {children_created} children.")
+    logger.debug(
+        f"[Expand] Node (Action={parent_action}, Depth={depth}) finished expansion. Children created: {children_created}. Total children: {len(node_to_expand.children)}. IsExpanded: {node_to_expand.is_expanded}"
+    )

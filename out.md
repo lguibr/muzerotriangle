@@ -51,7 +51,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "muzerotriangle"
-version = "0.4.0"
+version = "0.4.2"
 authors = [{ name="Luis Guilherme P. M.", email="lgpelin92@gmail.com" }]
 description = "AlphaZero implementation for a triangle puzzle game."
 readme = "README.md"
@@ -151,13 +151,13 @@ File: README.md
 
 [![CI/CD Status](https://github.com/lguibr/muzerotriangle/actions/workflows/ci_cd.yml/badge.svg)](https://github.com/lguibr/muzerotriangle/actions/workflows/ci_cd.yml) - [![codecov](https://codecov.io/gh/lguibr/muzerotriangle/graph/badge.svg?token=YOUR_CODECOV_TOKEN_HERE)](https://codecov.io/gh/lguibr/muzerotriangle) - [![PyPI version](https://badge.fury.io/py/muzerotriangle.svg)](https://badge.fury.io/py/muzerotriangle)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) - [![Python Version](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/downloads/)
 
-# AlphaTriangle (MuZero Implementation)
+# MuZeroTriangle (MuZero Implementation)
 
-<img src="bitmap.png" alt="AlphaTriangle Logo" width="300"/>
+<img src="bitmap.png" alt="MuZeroTriangle Logo" width="300"/>
 
 ## Overview
 
-AlphaTriangle is a project implementing an artificial intelligence agent based on **MuZero** principles to learn and play a custom puzzle game involving placing triangular shapes onto a grid. The agent learns through self-play reinforcement learning, guided by Monte Carlo Tree Search (MCTS) and a deep neural network (PyTorch).
+MuZeroTriangle is a project implementing an artificial intelligence agent based on **MuZero** principles to learn and play a custom puzzle game involving placing triangular shapes onto a grid. The agent learns through self-play reinforcement learning, guided by Monte Carlo Tree Search (MCTS) and a deep neural network (PyTorch).
 
 The project includes:
 
@@ -361,301 +361,874 @@ pytest-mock>=3.0.0
 typer[all]>=0.9.0
 pytest-cov>=3.0.0
 
-File: .muzerotriangle_data\mlruns\753884796909271804\meta.yaml
-artifact_location: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/753884796909271804
-creation_time: 1745058303933
-experiment_id: '753884796909271804'
-last_update_time: 1745058303933
+File: .muzerotriangle_data\mlruns\719011088879521405\meta.yaml
+artifact_location: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/719011088879521405
+creation_time: 1745067980150
+experiment_id: '719011088879521405'
+last_update_time: 1745067980150
 lifecycle_stage: active
-name: AlphaTriangle
+name: MuZeroTriangle
 
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\meta.yaml
-artifact_uri: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/753884796909271804/cd3104731f064853bd3c04cbb570febc/artifacts
-end_time: 1745058623396
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\meta.yaml
+artifact_uri: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/719011088879521405/05b52bd7005c4e66b880a9d2f81fcd37/artifacts
+end_time: null
 entry_point_name: ''
-experiment_id: '753884796909271804'
+experiment_id: '719011088879521405'
 lifecycle_stage: active
-run_id: cd3104731f064853bd3c04cbb570febc
-run_name: train_muzero_20250419_072454
-run_uuid: cd3104731f064853bd3c04cbb570febc
+run_id: 05b52bd7005c4e66b880a9d2f81fcd37
+run_name: train_muzero_20250419_101815
+run_uuid: 05b52bd7005c4e66b880a9d2f81fcd37
 source_name: ''
 source_type: 4
 source_version: ''
-start_time: 1745058304126
+start_time: 1745068703716
+status: 1
+tags: []
+user_id: lgui_
+
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\ACTION_DIM
+360
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\ACTION_ENCODING_DIM
+16
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\ACTIVATION_FUNCTION
+ReLU
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\AUTO_RESUME_LATEST
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\BATCH_SIZE
+64
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\BEST_CHECKPOINT_FILENAME
+best.pkl
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\BUFFER_CAPACITY
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\BUFFER_FILENAME
+buffer.pkl
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\BUFFER_SAVE_DIR_NAME
+buffers
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\BUFFER_SAVE_FREQ_STEPS
+10
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CHECKPOINT_SAVE_DIR_NAME
+checkpoints
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CHECKPOINT_SAVE_FREQ_STEPS
+2500
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\COLS
+15
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\COLS_PER_ROW
+[9, 11, 13, 15, 15, 13, 11, 9]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\COMPILE_MODEL
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CONFIG_FILENAME
+configs.json
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CONV_FILTERS
+[32, 64, 128]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CONV_KERNEL_SIZES
+[3, 3, 3]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CONV_PADDING
+[1, 1, 1]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\CONV_STRIDES
+[1, 1, 1]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\DEVICE
+auto
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\dirichlet_alpha
+0.3
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\dirichlet_epsilon
+0.25
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\DISCOUNT
+0.99
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\GAME_STATE_SAVE_DIR_NAME
+game_states
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\GRADIENT_CLIP_VALUE
+5.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\HIDDEN_STATE_DIM
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LATEST_CHECKPOINT_FILENAME
+latest.pkl
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LEARNING_RATE
+0.0001
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LOAD_BUFFER_PATH
+None
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LOAD_CHECKPOINT_PATH
+None
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LOG_DIR_NAME
+logs
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LR_SCHEDULER_ETA_MIN
+1e-06
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LR_SCHEDULER_TYPE
+CosineAnnealingLR
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\LR_SCHEDULER_T_MAX
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\max_search_depth
+16
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\MAX_TRAINING_STEPS
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\MIN_BUFFER_SIZE_TO_TRAIN
+10000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\MLFLOW_DIR_NAME
+mlruns
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\MLFLOW_TRACKING_URI
+file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\model_total_params
+2780512
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\model_trainable_params
+2780512
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\NUM_SELF_PLAY_WORKERS
+18
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\num_simulations
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\NUM_VALUE_ATOMS
+51
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\N_STEP_RETURNS
+10
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\OPTIMIZER_TYPE
+AdamW
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\OTHER_NN_INPUT_FEATURES_DIM
+30
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\PENALTY_GAME_OVER
+-10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\PER_ALPHA
+0.6
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\PER_BETA_ANNEAL_STEPS
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\PER_BETA_FINAL
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\PER_BETA_INITIAL
+0.4
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\PER_EPSILON
+1e-05
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\POLICY_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\POLICY_LOSS_WEIGHT
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\puct_coefficient
+1.5
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\RANDOM_SEED
+42
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REP_FC_DIMS_AFTER_ENCODER
+[]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REP_TRANSFORMER_FC_DIM
+256
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\RESIDUAL_BLOCK_FILTERS
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REWARD_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REWARD_LOSS_WEIGHT
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REWARD_PER_CLEARED_TRIANGLE
+0.5
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REWARD_PER_PLACED_TRIANGLE
+0.01
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REWARD_PER_STEP_ALIVE
+0.005
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\REWARD_SUPPORT_SIZE
+21
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\ROOT_DATA_DIR
+.muzerotriangle_data
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\RUNS_DIR_NAME
+runs
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\RUN_NAME
+train_muzero_20250419_101815
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\SAVE_BUFFER
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\SAVE_GAME_STATES
+False
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\temperature_anneal_steps
+100
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\temperature_final
+0.1
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\temperature_initial
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\USE_BATCH_NORM
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\USE_PER
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\USE_TRANSFORMER_IN_REP
+False
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\VALUE_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\VALUE_LOSS_WEIGHT
+0.25
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\VALUE_MAX
+10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\VALUE_MIN
+-10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\WEIGHT_DECAY
+0.0001
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\WORKER_DEVICE
+cpu
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\params\WORKER_UPDATE_FREQ_STEPS
+500
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\tags\mlflow.runName
+train_muzero_20250419_101815
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\tags\mlflow.source.name
+C:\Users\lgui_\AppData\Local\Programs\Python\Python310\Scripts\muzerotriangle
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\tags\mlflow.source.type
+LOCAL
+
+File: .muzerotriangle_data\mlruns\719011088879521405\05b52bd7005c4e66b880a9d2f81fcd37\tags\mlflow.user
+lgui_
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\meta.yaml
+artifact_uri: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/719011088879521405/628d5ba706874495a1b534c2de082ff6/artifacts
+end_time: 1745068342009
+entry_point_name: ''
+experiment_id: '719011088879521405'
+lifecycle_stage: active
+run_id: 628d5ba706874495a1b534c2de082ff6
+run_name: train_muzero_20250419_101034
+run_uuid: 628d5ba706874495a1b534c2de082ff6
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745068241923
 status: 3
 tags: []
 user_id: lgui_
 
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ACTION_DIM
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\ACTION_DIM
 360
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ACTION_ENCODING_DIM
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\ACTION_ENCODING_DIM
 16
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ACTIVATION_FUNCTION
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\ACTIVATION_FUNCTION
 ReLU
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\AUTO_RESUME_LATEST
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\AUTO_RESUME_LATEST
 True
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BATCH_SIZE
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\BATCH_SIZE
 64
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BEST_CHECKPOINT_FILENAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\BEST_CHECKPOINT_FILENAME
 best.pkl
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_CAPACITY
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\BUFFER_CAPACITY
 100000
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_FILENAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\BUFFER_FILENAME
 buffer.pkl
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_SAVE_DIR_NAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\BUFFER_SAVE_DIR_NAME
 buffers
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\BUFFER_SAVE_FREQ_STEPS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\BUFFER_SAVE_FREQ_STEPS
 10
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CHECKPOINT_SAVE_DIR_NAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CHECKPOINT_SAVE_DIR_NAME
 checkpoints
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CHECKPOINT_SAVE_FREQ_STEPS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CHECKPOINT_SAVE_FREQ_STEPS
 2500
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\COLS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\COLS
 15
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\COLS_PER_ROW
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\COLS_PER_ROW
 [9, 11, 13, 15, 15, 13, 11, 9]
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\COMPILE_MODEL
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\COMPILE_MODEL
 True
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONFIG_FILENAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CONFIG_FILENAME
 configs.json
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_FILTERS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CONV_FILTERS
 [32, 64, 128]
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_KERNEL_SIZES
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CONV_KERNEL_SIZES
 [3, 3, 3]
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_PADDING
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CONV_PADDING
 [1, 1, 1]
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\CONV_STRIDES
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\CONV_STRIDES
 [1, 1, 1]
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\DEVICE
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\DEVICE
 auto
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\dirichlet_alpha
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\dirichlet_alpha
 0.3
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\dirichlet_epsilon
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\dirichlet_epsilon
 0.25
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\DISCOUNT
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\DISCOUNT
 0.99
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\GAME_STATE_SAVE_DIR_NAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\GAME_STATE_SAVE_DIR_NAME
 game_states
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\GRADIENT_CLIP_VALUE
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\GRADIENT_CLIP_VALUE
 5.0
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\HIDDEN_STATE_DIM
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\HIDDEN_STATE_DIM
 128
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LATEST_CHECKPOINT_FILENAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LATEST_CHECKPOINT_FILENAME
 latest.pkl
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LEARNING_RATE
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LEARNING_RATE
 0.0001
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LOAD_BUFFER_PATH
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LOAD_BUFFER_PATH
 None
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LOAD_CHECKPOINT_PATH
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LOAD_CHECKPOINT_PATH
 None
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LOG_DIR_NAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LOG_DIR_NAME
 logs
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LR_SCHEDULER_ETA_MIN
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LR_SCHEDULER_ETA_MIN
 1e-06
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LR_SCHEDULER_TYPE
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LR_SCHEDULER_TYPE
 CosineAnnealingLR
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\LR_SCHEDULER_T_MAX
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\LR_SCHEDULER_T_MAX
 100000
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\max_search_depth
-10
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\max_search_depth
+16
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MAX_TRAINING_STEPS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\MAX_TRAINING_STEPS
 100000
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MIN_BUFFER_SIZE_TO_TRAIN
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\MIN_BUFFER_SIZE_TO_TRAIN
 10000
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MLFLOW_DIR_NAME
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\MLFLOW_DIR_NAME
 mlruns
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\MLFLOW_TRACKING_URI
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\MLFLOW_TRACKING_URI
 file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\model_total_params
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\model_total_params
 2780512
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\model_trainable_params
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\model_trainable_params
 2780512
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\NUM_SELF_PLAY_WORKERS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\NUM_SELF_PLAY_WORKERS
 18
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\num_simulations
-50
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\NUM_VALUE_ATOMS
-51
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\N_STEP_RETURNS
-10
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\OPTIMIZER_TYPE
-AdamW
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\OTHER_NN_INPUT_FEATURES_DIM
-30
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PENALTY_GAME_OVER
--10.0
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_ALPHA
-0.6
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_BETA_ANNEAL_STEPS
-100000
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_BETA_FINAL
-1.0
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_BETA_INITIAL
-0.4
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\PER_EPSILON
-1e-05
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\POLICY_HEAD_DIMS
-[64]
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\POLICY_LOSS_WEIGHT
-1.0
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\puct_coefficient
-1.5
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RANDOM_SEED
-42
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REP_FC_DIMS_AFTER_ENCODER
-[]
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REP_TRANSFORMER_FC_DIM
-256
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RESIDUAL_BLOCK_FILTERS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\num_simulations
 128
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_HEAD_DIMS
-[64]
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\NUM_VALUE_ATOMS
+51
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_LOSS_WEIGHT
-1.0
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\N_STEP_RETURNS
+10
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_PER_CLEARED_TRIANGLE
-0.5
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\OPTIMIZER_TYPE
+AdamW
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_PER_PLACED_TRIANGLE
-0.01
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\OTHER_NN_INPUT_FEATURES_DIM
+30
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_PER_STEP_ALIVE
-0.005
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\REWARD_SUPPORT_SIZE
-21
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\ROOT_DATA_DIR
-.muzerotriangle_data
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RUNS_DIR_NAME
-runs
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\RUN_NAME
-train_muzero_20250419_072454
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\SAVE_BUFFER
-True
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\SAVE_GAME_STATES
-False
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\temperature_anneal_steps
-100
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\temperature_final
-0.1
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\temperature_initial
-1.0
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\training_status
-INTERRUPTED
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\USE_BATCH_NORM
-True
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\USE_PER
-True
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\USE_TRANSFORMER_IN_REP
-False
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_HEAD_DIMS
-[64]
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_LOSS_WEIGHT
-0.25
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_MAX
-10.0
-
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\VALUE_MIN
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\PENALTY_GAME_OVER
 -10.0
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\WEIGHT_DECAY
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\PER_ALPHA
+0.6
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\PER_BETA_ANNEAL_STEPS
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\PER_BETA_FINAL
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\PER_BETA_INITIAL
+0.4
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\PER_EPSILON
+1e-05
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\POLICY_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\POLICY_LOSS_WEIGHT
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\puct_coefficient
+1.5
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\RANDOM_SEED
+42
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REP_FC_DIMS_AFTER_ENCODER
+[]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REP_TRANSFORMER_FC_DIM
+256
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\RESIDUAL_BLOCK_FILTERS
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REWARD_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REWARD_LOSS_WEIGHT
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REWARD_PER_CLEARED_TRIANGLE
+0.5
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REWARD_PER_PLACED_TRIANGLE
+0.01
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REWARD_PER_STEP_ALIVE
+0.005
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\REWARD_SUPPORT_SIZE
+21
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\ROOT_DATA_DIR
+.muzerotriangle_data
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\RUNS_DIR_NAME
+runs
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\RUN_NAME
+train_muzero_20250419_101034
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\SAVE_BUFFER
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\SAVE_GAME_STATES
+False
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\temperature_anneal_steps
+100
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\temperature_final
+0.1
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\temperature_initial
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\training_status
+INTERRUPTED
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\USE_BATCH_NORM
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\USE_PER
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\USE_TRANSFORMER_IN_REP
+False
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\VALUE_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\VALUE_LOSS_WEIGHT
+0.25
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\VALUE_MAX
+10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\VALUE_MIN
+-10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\WEIGHT_DECAY
 0.0001
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\WORKER_DEVICE
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\WORKER_DEVICE
 cpu
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\params\WORKER_UPDATE_FREQ_STEPS
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\params\WORKER_UPDATE_FREQ_STEPS
 500
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.runName
-train_muzero_20250419_072454
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\tags\mlflow.runName
+train_muzero_20250419_101034
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.source.name
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\tags\mlflow.source.name
 C:\Users\lgui_\AppData\Local\Programs\Python\Python310\Scripts\muzerotriangle
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.source.type
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\tags\mlflow.source.type
 LOCAL
 
-File: .muzerotriangle_data\mlruns\753884796909271804\cd3104731f064853bd3c04cbb570febc\tags\mlflow.user
+File: .muzerotriangle_data\mlruns\719011088879521405\628d5ba706874495a1b534c2de082ff6\tags\mlflow.user
+lgui_
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\meta.yaml
+artifact_uri: file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns/719011088879521405/65fb51c3903a4a3fa0c23537d91d1cca/artifacts
+end_time: 1745068049621
+entry_point_name: ''
+experiment_id: '719011088879521405'
+lifecycle_stage: active
+run_id: 65fb51c3903a4a3fa0c23537d91d1cca
+run_name: train_muzero_20250419_100612
+run_uuid: 65fb51c3903a4a3fa0c23537d91d1cca
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1745067980301
+status: 3
+tags: []
+user_id: lgui_
+
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\ACTION_DIM
+360
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\ACTION_ENCODING_DIM
+16
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\ACTIVATION_FUNCTION
+ReLU
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\AUTO_RESUME_LATEST
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\BATCH_SIZE
+64
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\BEST_CHECKPOINT_FILENAME
+best.pkl
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\BUFFER_CAPACITY
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\BUFFER_FILENAME
+buffer.pkl
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\BUFFER_SAVE_DIR_NAME
+buffers
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\BUFFER_SAVE_FREQ_STEPS
+10
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CHECKPOINT_SAVE_DIR_NAME
+checkpoints
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CHECKPOINT_SAVE_FREQ_STEPS
+2500
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\COLS
+15
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\COLS_PER_ROW
+[9, 11, 13, 15, 15, 13, 11, 9]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\COMPILE_MODEL
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CONFIG_FILENAME
+configs.json
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CONV_FILTERS
+[32, 64, 128]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CONV_KERNEL_SIZES
+[3, 3, 3]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CONV_PADDING
+[1, 1, 1]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\CONV_STRIDES
+[1, 1, 1]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\DEVICE
+auto
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\dirichlet_alpha
+0.3
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\dirichlet_epsilon
+0.25
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\DISCOUNT
+0.99
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\GAME_STATE_SAVE_DIR_NAME
+game_states
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\GRADIENT_CLIP_VALUE
+5.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\HIDDEN_STATE_DIM
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LATEST_CHECKPOINT_FILENAME
+latest.pkl
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LEARNING_RATE
+0.0001
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LOAD_BUFFER_PATH
+None
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LOAD_CHECKPOINT_PATH
+None
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LOG_DIR_NAME
+logs
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LR_SCHEDULER_ETA_MIN
+1e-06
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LR_SCHEDULER_TYPE
+CosineAnnealingLR
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\LR_SCHEDULER_T_MAX
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\max_search_depth
+16
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\MAX_TRAINING_STEPS
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\MIN_BUFFER_SIZE_TO_TRAIN
+10000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\MLFLOW_DIR_NAME
+mlruns
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\MLFLOW_TRACKING_URI
+file:///C:/Users/lgui_/lab/muzerotriangle/.muzerotriangle_data/mlruns
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\model_total_params
+2780512
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\model_trainable_params
+2780512
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\NUM_SELF_PLAY_WORKERS
+18
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\num_simulations
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\NUM_VALUE_ATOMS
+51
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\N_STEP_RETURNS
+10
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\OPTIMIZER_TYPE
+AdamW
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\OTHER_NN_INPUT_FEATURES_DIM
+30
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\PENALTY_GAME_OVER
+-10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\PER_ALPHA
+0.6
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\PER_BETA_ANNEAL_STEPS
+100000
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\PER_BETA_FINAL
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\PER_BETA_INITIAL
+0.4
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\PER_EPSILON
+1e-05
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\POLICY_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\POLICY_LOSS_WEIGHT
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\puct_coefficient
+1.5
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\RANDOM_SEED
+42
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REP_FC_DIMS_AFTER_ENCODER
+[]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REP_TRANSFORMER_FC_DIM
+256
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\RESIDUAL_BLOCK_FILTERS
+128
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REWARD_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REWARD_LOSS_WEIGHT
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REWARD_PER_CLEARED_TRIANGLE
+0.5
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REWARD_PER_PLACED_TRIANGLE
+0.01
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REWARD_PER_STEP_ALIVE
+0.005
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\REWARD_SUPPORT_SIZE
+21
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\ROOT_DATA_DIR
+.muzerotriangle_data
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\RUNS_DIR_NAME
+runs
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\RUN_NAME
+train_muzero_20250419_100612
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\SAVE_BUFFER
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\SAVE_GAME_STATES
+False
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\temperature_anneal_steps
+100
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\temperature_final
+0.1
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\temperature_initial
+1.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\training_status
+INTERRUPTED
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\USE_BATCH_NORM
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\USE_PER
+True
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\USE_TRANSFORMER_IN_REP
+False
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\VALUE_HEAD_DIMS
+[64]
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\VALUE_LOSS_WEIGHT
+0.25
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\VALUE_MAX
+10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\VALUE_MIN
+-10.0
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\WEIGHT_DECAY
+0.0001
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\WORKER_DEVICE
+cpu
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\params\WORKER_UPDATE_FREQ_STEPS
+500
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\tags\mlflow.runName
+train_muzero_20250419_100612
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\tags\mlflow.source.name
+C:\Users\lgui_\AppData\Local\Programs\Python\Python310\Scripts\muzerotriangle
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\tags\mlflow.source.type
+LOCAL
+
+File: .muzerotriangle_data\mlruns\719011088879521405\65fb51c3903a4a3fa0c23537d91d1cca\tags\mlflow.user
 lgui_
 
 File: .ruff_cache\CACHEDIR.TAG
@@ -903,7 +1476,7 @@ def train(
     log_level: LogLevelOption = "INFO",
     seed: SeedOption = 42,
 ):
-    """Run the AlphaTriangle training pipeline."""
+    """Run the MuZeroTriangle training pipeline."""
     setup_logging(log_level)
     logger = logging.getLogger(__name__)
 
@@ -938,7 +1511,7 @@ File: muzerotriangle\__init__.py
 
 
 File: muzerotriangle\config\app_config.py
-APP_NAME: str = "AlphaTriangle"
+APP_NAME: str = "MuZeroTriangle"
 
 
 File: muzerotriangle\config\env_config.py
@@ -1017,14 +1590,14 @@ class MCTSConfig(BaseModel):
     --- TUNED FOR INCREASED EXPLORATION & DEPTH ---
     """
 
-    num_simulations: int = Field(default=50, ge=1)  # Reduced for faster debugging
+    num_simulations: int = Field(default=128, ge=1)  # Reduced for faster debugging
     puct_coefficient: float = Field(default=1.5, gt=0)  # Adjusted c1/c2 balance
     temperature_initial: float = Field(default=1.0, ge=0)
     temperature_final: float = Field(default=0.1, ge=0)
     temperature_anneal_steps: int = Field(default=100, ge=0)  # Reduced anneal
     dirichlet_alpha: float = Field(default=0.3, gt=0)
     dirichlet_epsilon: float = Field(default=0.25, ge=0, le=1.0)
-    max_search_depth: int = Field(default=10, ge=1)  # Reduced depth
+    max_search_depth: int = Field(default=16, ge=1)  # Reduced depth
     discount: float = Field(
         default=0.99,
         gt=0,
@@ -2520,7 +3093,7 @@ File: muzerotriangle\environment\README.md
 
 ## Purpose and Architecture
 
-This module defines the game world for AlphaTriangle. It encapsulates the rules, state representation, actions, and core game logic. **Crucially, this module is now independent of any feature extraction logic specific to the neural network.** Its sole focus is the simulation of the game itself.
+This module defines the game world for MuZeroTriangle. It encapsulates the rules, state representation, actions, and core game logic. **Crucially, this module is now independent of any feature extraction logic specific to the neural network.** Its sole focus is the simulation of the game itself.
 
 -   **State Representation:** [`GameState`](core/game_state.py) holds the current board ([`GridData`](grid/grid_data.py)), available shapes (`List[Shape]`), score, and game status. It represents the canonical state of the game. It uses core structures like `Shape` and `Triangle` defined in [`muzerotriangle.structs`](../structs/README.md).
 -   **Core Logic:** Submodules ([`grid`](grid/README.md), [`shapes`](shapes/README.md), [`logic`](logic/README.md)) handle specific aspects like checking valid placements, clearing lines, managing shape generation, and calculating rewards. These logic modules operate on `GridData`, `Shape`, and `Triangle`. **Shape refilling now happens in batches: all slots are refilled only when all slots become empty.**
@@ -2644,6 +3217,7 @@ def decode_action(action_index: ActionType, config: EnvConfig) -> tuple[int, int
 
 
 File: muzerotriangle\environment\core\game_state.py
+# File: muzerotriangle/environment/core/game_state.py
 import logging
 import random
 from typing import TYPE_CHECKING
@@ -2697,7 +3271,7 @@ class GameState:
         self.game_over = False
         self.current_step = 0
 
-        # Call refill_shape_slots with the updated signature (no index)
+        # Call batch refill - it will fill all slots because they are all None
         shapes.refill_shape_slots(self, self._rng)
 
         if not self.valid_actions():
@@ -2720,9 +3294,8 @@ class GameState:
         reward = execute_placement(self, shape_idx, r, c, self._rng)
         self.current_step += 1
 
-        if not self.game_over and not self.valid_actions():
-            self.game_over = True
-            logger.info(f"Game over detected after step {self.current_step}.")
+        # The game_over flag is now set correctly within execute_placement
+        # after the potential batch refill.
 
         return reward, self.game_over
 
@@ -2738,9 +3311,6 @@ class GameState:
         """Returns the terminal outcome value (e.g., final score). Used by MCTS."""
         if not self.is_over():
             logger.warning("get_outcome() called on a non-terminal state.")
-            # Consider returning a default value or raising an error?
-            # Returning current score might be misleading for MCTS if not terminal.
-            # Let's return 0.0 as a neutral value if not over.
             return 0.0
         return self.game_score
 
@@ -3362,7 +3932,7 @@ This submodule contains higher-level game logic that operates on the `GameState`
 -   **`actions.py`:**
     -   `get_valid_actions`: Determines all possible valid moves (shape placements) from the current `GameState` by iterating through available shapes and grid positions, checking placement validity using [`GridLogic.can_place`](../grid/logic.py). Returns a list of encoded `ActionType` integers.
 -   **`step.py`:**
-    -   `execute_placement`: Performs the core logic when a shape is placed. It updates the `GridData` (occupancy and color), checks for and clears completed lines using [`GridLogic.check_and_clear_lines`](../grid/logic.py), calculates the reward for the step using `calculate_reward`, updates the game score and step counters, and **triggers a batch refill of shape slots using [`ShapeLogic.refill_shape_slots`](../shapes/logic.py) only if all slots become empty after the placement.**
+    -   `execute_placement`: Performs the core logic when a shape is placed. It updates the `GridData` (occupancy and color), checks for and clears completed lines using [`GridLogic.check_and_clear_lines`](../grid/logic.py), calculates the reward for the step using `calculate_reward`, updates the game score and step counters. **It then checks if all shape slots are empty and triggers a batch refill using [`ShapeLogic.refill_shape_slots`](../shapes/logic.py) if they are. Finally, it checks if the game is over based on the potentially refilled shapes.**
     -   `calculate_reward`: Calculates the reward based on the number of triangles placed, triangles cleared, and whether the game ended.
 
 ## Exposed Interfaces
@@ -3391,7 +3961,7 @@ This submodule contains higher-level game logic that operates on the `GameState`
 
 ---
 
-**Note:** Please keep this README updated when changing the logic for determining valid actions, executing placements (including reward calculation and shape refilling), or modifying dependencies.
+**Note:** Please keep this README updated when changing the logic for determining valid actions, executing placements (including reward calculation, **batch shape refilling**, and game over check timing), or modifying dependencies.
 
 File: muzerotriangle\environment\logic\step.py
 # File: muzerotriangle/environment/logic/step.py
@@ -3458,8 +4028,8 @@ def execute_placement(
     game_state: "GameState", shape_idx: int, r: int, c: int, rng: random.Random
 ) -> float:
     """
-    Places a shape, clears lines, updates game state (NumPy arrays), and calculates reward.
-    Handles batch refilling of shapes.
+    Places a shape, clears lines, updates game state (NumPy arrays), potentially
+    triggers a batch refill, checks for game over, and calculates reward.
 
     Args:
         game_state: The current game state (will be modified).
@@ -3479,42 +4049,32 @@ def execute_placement(
     # Use the NumPy-based can_place from GridLogic
     if not GridLogic.can_place(game_state.grid_data, shape, r, c):
         logger.error(f"Invalid placement attempted: Shape {shape_idx} at ({r},{c})")
-        # It's possible this check fails even if valid_actions included it,
-        # especially if the state changed unexpectedly (e.g., in multi-threaded envs, though not the case here).
-        # Returning 0 reward is reasonable.
         return 0.0
 
     # --- Place the shape ---
     placed_coords: set[tuple[int, int]] = set()
     placed_count = 0
-    # Get color ID from the shape's color
     color_id = COLOR_TO_ID_MAP.get(shape.color, NO_COLOR_ID)
     if color_id == NO_COLOR_ID:
         logger.warning(f"Shape color {shape.color} not found in COLOR_TO_ID_MAP!")
-        # Assign a default color ID? Or handle as error? Let's use 0 for now.
         color_id = 0
 
     for dr, dc, _ in shape.triangles:
         tri_r, tri_c = r + dr, c + dc
-        # Check validity using GridData method (which checks bounds)
         if game_state.grid_data.valid(tri_r, tri_c):
-            # Check death and occupancy using NumPy arrays
             if (
                 not game_state.grid_data._death_np[tri_r, tri_c]
                 and not game_state.grid_data._occupied_np[tri_r, tri_c]
             ):
-                # Update NumPy arrays
                 game_state.grid_data._occupied_np[tri_r, tri_c] = True
                 game_state.grid_data._color_id_np[tri_r, tri_c] = color_id
                 placed_coords.add((tri_r, tri_c))
                 placed_count += 1
             else:
-                # This case should ideally not be reached if can_place passed. Log if it does.
                 logger.error(
                     f"Placement conflict at ({tri_r},{tri_c}) during execution, though can_place was true."
                 )
         else:
-            # This case should ideally not be reached if can_place passed. Log if it does.
             logger.error(
                 f"Invalid coordinates ({tri_r},{tri_c}) encountered during placement execution."
             )
@@ -3523,7 +4083,6 @@ def execute_placement(
     game_state.pieces_placed_this_episode += 1
 
     # --- Check and clear lines ---
-    # Use check_and_clear_lines from GridLogic
     lines_cleared_count, unique_coords_cleared, _ = GridLogic.check_and_clear_lines(
         game_state.grid_data, placed_coords
     )
@@ -3532,24 +4091,24 @@ def execute_placement(
     # --- Update Score (Optional tracking) ---
     game_state.game_score += placed_count + len(unique_coords_cleared) * 2
 
-    # --- Refill shapes if all slots are empty ---
+    # --- Refill shapes if all slots are empty (Batch Refill Logic) ---
     if all(s is None for s in game_state.shapes):
         logger.debug("All shape slots empty, triggering batch refill.")
-        ShapeLogic.refill_shape_slots(game_state, rng)
+        ShapeLogic.refill_shape_slots(game_state, rng)  # Call batch refill
 
-    # --- Check for game over AFTER placement and refill ---
-    # Game is over if no valid moves remain for the *new* state
+    # --- Check for game over AFTER placement and potential refill ---
+    # This ensures game over is only triggered if no moves are possible with the *current or newly refilled* shapes
     if not game_state.valid_actions():
         game_state.game_over = True
         logger.info(
             f"Game over detected after placing shape {shape_idx} and potential refill."
         )
 
-    # --- Calculate Reward based on the outcome of this step ---
+    # --- Calculate Reward based on the final outcome of this step ---
     step_reward = calculate_reward(
         placed_count=placed_count,
-        unique_coords_cleared=unique_coords_cleared,  # Pass the set of cleared coords
-        is_game_over=game_state.game_over,
+        unique_coords_cleared=unique_coords_cleared,
+        is_game_over=game_state.game_over,  # Use the potentially updated game_over status
         config=game_state.env_config,
     )
 
@@ -3586,15 +4145,15 @@ def refill_shape_slots(game_state: "GameState", rng: random.Random) -> None:
     Refills ALL empty shape slots in the GameState, but ONLY if ALL slots are currently empty.
     This implements batch refilling.
     """
-    # --- CHANGED: Check if ALL slots are None ---
+    # --- RESTORED: Check if ALL slots are None ---
     if all(shape is None for shape in game_state.shapes):
         logger.debug("All shape slots are empty. Refilling all slots.")
         for i in range(game_state.env_config.NUM_SHAPE_SLOTS):
             game_state.shapes[i] = generate_random_shape(rng)
             logger.debug(f"Refilled slot {i} with {game_state.shapes[i]}")
     else:
-        logger.debug("Not all shape slots are empty. Skipping refill.")
-    # --- END CHANGED ---
+        logger.debug("Not all shape slots are empty. Skipping batch refill.")
+    # --- END RESTORED ---
 
 
 def get_neighbors(r: int, c: int, is_up: bool) -> list[tuple[int, int]]:
@@ -5045,13 +5604,13 @@ This module implements the Monte Carlo Tree Search algorithm, adapted for the Mu
 
 -   **Core Components ([`core/README.md`](core/README.md)):**
     -   `Node`: Represents a state in the search tree. In MuZero, nodes store the *hidden state* (`s_k`) predicted by the dynamics function, the predicted *reward* (`r_k`) to reach that state, and MCTS statistics (visit counts, value sum, prior probability). The root node holds the initial `GameState` and its corresponding initial hidden state (`s_0`) after the first inference.
-    -   `search`: Contains the main `run_mcts_simulations` function orchestrating the selection, expansion, and backpropagation phases. It uses the `NeuralNetwork` interface for initial inference (`h+f`) and recurrent inference (`g+f`). **It handles potential gradient issues by detaching tensors before converting to NumPy.**
+    -   `search`: Contains the main `run_mcts_simulations` function orchestrating the selection, expansion, and backpropagation phases. It uses the `NeuralNetwork` interface for initial inference (`h+f`) and recurrent inference (`g+f`). Includes extensive DEBUG level logging to trace simulation steps, node selection, expansion, and backpropagation. Handles potential gradient issues by detaching tensors before converting to NumPy. **Note:** When starting with an unexpanded root node (typical for MuZero at each game step), the root's visit count will be `num_simulations + 1` due to an initial backpropagation of the root's predicted value before the main simulation loop.
     -   `config`: Defines the `MCTSConfig` class holding hyperparameters like the number of simulations, PUCT coefficient, temperature settings, Dirichlet noise parameters, and the discount factor (`gamma`).
     -   `types`: Defines necessary type hints and protocols, notably `ActionPolicyValueEvaluator` (though the `NeuralNetwork` interface is now used directly) and `ActionPolicyMapping`.
 -   **Strategy Components ([`strategy/README.md`](strategy/README.md)):**
-    -   `selection`: Implements the tree traversal logic (PUCT calculation, Dirichlet noise addition, leaf selection).
-    -   `expansion`: Handles expanding leaf nodes using policy predictions from the network's prediction function (`f`).
-    -   `backpropagation`: Implements the process of updating node statistics back up the tree, incorporating predicted rewards and the discount factor.
+    -   `selection`: Implements the tree traversal logic (PUCT calculation, Dirichlet noise addition, leaf selection). Includes DEBUG level logging for PUCT scores and selected children. Uses value initialization (FPU) for unvisited nodes.
+    -   `expansion`: Handles expanding leaf nodes using policy predictions from the network's prediction function (`f`). Includes DEBUG level logging for expansion details.
+    -   `backpropagation`: Implements the process of updating node statistics back up the tree, incorporating predicted rewards and the discount factor. Includes DEBUG level logging for value propagation steps.
     -   `policy`: Provides functions to select the final action based on visit counts (`select_action_based_on_visits`) and to generate the policy target vector for training (`get_policy_target`).
 
 ## Exposed Interfaces
@@ -5059,7 +5618,7 @@ This module implements the Monte Carlo Tree Search algorithm, adapted for the Mu
 -   **Core:**
     -   `Node`: The tree node class (MuZero version).
     -   `MCTSConfig`: Configuration class (defined in [`muzerotriangle.config`](../config/README.md)).
-    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network: NeuralNetwork, valid_actions_from_state: List[ActionType]) -> int`: The main function to run MCTS.
+    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network: NeuralNetwork, valid_actions_from_state: List[ActionType]) -> int`: The main function to run MCTS. Returns the maximum depth reached during simulations.
     -   `ActionPolicyMapping`: Type alias for the policy dictionary.
     -   `MCTSExecutionError`: Custom exception for MCTS failures.
 -   **Strategy:**
@@ -5080,14 +5639,14 @@ This module implements the Monte Carlo Tree Search algorithm, adapted for the Mu
 -   **[`muzerotriangle.utils`](../utils/README.md)**:
     -   `ActionType`, `StateType`, `PolicyTargetMapping`: Used for actions, state representation, and policy targets.
 -   **`numpy`**:
-    -   Used for Dirichlet noise generation and policy calculations. **Requires careful handling (e.g., `.detach()`) when converting from `torch.Tensor`.**
+    -   Used for Dirichlet noise and policy calculations. **Requires careful handling (e.g., `.detach()`) when converting from `torch.Tensor`.**
 -   **`torch`**:
     -   Used for hidden states within `Node`.
 -   **Standard Libraries:** `typing`, `math`, `logging`, `numpy`, `time`.
 
 ---
 
-**Note:** Please keep this README updated when changing the MCTS algorithm phases (selection, expansion, backpropagation), the node structure, configuration options, or the interaction with the environment or neural network. Accurate documentation is crucial for maintainability.
+**Note:** Please keep this README updated when changing the MCTS algorithm phases (selection, expansion, backpropagation), the node structure, configuration options, or the interaction with the environment or neural network. Accurate documentation is crucial for maintainability. **Set the logger level for `muzerotriangle.mcts` to `DEBUG` to enable detailed tracing.**
 
 File: muzerotriangle\mcts\__init__.py
 """
@@ -5228,7 +5787,7 @@ File: muzerotriangle\mcts\core\README.md
 This submodule defines the fundamental building blocks and interfaces for the MuZero Monte Carlo Tree Search implementation.
 
 -   **[`Node`](node.py):** The `Node` class is the cornerstone, representing a single state within the search tree. It stores the associated *hidden state* (`torch.Tensor`), the predicted *reward* to reach this state, parent/child relationships, the action that led to it, and crucial MCTS statistics (visit count, value sum, prior probability). The root node additionally holds the initial `GameState`. It provides properties like `value_estimate` (Q-value) and `is_expanded`.
--   **[`search`](search.py):** The `search.py` module contains the high-level `run_mcts_simulations` function. This function orchestrates the core MCTS loop for a given root node: performing initial inference, then repeatedly selecting leaves, expanding them using the network's dynamics and prediction functions, and backpropagating the results. It uses helper functions from the [`muzerotriangle.mcts.strategy`](../strategy/README.md) submodule. It handles potential gradient issues by detaching tensors before converting to NumPy.
+-   **[`search`](search.py):** The `search.py` module contains the high-level `run_mcts_simulations` function. This function orchestrates the core MCTS loop for a given root node: performing initial inference, then repeatedly selecting leaves, expanding them using the network's dynamics and prediction functions, and backpropagating the results. It uses helper functions from the [`muzerotriangle.mcts.strategy`](../strategy/README.md) submodule. **Includes extensive DEBUG level logging** for tracing the simulation process. Handles potential gradient issues by detaching tensors before converting to NumPy.
 -   **[`types`](types.py):** The `types.py` module defines essential type hints and protocols for the MCTS module, such as `ActionPolicyMapping`. The `ActionPolicyValueEvaluator` protocol is less relevant now as the `NeuralNetwork` interface is used directly.
 
 ## Exposed Interfaces
@@ -5237,7 +5796,7 @@ This submodule defines the fundamental building blocks and interfaces for the Mu
     -   `Node`: The tree node class (MuZero version).
     -   `MCTSExecutionError`: Custom exception for MCTS failures.
 -   **Functions:**
-    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network: NeuralNetwork, valid_actions_from_state: List[ActionType]) -> int`: Orchestrates the MCTS process.
+    -   `run_mcts_simulations(root_node: Node, config: MCTSConfig, network: NeuralNetwork, valid_actions_from_state: List[ActionType]) -> int`: Orchestrates the MCTS process. Returns the maximum depth reached during simulations.
 -   **Types:**
     -   `ActionPolicyMapping`: Type alias for the policy dictionary (mapping action index to probability).
     -   `ActionPolicyValueEvaluator`: Protocol defining the evaluation interface (though `NeuralNetwork` is used directly).
@@ -5264,18 +5823,22 @@ This submodule defines the fundamental building blocks and interfaces for the Mu
 
 ---
 
-**Note:** Please keep this README updated when modifying the `Node` structure, the `run_mcts_simulations` logic, or the interfaces used. Accurate documentation is crucial for maintainability.
+**Note:** Please keep this README updated when modifying the `Node` structure, the `run_mcts_simulations` logic, or the interfaces used. Accurate documentation is crucial for maintainability. **Set the logger level for `muzerotriangle.mcts.core` to `DEBUG` to enable detailed tracing.**
 
 File: muzerotriangle\mcts\core\search.py
 # File: muzerotriangle/mcts/core/search.py
 import logging
 from typing import TYPE_CHECKING
 
+import torch
+
 from ...config import MCTSConfig
-from ...features import extract_state_features  # Import feature extractor
-from ...utils.types import ActionType, StateType  # Import StateType
+from ...features import extract_state_features
+from ...utils.types import ActionType, StateType
 from ..strategy import backpropagation, expansion, selection
+from ..strategy.backpropagation import backpropagate_value
 from .node import Node
+
 
 if TYPE_CHECKING:
     from ...nn import NeuralNetwork
@@ -5293,102 +5856,146 @@ def run_mcts_simulations(
     network: "NeuralNetwork",
     valid_actions_from_state: list[ActionType],
 ) -> int:
-    """Runs MuZero MCTS simulations."""
-    if root_node.initial_game_state is None:
-        raise MCTSExecutionError("Root node needs initial_game_state.")
-    if root_node.initial_game_state.is_over():
+    """
+    Runs MuZero MCTS simulations starting from the root_node.
+
+    Args:
+        root_node: The root node of the search, containing the current state representation.
+                   If unexpanded, it should contain the initial_game_state.
+        config: MCTS configuration parameters.
+        network: The neural network interface for evaluations.
+        valid_actions_from_state: A list of valid actions from the root state.
+
+    Returns:
+        int: The maximum search depth reached during the simulations.
+    """
+    if root_node.initial_game_state is None and root_node.hidden_state is None:
+        raise MCTSExecutionError("Root node needs initial_game_state or hidden_state.")
+    if (
+        root_node.initial_game_state is not None
+        and root_node.initial_game_state.is_over()
+    ):
+        logger.debug("[MCTS] Root node is terminal. Skipping simulations.")
         return 0
 
     max_depth_overall = 0
     sim_success_count = 0
     sim_error_count = 0
+    initial_backprop_done = False
 
-    # Initial Root Inference and Expansion
+    # Initial Root Inference and Expansion (if root is unexpanded)
     if not root_node.is_expanded:
-        logger.debug("[MCTS] Root node initial inference...")
+        logger.debug("[MCTS] Root node not expanded. Performing initial inference...")
+        if root_node.initial_game_state is None:
+            raise MCTSExecutionError(
+                "Unexpanded root node requires initial_game_state for inference."
+            )
         try:
-            # Extract features first, pass StateType dict
             state_dict: StateType = extract_state_features(
                 root_node.initial_game_state, network.model_config
             )
-            # Ensure tensors are on the correct device
-            # initial_inference expects StateType dict with numpy arrays
-            # The conversion to tensor happens inside initial_inference
             (
                 policy_logits,
                 value_logits,
                 _,
                 initial_hidden_state,
             ) = network.initial_inference(
-                state_dict  # type: ignore[arg-type] # MyPy seems confused here
+                state_dict  # type: ignore[arg-type]
             )
 
-            root_node.hidden_state = initial_hidden_state.squeeze(
-                0
-            ).detach()  # Detach here
+            root_node.hidden_state = initial_hidden_state.squeeze(0).detach()
             policy_probs = (
                 network._logits_to_probs(policy_logits)
                 .squeeze(0)
-                .detach()  # Detach here
+                .detach()
                 .cpu()
                 .numpy()
             )
             root_node.predicted_value = network._logits_to_scalar(
                 value_logits, network.support
             ).item()
+            logger.debug(
+                f"[MCTS] Initial inference complete. Root predicted value: {root_node.predicted_value:.4f}"
+            )
 
-            # Filter policy map by valid actions for root
             full_policy_map = {i: float(p) for i, p in enumerate(policy_probs)}
             filtered_policy_map = {
                 action: full_policy_map.get(action, 0.0)
                 for action in valid_actions_from_state
             }
 
-            # Pass valid actions AND the filtered policy map for the initial root expansion
             expansion.expand_node(
                 root_node,
-                filtered_policy_map,  # Pass filtered map
+                filtered_policy_map,
                 network,
-                valid_actions_from_state,  # Pass valid actions explicitly
+                valid_actions_from_state,
             )
 
+            # Backpropagate the initial root value prediction
             if root_node.predicted_value is not None:
-                depth_bp = backpropagation.backpropagate_value(
+                logger.debug("[MCTS] Backpropagating initial root value...")
+                depth_bp = backpropagate_value(
                     root_node, root_node.predicted_value, config.discount
                 )
                 max_depth_overall = max(max_depth_overall, depth_bp)
-            # Apply noise only if children were actually created
+                initial_backprop_done = True  # Mark that the +1 visit occurred
+                logger.debug(
+                    f"[MCTS] Initial backprop complete. Depth: {depth_bp}, Root visits: {root_node.visit_count}"
+                )
             if root_node.children:
+                logger.debug("[MCTS] Adding Dirichlet noise to root priors...")
                 selection.add_dirichlet_noise(root_node, config)
+            else:
+                logger.warning("[MCTS] Root node has no children after expansion!")
         except Exception as e:
-            raise MCTSExecutionError(f"Initial root inference failed: {e}") from e
-    elif (
-        root_node.visit_count == 0 and root_node.children
-    ):  # Apply noise only if children exist
-        # Apply noise only if root hasn't been visited yet in this MCTS run
+            logger.error(
+                f"Error during MCTS initial inference/expansion: {e}", exc_info=True
+            )
+            raise MCTSExecutionError(
+                f"Initial root inference/expansion failed: {e}"
+            ) from e
+    elif root_node.visit_count == 0 and root_node.children:
+        # If root was expanded previously but has 0 visits (e.g., loaded checkpoint), add noise
+        logger.debug("[MCTS] Root expanded but unvisited. Adding Dirichlet noise...")
         selection.add_dirichlet_noise(root_node, config)
 
     # Simulation Loop
     for sim in range(config.num_simulations):
+        logger.debug(
+            f"[MCTS Sim {sim+1}/{config.num_simulations}] Starting simulation..."
+        )
         current_node = root_node
         search_path = [current_node]
         depth = 0
         try:
-            # Selection
+            # Selection Phase
+            logger.debug(f"[MCTS Sim {sim+1}] --- Selection Phase ---")
             while current_node.is_expanded:
                 if (
                     config.max_search_depth is not None
                     and depth >= config.max_search_depth
                 ):
+                    logger.debug(
+                        f"[MCTS Sim {sim+1}] Max search depth ({config.max_search_depth}) reached at depth {depth}. Stopping selection."
+                    )
                     break
-                current_node = selection.select_child_node(current_node, config)
+                selected_child = selection.select_child_node(current_node, config)
+                logger.debug(
+                    f"[MCTS Sim {sim+1}] Selected child action: {selected_child.action_taken} (Depth {depth+1})"
+                )
+                current_node = selected_child
                 search_path.append(current_node)
                 depth += 1
             leaf_node = current_node
             max_depth_overall = max(max_depth_overall, depth)
+            leaf_action = (
+                leaf_node.action_taken if leaf_node.action_taken is not None else "Root"
+            )
+            logger.debug(
+                f"[MCTS Sim {sim+1}] Selected Leaf Node (Action={leaf_action}, Depth={depth}, Expanded={leaf_node.is_expanded}, Visits={leaf_node.visit_count})"
+            )
 
-            # --- ADDED CHECK: Don't expand if leaf represents a terminal state ---
-            # We can only reliably check this for the root node in MuZero MCTS
+            # Check if leaf is terminal (based on game state if root, or potentially network prediction if needed)
             is_terminal_leaf = False
             if (
                 leaf_node.is_root
@@ -5396,17 +6003,15 @@ def run_mcts_simulations(
                 and not leaf_node.initial_game_state.valid_actions()
             ):
                 is_terminal_leaf = True
-                logger.debug(
-                    "Leaf node (root) has no valid actions. Treating as terminal."
-                )
-            # --- END ADDED CHECK ---
+                logger.debug(f"[MCTS Sim {sim+1}] Leaf node is terminal (root state).")
 
-            # Expansion & Prediction
+            # Expansion & Prediction Phase
+            logger.debug(f"[MCTS Sim {sim+1}] --- Expansion/Prediction Phase ---")
             value_for_backprop = 0.0
-            # --- MODIFIED: Only expand/predict if not terminal ---
             if not is_terminal_leaf and leaf_node.hidden_state is not None:
-                # --- END MODIFIED ---
-                # Ensure hidden_state is on the correct device and has batch dim
+                logger.debug(
+                    f"[MCTS Sim {sim+1}] Leaf not terminal. Performing recurrent inference..."
+                )
                 hidden_state_batch = leaf_node.hidden_state.to(
                     network.device
                 ).unsqueeze(0)
@@ -5416,66 +6021,79 @@ def run_mcts_simulations(
                     value_logits, network.support
                 ).item()
                 value_for_backprop = leaf_node.predicted_value
+                logger.debug(
+                    f"[MCTS Sim {sim+1}] Leaf predicted value: {value_for_backprop:.4f}"
+                )
                 policy_probs = (
                     network._logits_to_probs(policy_logits)
                     .squeeze(0)
-                    .detach()  # Detach here
+                    .detach()
                     .cpu()
                     .numpy()
                 )
                 policy_map = {i: float(p) for i, p in enumerate(policy_probs)}
-                # Pass valid_actions_from_state here as well, as the leaf node might be the root
-                # or we might need to re-evaluate valid actions if the game state was available
-                # For MuZero, we rely on the policy mask from the network if available,
-                # otherwise, we might need the game state if the node represents a real state.
-                # Since we only expand based on the policy prediction, we don't strictly need
-                # valid_actions here unless we want to mask the policy further.
-                # Let's assume the policy prediction already accounts for valid actions.
+
+                # Expand the leaf node
                 expansion.expand_node(
                     leaf_node,
                     policy_map,
                     network,
-                    valid_actions=None,  # Pass None here as we use the network's policy
+                    valid_actions=None,  # Let expansion use policy map keys
                 )
-            elif (
-                leaf_node.is_root and leaf_node.predicted_value is not None
-            ):  # Handle root being leaf
+            elif leaf_node.is_root and leaf_node.predicted_value is not None:
+                # If we stopped at the root (e.g., max depth 0), use its initial prediction
                 value_for_backprop = leaf_node.predicted_value
-            # --- ADDED: Handle terminal leaf value ---
-            elif is_terminal_leaf:
-                # If it's terminal, the value is known (e.g., 0 or from game outcome if available)
-                # For simplicity, let's use 0, assuming no outcome is readily available here.
-                value_for_backprop = 0.0
-                logger.debug("Using 0.0 as value for terminal leaf node.")
-            # --- END ADDED ---
-            else:
-                # This case should ideally not happen if the game hasn't ended before expansion
-                # If it's a terminal state reached during simulation, the value should be the actual outcome
-                # For MuZero's pure MCTS (without explicit game state simulation),
-                # we rely on the network's value prediction. If hidden_state is None here, it's an error.
-                logger.error(
-                    f"Leaf node state invalid: is_root={leaf_node.is_root}, hidden_state is None, is_terminal={is_terminal_leaf}"
+                logger.debug(
+                    f"[MCTS Sim {sim+1}] Using initial root predicted value for backprop: {value_for_backprop:.4f}"
                 )
-                value_for_backprop = 0.0  # Fallback, but indicates an issue
+            elif is_terminal_leaf:
+                value_for_backprop = 0.0  # Terminal nodes have a value of 0
+                logger.debug(
+                    f"[MCTS Sim {sim+1}] Using terminal value (0.0) for backprop."
+                )
+            else:
+                # This case indicates an issue, e.g., non-root node without hidden state
+                logger.error(
+                    f"[MCTS Sim {sim+1}] Leaf node state invalid: is_root={leaf_node.is_root}, hidden_state is None, is_terminal={is_terminal_leaf}. Using 0.0 for backprop."
+                )
+                value_for_backprop = 0.0
 
-            # Backpropagation
-            _ = backpropagation.backpropagate_value(
+            # Backpropagation Phase
+            logger.debug(f"[MCTS Sim {sim+1}] --- Backpropagation Phase ---")
+            depth_bp = backpropagation.backpropagate_value(
                 leaf_node, value_for_backprop, config.discount
+            )
+            logger.debug(
+                f"[MCTS Sim {sim+1}] Backpropagation complete. Path depth: {depth_bp}"
             )
             sim_success_count += 1
         except Exception as e:
             sim_error_count += 1
             logger.error(f"Error in simulation {sim + 1}: {e}", exc_info=True)
-            # Optionally break or continue based on error tolerance
+            # Optionally break or continue depending on desired robustness
             # break
 
-    if sim_error_count > config.num_simulations * 0.1:  # Allow up to 10% errors
+    logger.debug("[MCTS] Finished simulations. Final root children stats:")
+    if root_node.children:
+        for action, child in sorted(root_node.children.items()):
+            logger.debug(
+                f"  Child Action={action}: Visits={child.visit_count}, Q={child.value_estimate:.4f}, P={child.prior_probability:.4f}"
+            )
+    else:
+        logger.debug("  Root node has no children after simulations.")
+
+    if sim_error_count > config.num_simulations * 0.1:
         logger.warning(
             f"MCTS completed with {sim_error_count} errors out of {config.num_simulations} simulations."
         )
-        # Decide if this should be a fatal error
-        # raise MCTSExecutionError(f"MCTS failed: High error rate ({sim_error_count} errors).")
 
+    # Note: Root visit count will be num_simulations + 1 if the root was initially unexpanded
+    # because of the initial backpropagation of the root's predicted value.
+    # If the root was already expanded (e.g., tree reuse), visit count would be num_simulations.
+    expected_visits = config.num_simulations + (1 if initial_backprop_done else 0)
+    logger.debug(
+        f"[MCTS] Completed {sim_success_count} simulations. Max depth reached: {max_depth_overall}. Root visits: {root_node.visit_count} (Expected ~{expected_visits})"
+    )
     return max_depth_overall
 
 
@@ -5544,8 +6162,8 @@ logger = logging.getLogger(__name__)
 
 def backpropagate_value(
     leaf_node: "Node",
-    value_from_leaf: float,  # Value estimate v_L from f(s_L) or terminal reward
-    discount: float,  # Gamma discount factor
+    value_from_leaf: float,
+    discount: float,
 ) -> int:
     """
     Propagates the simulation value back up the tree from the leaf node.
@@ -5554,68 +6172,48 @@ def backpropagate_value(
     Returns the depth of the backpropagation path.
     """
     current_node: Node | None = leaf_node
-    path_str = []
     depth = 0
-    value_to_propagate: float = value_from_leaf  # Start with v_L or terminal reward
-
+    value_to_propagate: float = value_from_leaf
     logger.debug(
-        f"[Backprop] Starting backprop from leaf node {leaf_node.action_taken} "
-        f"with initial value_from_leaf={value_from_leaf:.4f} and discount={discount}"
+        f"  [Backprop Start] Leaf Node (Action={leaf_node.action_taken if leaf_node.action_taken is not None else 'LeafRoot'}, Visits={leaf_node.visit_count}), StartValue={value_from_leaf:.4f}"
     )
 
     while current_node is not None:
-        # --- MuZero Modification ---
-        # The value estimate Q(s,a) stored at the parent relates to the value G
-        # derived *from* the current_node.
-        # The value_to_propagate represents the value starting from *this* node's state.
-        # We add this value to the node's statistics.
-        # When moving to the parent, we discount the current value_to_propagate
-        # and add the predicted reward 'r' that led *to* the current_node.
-        # ---
-
-        q_before = current_node.value_estimate
-        total_val_before = current_node.value_sum
-        visits_before = current_node.visit_count
-
-        current_node.visit_count += 1
-        current_node.value_sum += value_to_propagate  # Add the calculated G
-
-        q_after = current_node.value_estimate
-        total_val_after = current_node.value_sum
-        visits_after = current_node.visit_count
-
-        action_str = (
-            f"Act={current_node.action_taken}"
+        action_str_bp = (
+            current_node.action_taken
             if current_node.action_taken is not None
             else "Root"
         )
-        path_str.append(
-            f"N({action_str},R={current_node.reward:.2f},V={visits_after},Q={q_after:.3f})"
-        )
-
+        visits_before_bp = current_node.visit_count
+        value_sum_before_bp = current_node.value_sum
         logger.debug(
-            f"  [Backprop] Depth {depth}: Node({action_str}), "
-            f"Visits: {visits_before} -> {visits_after}, "
-            f"PropagatedG={value_to_propagate:.4f}, "
-            f"ValueSum: {total_val_before:.3f} -> {total_val_after:.3f}, "
-            f"Q: {q_before:.3f} -> {q_after:.3f}"
+            f"    [Backprop Pre ] Node({action_str_bp:<4}, Depth={depth}): V_b={visits_before_bp:<4}, Sum_b={value_sum_before_bp: .3f}, PropG={value_to_propagate:.4f}"
         )
 
-        # --- MuZero: Calculate value for the parent ---
-        # G_{parent} = r_{current} + gamma * G_{current}
-        # where r_{current} is the reward predicted by g() for reaching current_node
-        if current_node.parent is not None:  # Don't update G beyond the root
+        current_node.visit_count += 1
+        current_node.value_sum += value_to_propagate
+
+        visits_after_bp = current_node.visit_count
+        value_sum_after_bp = current_node.value_sum
+        q_after = current_node.value_estimate
+        logger.debug(
+            f"    [Backprop Post] Node({action_str_bp:<4}, Depth={depth}): V {visits_before_bp}->{visits_after_bp}, Sum {value_sum_before_bp:.3f}->{value_sum_after_bp:.3f} (Q={q_after:.3f})"
+        )
+
+        if current_node.parent is not None:
+            # Apply discount and add reward *before* moving to parent
             value_to_propagate = current_node.reward + discount * value_to_propagate
             logger.debug(
-                f"    [Backprop] PrevG={value_to_propagate / discount - current_node.reward:.4f} -> "
-                f"NextG (for parent) = r_k({current_node.reward:.3f}) + gamma({discount}) * PrevG = {value_to_propagate:.4f}"
+                f"      Value for parent: r_k={current_node.reward:.3f} + gamma={discount:.2f} * G_child={value_to_propagate / discount:.4f} = {value_to_propagate:.4f}"
             )
-        # ---
+        else:
+            # Reached the root node
+            logger.debug("  [Backprop End] Reached root node.")
+            break
 
         current_node = current_node.parent
         depth += 1
 
-    logger.debug(f"[Backprop] Finished. Path: {' <- '.join(reversed(path_str))}")
     return depth
 
 
@@ -5624,13 +6222,12 @@ File: muzerotriangle\mcts\strategy\expansion.py
 import logging
 from typing import TYPE_CHECKING
 
-import torch  # Import torch for tensor check
+import torch
 
 from ..core.node import Node
 from ..core.types import ActionPolicyMapping
 
 if TYPE_CHECKING:
-    # Use NeuralNetwork interface type hint
     from muzerotriangle.nn import NeuralNetwork
     from muzerotriangle.utils.types import ActionType
 
@@ -5639,73 +6236,98 @@ logger = logging.getLogger(__name__)
 
 
 def expand_node(
-    node_to_expand: "Node",  # Node containing s_k
-    policy_prediction: ActionPolicyMapping,  # Policy p_k from f(s_k)
-    network: "NeuralNetwork",  # Network interface to call dynamics (g)
-    valid_actions: list["ActionType"] | None = None,  # Pass valid actions explicitly
+    node_to_expand: "Node",
+    policy_prediction: ActionPolicyMapping,
+    network: "NeuralNetwork",
+    valid_actions: list["ActionType"] | None = None,
 ):
     """
     Expands a leaf node in the MuZero search tree.
     If valid_actions is provided, only those actions are considered for expansion.
     Otherwise, actions with non-zero prior probability in policy_prediction are considered.
     """
+    parent_action = (
+        node_to_expand.action_taken
+        if node_to_expand.action_taken is not None
+        else "Root"
+    )
+    depth = 0
+    temp_node = node_to_expand
+    while temp_node.parent:
+        depth += 1
+        temp_node = temp_node.parent
+
+    logger.debug(
+        f"[Expand] Attempting expansion for Node (Action={parent_action}, Depth={depth}, Visits={node_to_expand.visit_count})"
+    )
+
     if node_to_expand.is_expanded:
-        logger.debug(f"Node {node_to_expand.action_taken} already expanded. Skipping.")
+        logger.debug(
+            f"[Expand] Node (Action={parent_action}) already expanded. Skipping."
+        )
         return
     hidden_state_k = node_to_expand.hidden_state
     if hidden_state_k is None:
         logger.error(
-            f"[Expand] Node {node_to_expand.action_taken} has no hidden state."
+            f"[Expand] Node (Action={parent_action}) has no hidden state. Cannot expand."
         )
         return
 
-    logger.debug(f"[Expand] Expanding Node via action: {node_to_expand.action_taken}")
-
-    # --- MODIFIED: Determine actions to expand based on valid_actions first ---
     if valid_actions is not None:
-        # If valid_actions are provided (e.g., for root), only expand these
         actions_to_expand_set = set(valid_actions)
+        logger.debug(
+            f"[Expand] Using provided valid_actions: {len(actions_to_expand_set)} actions."
+        )
         if not actions_to_expand_set:
             logger.warning(
-                f"[Expand] No valid actions provided for node {node_to_expand.action_taken}. Node will remain unexpanded."
-            )
-            return  # Do not create children if valid_actions is empty
-    else:
-        # If valid_actions not provided, use policy prediction keys (for internal nodes)
-        # Filter by non-zero prior? Optional, but can reduce unnecessary dynamics calls.
-        # Let's keep expanding all actions predicted by the policy for now.
-        actions_to_expand_set = set(policy_prediction.keys())
-        if not actions_to_expand_set:
-            logger.warning(
-                f"[Expand] No actions found in policy prediction for node {node_to_expand.action_taken}. Node will remain unexpanded."
+                f"[Expand] No valid actions provided for node {parent_action}. Node will remain unexpanded."
             )
             return
-    # --- END MODIFIED ---
+    else:
+        # Expand based on policy prediction keys (actions with non-zero prior)
+        actions_to_expand_set = {
+            a for a, p in policy_prediction.items() if p > 0
+        }  # Filter zero priors
+        # Log the policy map being used
+        policy_log_str = ", ".join(
+            f"{a}:{p:.3f}" for a, p in sorted(policy_prediction.items()) if p > 1e-4
+        )
+        logger.debug(
+            f"[Expand] Using policy prediction keys ({len(actions_to_expand_set)} actions with >0 prior). Policy: {{{policy_log_str}}}"
+        )
+        if not actions_to_expand_set:
+            logger.warning(
+                f"[Expand] No actions found with non-zero prior in policy prediction for node {parent_action}. Node will remain unexpanded."
+            )
+            return
 
     children_created = 0
     for action in actions_to_expand_set:
-        # Get prior probability for this action from the prediction
         prior = policy_prediction.get(action, 0.0)
         if prior < 0:
-            logger.warning(f"Negative prior {prior} for action {action}. Clamping.")
+            logger.warning(
+                f"[Expand] Negative prior {prior} for action {action}. Clamping to 0."
+            )
             prior = 0.0
-        # Optional: Skip expansion if prior is zero?
-        # if prior <= 1e-6:
-        #     continue
+        # Skip actions with zero prior unless they were explicitly provided as valid
+        if prior == 0.0 and valid_actions is None:
+            continue
 
+        logger.debug(
+            f"  [Expand Child] Action={action}, Prior={prior:.4f}. Calling dynamics..."
+        )
         try:
             if not isinstance(hidden_state_k, torch.Tensor):
-                logger.error(f"Hidden state is not a tensor: {type(hidden_state_k)}")
+                logger.error(
+                    f"  [Expand Child] Hidden state is not a tensor: {type(hidden_state_k)}"
+                )
                 continue
-            # Ensure hidden state is batched for dynamics call
             hidden_state_k_batch = (
                 hidden_state_k.unsqueeze(0)
                 if hidden_state_k.dim() == 1
                 else hidden_state_k
             )
 
-            # Call dynamics on the underlying model
-            # Ensure action is a tensor for the model
             action_tensor = torch.tensor(
                 [action], dtype=torch.long, device=network.device
             )
@@ -5713,14 +6335,14 @@ def expand_node(
                 hidden_state_k_batch, action_tensor
             )
 
-            # Remove batch dimension and calculate scalar reward
-            hidden_state_k_plus_1 = hidden_state_k_plus_1.squeeze(
-                0
-            ).detach()  # Detach here
+            hidden_state_k_plus_1 = hidden_state_k_plus_1.squeeze(0).detach()
             reward_logits = reward_logits.squeeze(0)
             reward_k_plus_1 = network._logits_to_scalar(
                 reward_logits.unsqueeze(0), network.reward_support
             ).item()
+            logger.debug(
+                f"  [Expand Child] Dynamics success. Action={action}, Reward={reward_k_plus_1:.3f}"
+            )
 
         except Exception as e:
             logger.error(
@@ -5729,7 +6351,6 @@ def expand_node(
             )
             continue
 
-        # Create the child node
         child = Node(
             prior=prior,
             hidden_state=hidden_state_k_plus_1,
@@ -5738,12 +6359,11 @@ def expand_node(
             action_taken=action,
         )
         node_to_expand.children[action] = child
-        logger.debug(
-            f"  [Expand] Created child for action {action}: Prior={prior:.4f}, Reward={reward_k_plus_1:.3f}"
-        )
         children_created += 1
 
-    logger.debug(f"[Expand] Node expanded with {children_created} children.")
+    logger.debug(
+        f"[Expand] Node (Action={parent_action}, Depth={depth}) finished expansion. Children created: {children_created}. Total children: {len(node_to_expand.children)}. IsExpanded: {node_to_expand.is_expanded}"
+    )
 
 
 File: muzerotriangle\mcts\strategy\policy.py
@@ -6000,14 +6620,14 @@ File: muzerotriangle\mcts\strategy\README.md
 This submodule implements the specific algorithms and heuristics used within the different phases of the Monte Carlo Tree Search, as orchestrated by [`muzerotriangle.mcts.core.search.run_mcts_simulations`](../core/search.py).
 
 -   **[`selection`](selection.py):** Contains the logic for traversing the tree from the root to a leaf node.
-    -   `calculate_puct_score`: Implements the PUCT (Polynomial Upper Confidence Trees) formula, balancing exploitation (node value) and exploration (prior probability and visit counts).
+    -   `calculate_puct_score`: Implements the PUCT (Polynomial Upper Confidence Trees) formula, balancing exploitation (node value) and exploration (prior probability and visit counts). **Uses parent's value estimate for unvisited children (Value Initialization / FPU) to encourage exploration.**
     -   `add_dirichlet_noise`: Adds noise to the root node's prior probabilities to encourage exploration early in the search, as done in AlphaZero.
-    -   `select_child_node`: Chooses the child with the highest PUCT score.
-    -   `traverse_to_leaf`: Repeatedly applies `select_child_node` to navigate down the tree.
+    -   `select_child_node`: Chooses the child with the highest PUCT score. Includes DEBUG level logging for scores.
+    -   `traverse_to_leaf`: Repeatedly applies `select_child_node` to navigate down the tree. Includes DEBUG level logging for traversal steps.
 -   **[`expansion`](expansion.py):** Handles the expansion of a selected leaf node.
-    -   `expand_node`: Takes a node, a policy prediction (from the network's `f` function), the network itself (for the `g` function), and optionally a list of valid actions. It creates child `Node` objects by applying the dynamics function (`g`) for each action, storing the resulting hidden state (`s_{k+1}`) and predicted reward (`r_{k+1}`). **It handles potential gradient issues by detaching tensors before storing them in the node.**
+    -   `expand_node`: Takes a node, a policy prediction (from the network's `f` function), the network itself (for the `g` function), and optionally a list of valid actions. It creates child `Node` objects by applying the dynamics function (`g`) for each action, storing the resulting hidden state (`s_{k+1}`) and predicted reward (`r_{k+1}`). Includes DEBUG level logging for expansion details. Handles potential gradient issues by detaching tensors before storing them in the node.
 -   **[`backpropagation`](backpropagation.py):** Implements the update step after a simulation.
-    -   `backpropagate_value`: Traverses from the expanded leaf node back up to the root, incrementing the `visit_count` and adding the simulation's resulting `value` (calculated using the network's value prediction and discounted rewards) to the `value_sum` of each node along the path.
+    -   `backpropagate_value`: Traverses from the expanded leaf node back up to the root, incrementing the `visit_count` and adding the simulation's resulting `value` (calculated using the network's value prediction and discounted rewards) to the `value_sum` of each node along the path. Includes DEBUG level logging for value propagation steps.
 -   **[`policy`](policy.py):** Provides functions related to action selection and policy target generation after MCTS has run.
     -   `select_action_based_on_visits`: Selects the final action to be played in the game based on the visit counts of the root's children, using a temperature parameter to control exploration vs. exploitation.
     -   `get_policy_target`: Generates the policy target vector (a probability distribution over actions) based on the visit counts, which is used as a training target for the neural network's policy head.
@@ -6048,7 +6668,7 @@ This submodule implements the specific algorithms and heuristics used within the
 
 ---
 
-**Note:** Please keep this README updated when modifying the algorithms within selection, expansion, backpropagation, or policy generation, or changing how they interact with the `Node` structure or `MCTSConfig`. Accurate documentation is crucial for maintainability.
+**Note:** Please keep this README updated when modifying the algorithms within selection, expansion, backpropagation, or policy generation, or changing how they interact with the `Node` structure or `MCTSConfig`. Accurate documentation is crucial for maintainability. **Set the logger level for `muzerotriangle.mcts.strategy` to `DEBUG` to enable detailed tracing.**
 
 File: muzerotriangle\mcts\strategy\selection.py
 # File: muzerotriangle/mcts/strategy/selection.py
@@ -6072,41 +6692,54 @@ class SelectionError(Exception):
 
 
 def calculate_puct_score(
-    parent_node: "Node",  # The node *from* which we are selecting a child
-    child_node: "Node",  # The child node being evaluated
+    parent_node: "Node",
+    child_node: "Node",
     config: MCTSConfig,
 ) -> tuple[float, float, float]:
     """
     Calculates the PUCT score for a child node, used for selection from the parent.
     Score = Q(parent, action_to_child) + U(parent, action_to_child)
-    Q value is the average value derived from simulations passing through the child.
-    U value is the exploration bonus based on the child's prior and visit counts.
+    Uses parent's value estimate for unvisited children (Value Initialization / FPU).
     """
-    # Q(s, a) is the value estimate of the child node itself
-    # It represents the expected return *after* taking 'action_taken' from the parent.
-    q_value = child_node.value_estimate
+    # --- Value Initialization / FPU ---
+    if child_node.visit_count == 0:
+        # Use parent's value estimate as initial Q for unvisited children.
+        # If parent is root and also unvisited (only during initial call before backprop), use 0.
+        q_value = parent_node.value_estimate if parent_node.visit_count > 0 else 0.0
+        # Log that FPU/Value Init is being used
+        logger.debug(
+            f"      PUCT Calc (FPU): Action={child_node.action_taken}, Using Parent Q={q_value:.4f} (Child Visits=0)"
+        )
+    else:
+        q_value = child_node.value_estimate
+    # --- End Value Initialization ---
 
-    # P(a|s) is the prior probability stored in the child node
     prior = child_node.prior_probability
     parent_visits = parent_node.visit_count
     child_visits = child_node.visit_count
 
-    # Exploration bonus U(s, a)
-    # Use max(1, parent_visits) to avoid math domain error if parent_visits is 0 (though it shouldn't be if we're selecting a child)
+    # Ensure parent_visits is at least 1 for the sqrt calculation to avoid issues at root
+    parent_visits_adjusted = max(1, parent_visits)
+
+    # Use adjusted count for sqrt
+    parent_sqrt_term = math.sqrt(parent_visits_adjusted)
+
     exploration_term = (
-        config.puct_coefficient
-        * prior
-        * (math.sqrt(max(1, parent_visits)) / (1 + child_visits))
+        config.puct_coefficient * prior * (parent_sqrt_term / (1 + child_visits))
     )
     score = q_value + exploration_term
 
-    # Ensure score is finite
     if not np.isfinite(score):
         logger.warning(
-            f"Non-finite PUCT score calculated (Q={q_value}, P={prior}, ChildN={child_visits}, ParentN={parent_visits}, Exp={exploration_term}). Defaulting to Q-value."
+            f"Non-finite PUCT score calculated: Q={q_value}, P={prior}, Np={parent_visits}, Nc={child_visits}. Resetting exploration term to 0."
         )
         score = q_value
         exploration_term = 0.0
+
+    # Add detailed logging for Q and U terms
+    logger.debug(
+        f"      PUCT Calc: Action={child_node.action_taken}, Q={q_value:.4f}, P={prior:.4f}, Np={parent_visits}(adj={parent_visits_adjusted}), Nc={child_visits} -> U={exploration_term:.4f}, Score={score:.4f}"
+    )
 
     return score, q_value, exploration_term
 
@@ -6126,36 +6759,32 @@ def add_dirichlet_noise(node: Node, config: MCTSConfig):
     eps = config.dirichlet_epsilon
 
     noisy_priors_sum = 0.0
+    logger.debug(f"  [Noise] Adding noise (alpha={config.dirichlet_alpha}, eps={eps})")
     for i, action in enumerate(actions):
         child = node.children[action]
         original_prior = child.prior_probability
         child.prior_probability = (1 - eps) * child.prior_probability + eps * noise[i]
         noisy_priors_sum += child.prior_probability
         logger.debug(
-            f"  [Noise] Action {action}: OrigP={original_prior:.4f}, Noise={noise[i]:.4f} -> NewP={child.prior_probability:.4f}"
+            f"    Action {action}: P_orig={original_prior:.4f}, Noise={noise[i]:.4f} -> P_new={child.prior_probability:.4f}"
         )
 
-    # Re-normalize priors
+    # Normalize if sum is not close to 1
     if abs(noisy_priors_sum - 1.0) > 1e-6:
-        logger.debug(
-            f"Re-normalizing priors after Dirichlet noise (Sum={noisy_priors_sum:.6f})"
-        )
         norm_factor = noisy_priors_sum if noisy_priors_sum > 1e-9 else 1.0
+        logger.warning(
+            f"  [Noise] Priors sum to {noisy_priors_sum:.6f} after noise. Normalizing."
+        )
         if norm_factor > 1e-9:
             for action in actions:
                 node.children[action].prior_probability /= norm_factor
         else:
-            # If sum is zero (e.g., all priors were zero), distribute uniformly
             logger.warning(
-                "Sum of priors after noise is near zero. Resetting to uniform."
+                "  [Noise] Sum of priors after noise is near zero. Resetting to uniform."
             )
             uniform_prob = 1.0 / len(actions)
             for action in actions:
                 node.children[action].prior_probability = uniform_prob
-
-    logger.debug(
-        f"[Noise] Added Dirichlet noise (alpha={config.dirichlet_alpha}, eps={eps}) to {len(actions)} root node priors."
-    )
 
 
 def select_child_node(node: Node, config: MCTSConfig) -> Node:
@@ -6167,44 +6796,32 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
         raise SelectionError(f"Cannot select child from node {node} with no children.")
 
     best_score = -float("inf")
-    best_children: list[Node] = []  # Use a list for tie-breaking
+    best_children: list[Node] = []
 
-    if logger.isEnabledFor(logging.DEBUG):
-        # Check if root node to display step correctly
-        state_info = (
-            f"Step={node.initial_game_state.current_step}"
-            if node.is_root and node.initial_game_state
-            else f"Action={node.action_taken}"
-        )
-        logger.debug(
-            f"  [Select] Selecting child for Node (Visits={node.visit_count}, Children={len(node.children)}, {state_info}):"
-        )
+    parent_action = node.action_taken if node.action_taken is not None else "Root"
+    # Log parent visit count before loop
+    logger.debug(
+        f"  [SelectChild] Parent Node (Action={parent_action}, Visits={node.visit_count}, Value={node.value_estimate:.4f}, Children={len(node.children)}): Calculating PUCT scores..."
+    )
 
     for action, child in node.children.items():
-        # Pass the parent (current node) and the child being evaluated
         score, q, exp_term = calculate_puct_score(node, child, config)
 
-        if logger.isEnabledFor(logging.DEBUG):
-            log_entry = (
-                f"    Act={action}, Score={score:.4f} "
-                f"(Q={q:.3f}, P={child.prior_probability:.4f}, N={child.visit_count}, Exp={exp_term:.4f})"
-            )
-            logger.debug(log_entry)  # Log each child's score
+        # Log entry moved inside calculate_puct_score
 
         if not np.isfinite(score):
             logger.warning(
-                f"    [Select] Non-finite PUCT score ({score}) calculated for child action {action}. Skipping."
+                f"    [SelectChild] Non-finite PUCT score ({score}) calculated for child action {action}. Skipping."
             )
             continue
 
         if score > best_score:
             best_score = score
-            best_children = [child]  # Start a new list with this best child
-        # Tie-breaking: if scores are equal, add to the list
-        elif abs(score - best_score) < 1e-9:  # Use tolerance for float comparison
+            best_children = [child]
+        elif abs(score - best_score) < 1e-9:  # Handle ties by collecting all best
             best_children.append(child)
 
-    if not best_children:  # Changed from checking best_child is None
+    if not best_children:
         child_details = [
             f"Act={a}, N={c.visit_count}, P={c.prior_probability:.4f}, Q={c.value_estimate:.3f}"
             for a, c in node.children.items()
@@ -6217,26 +6834,24 @@ def select_child_node(node: Node, config: MCTSConfig) -> Node:
         logger.error(
             f"Could not select best child for {state_info}. Child details: {child_details}"
         )
-        # Fallback: if all scores are non-finite or no children found, pick a random child
         if not node.children:
             raise SelectionError(
-                f"Cannot select child from node {node} with no children (should have been caught earlier)."
+                f"Cannot select child from node {state_info} with no children (should have been caught earlier)."
             )
         logger.warning(
             f"All child scores were non-finite or no children found. Selecting a random child for node {state_info}."
         )
-        # Ensure we actually have children before choosing randomly
         if not node.children:
             raise SelectionError(
                 f"Node {state_info} has no children to select from, even randomly."
             )
         selected_child = random.choice(list(node.children.values()))
     else:
-        # If there are ties, select randomly among the best
+        # Break ties randomly among the best children
         selected_child = random.choice(best_children)
 
     logger.debug(
-        f"  [Select] --> Selected Child: Action {selected_child.action_taken}, Score {best_score:.4f}, Q-value {selected_child.value_estimate:.3f}"
+        f"  [SelectChild] --> Selected Child: Action {selected_child.action_taken}, Score {best_score:.4f}"
     )
     return selected_child
 
@@ -6252,39 +6867,25 @@ def traverse_to_leaf(root_node: Node, config: MCTSConfig) -> tuple[Node, int]:
     """
     current_node = root_node
     depth = 0
-    state_info = (
-        f"Root Step {root_node.initial_game_state.current_step}"
-        if root_node.is_root and root_node.initial_game_state
-        else f"Node Action {root_node.action_taken}"
-    )
-    logger.debug(f"[Traverse] --- Start Traverse (Start Node: {state_info}) ---")
     stop_reason = "Unknown"
+    logger.debug(f"  [Traverse] Starting traversal from node: {current_node}")
 
-    while current_node.is_expanded:  # Traverse while node has children
-        state_info = (
-            f"Root Step {current_node.initial_game_state.current_step}"
-            if current_node.is_root and current_node.initial_game_state
-            else f"Node Action {current_node.action_taken}"
-        )
+    while current_node.is_expanded:
         logger.debug(
-            f"  [Traverse] Depth {depth}: Considering Node {state_info} (Expanded={current_node.is_expanded})"
+            f"  [Traverse] Depth {depth}: Node Action={current_node.action_taken if current_node.action_taken is not None else 'Root'} (Visits={current_node.visit_count}) is expanded. Selecting child..."
         )
-
         if config.max_search_depth is not None and depth >= config.max_search_depth:
-            stop_reason = "Max Depth Reached"
-            logger.debug(
-                f"  [Traverse] Depth {depth}: Hit MAX DEPTH ({config.max_search_depth}). Stopping traverse."
-            )
+            stop_reason = f"Max Depth Reached ({config.max_search_depth})"
+            logger.debug(f"  [Traverse] Stop reason: {stop_reason}")
             break
 
-        # Node is expanded and below max depth - select child
         try:
             selected_child = select_child_node(current_node, config)
-            logger.debug(
-                f"  [Traverse] Depth {depth}: Selected child with action {selected_child.action_taken}"
-            )
             current_node = selected_child
             depth += 1
+            logger.debug(
+                f"  [Traverse] Depth {depth}: Moved to child node {current_node.action_taken}"
+            )
         except SelectionError as e:
             stop_reason = f"Child Selection Error: {e}"
             logger.error(
@@ -6306,24 +6907,11 @@ def traverse_to_leaf(root_node: Node, config: MCTSConfig) -> tuple[Node, int]:
             )
             break
     else:
-        # Loop finished because node is not expanded (it's a leaf)
         stop_reason = "Unexpanded Leaf"
-        state_info = (
-            f"Root Step {current_node.initial_game_state.current_step}"
-            if current_node.is_root and current_node.initial_game_state
-            else f"Node Action {current_node.action_taken}"
-        )
-        logger.debug(
-            f"  [Traverse] Depth {depth}: Node {state_info} is LEAF (not expanded). Stopping traverse."
-        )
+        logger.debug(f"  [Traverse] Stop reason: {stop_reason}")
 
-    state_info_final = (
-        f"Root Step {current_node.initial_game_state.current_step}"
-        if current_node.is_root and current_node.initial_game_state
-        else f"Node Action {current_node.action_taken}"
-    )
     logger.debug(
-        f"[Traverse] --- End Traverse: Reached Node {state_info_final} at Depth {depth}. Reason: {stop_reason} ---"
+        f"  [Traverse] Finished traversal. Leaf: {current_node.action_taken}, Depth: {depth}, Stop Reason: {stop_reason}"
     )
     return current_node, depth
 
@@ -6659,7 +7247,7 @@ from ..config import EnvConfig, ModelConfig, TrainConfig
 from ..environment import GameState
 from ..features import extract_state_features
 from ..utils.types import ActionType, PolicyValueOutput, StateType
-from .model import MuZeroNet  # Import MuZeroNet
+from .model import MuZeroNet
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -6696,7 +7284,6 @@ class NeuralNetwork:
         self.action_dim = env_config.ACTION_DIM
         self.model.eval()
 
-        # Distributional Value Head parameters
         self.num_value_atoms = model_config.NUM_VALUE_ATOMS
         self.v_min = model_config.VALUE_MIN
         self.v_max = model_config.VALUE_MAX
@@ -6707,19 +7294,16 @@ class NeuralNetwork:
             self.v_min, self.v_max, self.num_value_atoms, device=self.device
         )
 
-        # Distributional Reward Head parameters (assuming symmetric support around 0)
         self.num_reward_atoms = model_config.REWARD_SUPPORT_SIZE
         if self.num_reward_atoms <= 1:
             raise ValueError("REWARD_SUPPORT_SIZE must be greater than 1")
-        # Calculate reward min/max based on support size (e.g., size 21 -> -10 to 10)
         self.r_max = float((self.num_reward_atoms - 1) // 2)
         self.r_min = -self.r_max
-        self.delta_r = 1.0  # Assuming integer steps for reward support
+        self.delta_r = 1.0
         self.reward_support = torch.linspace(
             self.r_min, self.r_max, self.num_reward_atoms, device=self.device
         )
 
-        # Compile model if requested and compatible
         self._try_compile_model()
 
     def _try_compile_model(self):
@@ -6742,7 +7326,6 @@ class NeuralNetwork:
             logger.info(
                 f"Attempting to compile model with torch.compile() on device '{self.device}'..."
             )
-            # Compile the underlying MuZeroNet instance
             self.model = torch.compile(self.model)  # type: ignore
             logger.info(f"Model compiled successfully on device '{self.device}'.")
         except Exception as e:
@@ -6809,7 +7392,6 @@ class NeuralNetwork:
     ) -> torch.Tensor:
         """Calculates the expected scalar value from distribution logits."""
         probs = self._logits_to_probs(logits)
-        # Expand support to match batch size if needed
         support_expanded = support.expand_as(probs)
         scalar = torch.sum(probs * support_expanded, dim=-1)
         return scalar
@@ -6834,7 +7416,6 @@ class NeuralNetwork:
             observation["other_features"], dtype=torch.float32, device=self.device
         )
 
-        # Add batch dimension if necessary
         if grid_tensor.dim() == 3:
             grid_tensor = grid_tensor.unsqueeze(0)
         if other_features_tensor.dim() == 1:
@@ -6844,8 +7425,6 @@ class NeuralNetwork:
             grid_tensor, other_features_tensor
         )
 
-        # Create dummy reward logits (batch_size, num_reward_atoms)
-        # Initial state doesn't have a predicted reward from dynamics
         dummy_reward_logits = torch.zeros(
             (1, self.num_reward_atoms), device=self.device
         )
@@ -6868,44 +7447,52 @@ class NeuralNetwork:
                    All tensors will have a batch dimension.
         """
         self.model.eval()
-        # Ensure hidden_state has a batch dimension
         if hidden_state.dim() == 1:
             hidden_state = hidden_state.unsqueeze(0)
 
-        # Ensure action is a tensor with a batch dimension
         if isinstance(action, int):
             action_tensor = torch.tensor([action], dtype=torch.long, device=self.device)
         elif isinstance(action, torch.Tensor):
-            if action.dim() == 0:  # Scalar tensor
+            if action.dim() == 0:
                 action_tensor = action.unsqueeze(0).to(self.device)
-            elif action.dim() == 1:  # Already a batch of actions
+            elif action.dim() == 1:
                 action_tensor = action.to(self.device)
             else:
                 raise ValueError(f"Unsupported action tensor shape: {action.shape}")
         else:
             raise TypeError(f"Unsupported action type: {type(action)}")
 
-        # Ensure action_tensor has the same batch size as hidden_state
         if action_tensor.shape[0] != hidden_state.shape[0]:
             if hidden_state.shape[0] == 1 and action_tensor.shape[0] > 1:
-                # Repeat hidden state if it's a single state for a batch of actions
                 hidden_state = hidden_state.expand(action_tensor.shape[0], -1)
             elif action_tensor.shape[0] == 1 and hidden_state.shape[0] > 1:
-                # Repeat action if it's a single action for a batch of states
                 action_tensor = action_tensor.expand(hidden_state.shape[0])
             else:
                 raise ValueError(
                     f"Batch size mismatch between hidden_state ({hidden_state.shape[0]}) and action ({action_tensor.shape[0]})"
                 )
 
+        # hs_finite = torch.all(torch.isfinite(hidden_state)).item() # Removed log
+        # logger.debug(f"[Recurrent Inference] Input HS shape: {hidden_state.shape}, isfinite: {hs_finite}") # Removed log
+        # if not hs_finite: logger.warning("[Recurrent Inference] Input hidden_state contains non-finite values!") # Removed log
+
         next_hidden_state, reward_logits = self.model.dynamics(
             hidden_state, action_tensor
         )
         policy_logits, value_logits = self.model.predict(next_hidden_state)
-        return policy_logits, value_logits, reward_logits, next_hidden_state
 
-    # --- Compatibility methods for MCTS/Workers expecting PolicyValueOutput ---
-    # These now perform initial inference.
+        # nhs_finite = torch.all(torch.isfinite(next_hidden_state)).item() # Removed log
+        # rl_finite = torch.all(torch.isfinite(reward_logits)).item() # Removed log
+        # pl_finite = torch.all(torch.isfinite(policy_logits)).item() # Removed log
+        # vl_finite = torch.all(torch.isfinite(value_logits)).item() # Removed log
+        # logger.debug(f"[Recurrent Inference] Output NHS shape: {next_hidden_state.shape}, isfinite: {nhs_finite}") # Removed log
+        # logger.debug(f"[Recurrent Inference] Output RewardLogits shape: {reward_logits.shape}, isfinite: {rl_finite}") # Removed log
+        # logger.debug(f"[Recurrent Inference] Output PolicyLogits shape: {policy_logits.shape}, isfinite: {pl_finite}") # Removed log
+        # logger.debug(f"[Recurrent Inference] Output ValueLogits shape: {value_logits.shape}, isfinite: {vl_finite}") # Removed log
+        # if not (nhs_finite and rl_finite and pl_finite and vl_finite): # Removed log
+        #      logger.warning("[Recurrent Inference] Output contains non-finite values!") # Removed log
+
+        return policy_logits, value_logits, reward_logits, next_hidden_state
 
     @torch.inference_mode()
     def evaluate(self, state: GameState) -> PolicyValueOutput:
@@ -6915,16 +7502,12 @@ class NeuralNetwork:
         """
         self.model.eval()
         try:
-            # 1. Feature Extraction
             state_dict: StateType = extract_state_features(state, self.model_config)
-            # 2. Initial Inference
             policy_logits, value_logits, _, _ = self.initial_inference(state_dict)
 
-            # 3. Process Outputs
             policy_probs_tensor = self._logits_to_probs(policy_logits)
             expected_value_tensor = self._logits_to_scalar(value_logits, self.support)
 
-            # Validate and normalize policy probabilities
             policy_probs = policy_probs_tensor.squeeze(0).cpu().numpy()
             if not np.all(np.isfinite(policy_probs)):
                 raise NetworkEvaluationError(
@@ -6941,7 +7524,6 @@ class NeuralNetwork:
                 else:
                     policy_probs /= prob_sum
 
-            # Convert to expected output format
             action_policy: Mapping[ActionType, float] = {
                 i: float(p) for i, p in enumerate(policy_probs)
             }
@@ -6965,19 +7547,15 @@ class NeuralNetwork:
             return []
         self.model.eval()
         try:
-            # 1. Batch Feature Extraction
             grid_tensor, other_features_tensor = self._batch_states_to_tensors(states)
 
-            # 2. Batch Initial Inference (using model's forward)
             policy_logits, value_logits, _ = self.model(
                 grid_tensor, other_features_tensor
             )
 
-            # 3. Batch Process Outputs
             policy_probs_tensor = self._logits_to_probs(policy_logits)
             expected_values_tensor = self._logits_to_scalar(value_logits, self.support)
 
-            # Validate and normalize policies
             policy_probs = policy_probs_tensor.cpu().numpy()
             expected_values = expected_values_tensor.cpu().numpy()
 
@@ -7022,7 +7600,7 @@ class NeuralNetwork:
             weights_on_device = {k: v.to(self.device) for k, v in weights.items()}
             model_to_load = getattr(self.model, "_orig_mod", self.model)
             model_to_load.load_state_dict(weights_on_device)
-            self.model.eval()  # Ensure model is in eval mode after loading weights
+            self.model.eval()
             logger.debug("NN weights set successfully.")
         except Exception as e:
             logger.error(f"Error setting weights on NN instance: {e}", exc_info=True)
@@ -7096,7 +7674,7 @@ from .model import MuZeroNet  # Changed from AlphaTriangleNet
 from .network import NeuralNetwork
 
 __all__ = [
-    "MuZeroNet",  # Changed from AlphaTriangleNet
+    "MuZeroNet",
     "NeuralNetwork",
 ]
 
@@ -8264,7 +8842,7 @@ This submodule focuses specifically on generating game episodes through self-pla
         -   Steps its local game environment (`GameState.step`).
         -   **After the episode concludes, it iterates backwards through the collected steps to calculate and store the N-step discounted reward target (`n_step_reward_target`) for each step.**
         -   Returns the completed `Trajectory` list, final score, episode length, and MCTS statistics via a `SelfPlayResult` object.
-        -   Asynchronously logs per-step statistics and reports its current `GameState` to the `StatsCollectorActor`.
+        -   Asynchronously logs per-step statistics (`MCTS/Step_Visits`, `MCTS/Step_Depth`, `RL/Step_Reward`, **`RL/Current_Score`**) and reports its current `GameState` to the `StatsCollectorActor`.
 
 ## Exposed Interfaces
 
@@ -8298,13 +8876,13 @@ This submodule focuses specifically on generating game episodes through self-pla
 
 File: muzerotriangle\rl\self_play\worker.py
 # File: muzerotriangle/rl/self_play/worker.py
-# File: muzerotriangle/rl/self_play/worker.py
 import logging
 import random
 from typing import TYPE_CHECKING
 
 import numpy as np
 import ray
+import torch  # Keep the import
 
 from ...environment import GameState
 from ...features import extract_state_features
@@ -8321,8 +8899,6 @@ from ..types import SelfPlayResult
 
 if TYPE_CHECKING:
     # import torch # Already imported above
-
-    import torch
 
     from ...utils.types import (
         ActionType,  # Import ActionType
@@ -8361,14 +8937,18 @@ class SelfPlayWorker:
         self.seed = seed if seed is not None else random.randint(0, 1_000_000)
         self.worker_device_str = worker_device_str
         self.current_trainer_step = 0
-        worker_log_level = logging.INFO
+        # Ensure logger is configured for the actor process
+        worker_log_level = logging.INFO  # Revert to INFO unless debugging worker
         log_format = (
             f"%(asctime)s [%(levelname)s] [W{self.actor_id}] %(name)s: %(message)s"
         )
         logging.basicConfig(level=worker_log_level, format=log_format, force=True)
         global logger
         logger = logging.getLogger(__name__)
-        logging.getLogger("muzerotriangle.mcts").setLevel(logging.WARNING)
+        # Keep MCTS/NN logs less verbose unless needed
+        # Set MCTS logger level based on main logger level for debugging
+        mcts_log_level = logging.getLogger().level
+        logging.getLogger("muzerotriangle.mcts").setLevel(mcts_log_level)
         logging.getLogger("muzerotriangle.nn").setLevel(logging.WARNING)
         set_random_seeds(self.seed)
         self.device = get_device(self.worker_device_str)
@@ -8404,7 +8984,10 @@ class SelfPlayWorker:
             except Exception as e:
                 logger.error(f"W{self.actor_id}: Failed report state: {e}")
 
-    def _log_step_stats_async(self, game_step, mcts_visits, mcts_depth, step_reward):
+    def _log_step_stats_async(
+        self, game_step, mcts_visits, mcts_depth, step_reward, current_score
+    ):
+        # Reverted to log_batch
         if self.stats_collector_actor:
             try:
                 step_info: StepInfo = {
@@ -8415,8 +8998,10 @@ class SelfPlayWorker:
                     "MCTS/Step_Visits": (float(mcts_visits), step_info),
                     "MCTS/Step_Depth": (float(mcts_depth), step_info),
                     "RL/Step_Reward": (step_reward, step_info),
+                    "RL/Current_Score": (current_score, step_info),
                 }
                 self.stats_collector_actor.log_batch.remote(step_stats)
+                logger.debug(f"W{self.actor_id}: Sent batch log for step {game_step}")
             except Exception as e:
                 logger.error(f"W{self.actor_id}: Failed log step stats: {e}")
 
@@ -8436,19 +9021,26 @@ class SelfPlayWorker:
                         discount**i * trajectory_raw[step_index]["reward"]
                     )
                 else:
+                    # Bootstrap with the value of the last *actual* state if episode ended early
                     if traj_len > 0:
                         last_step_value = trajectory_raw[-1]["value_target"]
                         n_step_reward_target += discount**i * last_step_value
-                    break
+                    break  # Stop accumulating reward if we are past the end
 
+            # Add the final bootstrap value if the n-step horizon extends beyond the trajectory
             bootstrap_index = t + n_steps
-            if bootstrap_index < traj_len:
+            if (
+                bootstrap_index >= traj_len and traj_len > 0
+            ):  # Check if bootstrap is needed
+                # If the bootstrap index is exactly at the end or beyond, use the last state's value
+                last_step_value = trajectory_raw[-1]["value_target"]
+                # The power should be n_steps, as it represents the value after n steps
+                n_step_reward_target += discount**n_steps * last_step_value
+            elif bootstrap_index < traj_len:  # If bootstrap index is within trajectory
                 n_step_reward_target += (
                     discount**n_steps * trajectory_raw[bootstrap_index]["value_target"]
                 )
-            elif bootstrap_index == traj_len and traj_len > 0:
-                last_step_value = trajectory_raw[-1]["value_target"]
-                n_step_reward_target += discount**n_steps * last_step_value
+            # If trajectory is empty (should not happen if called), target remains 0
 
             # Create the final TrajectoryStep dict
             step_data: TrajectoryStep = {
@@ -8480,6 +9072,7 @@ class SelfPlayWorker:
 
         while not game.is_over():
             game_step = game.current_step
+            logger.debug(f"W{self.actor_id} Step {game_step}: Starting step...")
             try:
                 observation: StateType = extract_state_features(game, self.model_config)
                 valid_actions = game.valid_actions()
@@ -8496,19 +9089,35 @@ class SelfPlayWorker:
                 break
 
             if current_hidden_state is None:
-                _, _, _, hidden_state_tensor = self.nn_evaluator.initial_inference(
-                    observation
-                )
-                current_hidden_state = hidden_state_tensor.squeeze(0)
-                root_node = Node(
-                    hidden_state=current_hidden_state, initial_game_state=game.copy()
-                )
+                logger.debug(f"W{self.actor_id} Step {game_step}: Initial inference...")
+                try:
+                    _, _, _, hidden_state_tensor = self.nn_evaluator.initial_inference(
+                        observation
+                    )
+                    current_hidden_state = hidden_state_tensor.squeeze(0)
+                    root_node = Node(
+                        hidden_state=current_hidden_state,
+                        initial_game_state=game.copy(),
+                    )
+                    logger.debug(
+                        f"W{self.actor_id} Step {game_step}: Initial inference successful."
+                    )
+                except Exception as inf_err:
+                    logger.error(
+                        f"W{self.actor_id} Step {game_step}: Initial Inference failed: {inf_err}",
+                        exc_info=True,
+                    )
+                    break  # Stop episode if inference fails
             else:
+                logger.debug(
+                    f"W{self.actor_id} Step {game_step}: Using existing hidden state."
+                )
                 root_node = Node(
                     hidden_state=current_hidden_state, initial_game_state=game.copy()
                 )
 
             mcts_max_depth = 0
+            logger.debug(f"W{self.actor_id} Step {game_step}: Starting MCTS...")
             try:
                 mcts_max_depth = run_mcts_simulations(
                     root_node, self.mcts_config, self.nn_evaluator, valid_actions
@@ -8516,12 +9125,16 @@ class SelfPlayWorker:
                 step_root_visits.append(root_node.visit_count)
                 step_tree_depths.append(mcts_max_depth)
                 step_simulations.append(self.mcts_config.num_simulations)
+                logger.info(
+                    f"W{self.actor_id} Step {game_step}: MCTS finished. Root visits: {root_node.visit_count}, Max Depth Reached: {mcts_max_depth}, Configured sims: {self.mcts_config.num_simulations}"
+                )
             except MCTSExecutionError as mcts_err:
                 logger.error(
                     f"W{self.actor_id} Step {game_step}: MCTS failed: {mcts_err}"
                 )
-                break
+                break  # Stop episode if MCTS fails
 
+            logger.debug(f"W{self.actor_id} Step {game_step}: Selecting action...")
             try:
                 temp = (
                     self.mcts_config.temperature_initial
@@ -8534,15 +9147,22 @@ class SelfPlayWorker:
                 policy_target: PolicyTargetMapping = get_policy_target(
                     root_node, temperature=1.0
                 )
+                # Use predicted value from MCTS root for value target
                 value_target: float = root_node.value_estimate
+                logger.debug(
+                    f"W{self.actor_id} Step {game_step}: Action selected: {action}, Value target: {value_target:.3f}"
+                )
             except Exception as policy_err:
                 logger.error(
                     f"W{self.actor_id} Step {game_step}: Policy/Action failed: {policy_err}",
                     exc_info=True,
                 )
-                break
+                break  # Stop episode if policy selection fails
 
             real_reward, done = game.step(action)
+            logger.debug(
+                f"W{self.actor_id} Step {game_step}: Game stepped. Action={action}, Reward={real_reward:.3f}, Done={done}"
+            )
 
             # Store raw step data (n_step_reward_target will be added later)
             step_data_raw: dict = {
@@ -8550,7 +9170,7 @@ class SelfPlayWorker:
                 "action": action,
                 "reward": real_reward,
                 "policy_target": policy_target,
-                "value_target": value_target,
+                "value_target": value_target,  # Store MCTS value estimate
                 "hidden_state": (
                     current_hidden_state.detach().cpu().numpy()
                     if current_hidden_state is not None
@@ -8560,32 +9180,49 @@ class SelfPlayWorker:
             trajectory_raw.append(step_data_raw)
 
             if not done:
+                logger.debug(
+                    f"W{self.actor_id} Step {game_step}: Calling dynamics for next state..."
+                )
                 try:
                     if current_hidden_state is not None:
+                        # Ensure action is compatible with dynamics function
+                        action_tensor = torch.tensor(
+                            [action], dtype=torch.long, device=self.device
+                        )  # Use torch here
                         hs_batch = current_hidden_state.to(self.device).unsqueeze(0)
                         next_hidden_state_tensor, _ = self.nn_evaluator.model.dynamics(
-                            hs_batch, action
+                            hs_batch,
+                            action_tensor,  # Pass action tensor
                         )
                         current_hidden_state = next_hidden_state_tensor.squeeze(0)
-                    else:
-                        logger.error(
-                            f"W{self.actor_id} Step {game_step}: hidden_state is None before dynamics call"
+                        logger.debug(
+                            f"W{self.actor_id} Step {game_step}: Dynamics successful."
                         )
-                        break
+                    else:
+                        # This case should ideally not be reached if game logic is correct
+                        logger.error(
+                            f"W{self.actor_id} Step {game_step}: hidden_state is None before dynamics call, but game not done."
+                        )
                 except Exception as dyn_err:
                     logger.error(
                         f"W{self.actor_id} Step {game_step}: Dynamics error: {dyn_err}",
                         exc_info=True,
                     )
-                    break
+                    break  # Stop episode if dynamics fails
             else:
-                current_hidden_state = None
+                current_hidden_state = None  # Reset hidden state for next episode
 
             self._report_current_state(game)
+            # Log stats including current score
             self._log_step_stats_async(
-                game_step, root_node.visit_count, mcts_max_depth, real_reward
+                game_step,
+                root_node.visit_count,
+                mcts_max_depth,
+                real_reward,
+                game.game_score,  # Pass current score
             )
             if done:
+                logger.debug(f"W{self.actor_id} Step {game_step}: Game ended.")
                 break
 
         # --- Episode End ---
@@ -8651,7 +9288,9 @@ class StatsCollectorActor:
         self._last_state_update_time: dict[int, float] = {}
 
         # Ensure logger is configured for the actor process
-        log_level = logging.INFO
+        log_level = (
+            logging.INFO
+        )  # Keep default INFO unless debugging specific actor issues
         # Check if runtime_context is available before using it
         actor_id_str = "UnknownActor"
         try:
@@ -8660,6 +9299,7 @@ class StatsCollectorActor:
         except Exception:
             pass  # Ignore if context cannot be retrieved
         log_format = f"%(asctime)s [%(levelname)s] [StatsCollectorActor pid={actor_id_str}] %(name)s: %(message)s"
+        # Set force=True to ensure configuration applies even if root logger was configured
         logging.basicConfig(level=log_level, format=log_format, force=True)
         global logger  # Re-assign logger after config
         logger = logging.getLogger(__name__)
@@ -8670,9 +9310,13 @@ class StatsCollectorActor:
 
     def log(self, metric_name: str, value: float, step_info: StepInfo):
         """Logs a single metric value with its associated step information."""
-        logger.debug(
-            f"Attempting to log metric='{metric_name}', value={value}, step_info={step_info}"
-        )
+        # --- REMOVED Debugging for RL/Current_Score ---
+        # if metric_name == "RL/Current_Score":
+        #     logger.debug(
+        #         f"Received log for RL/Current_Score: value={value}, step_info={step_info}"
+        #     )
+        # --- END REMOVED ---
+
         if not isinstance(metric_name, str):
             logger.error(f"Invalid metric_name type: {type(metric_name)}")
             return
@@ -8694,9 +9338,14 @@ class StatsCollectorActor:
             value_float = float(value)
             # Store the StepInfo dict directly
             self._data[metric_name].append((step_info, value_float))
-            logger.debug(
-                f"Successfully logged metric='{metric_name}', value={value_float}, step_info={step_info}. Deque size: {len(self._data[metric_name])}"
-            )
+
+            # --- REMOVED Debugging for RL/Current_Score ---
+            # if metric_name == "RL/Current_Score":
+            #     logger.debug(
+            #         f"Successfully stored RL/Current_Score. Deque size: {len(self._data[metric_name])}"
+            #     )
+            # --- END REMOVED ---
+
         except (ValueError, TypeError) as e:
             logger.error(
                 f"Could not log metric '{metric_name}'. Invalid value conversion: {e}"
@@ -9247,31 +9896,27 @@ class PlotDefinitions:
         # Define the layout and properties of each plot
         self._definitions: list[PlotDefinition] = [
             # Row 1
-            # --- CHANGED: x_axis_type to "game_step_index" for Score ---
+            # --- REVERTED: Score back to original position ---
             PlotDefinition("RL/Current_Score", "Score", False, "game_step_index"),
-            # --- END CHANGED ---
+            # --- END REVERTED ---
             PlotDefinition(
                 "Rate/Episodes_Per_Sec", "Episodes/sec", False, "buffer_size"
             ),
             PlotDefinition("Loss/Total", "Total Loss", True, "global_step"),
             # Row 2
-            # --- CHANGED: x_axis_type to "game_step_index" for Step Reward ---
             PlotDefinition("RL/Step_Reward", "Step Reward", False, "game_step_index"),
-            # --- END CHANGED ---
             PlotDefinition(
                 "Rate/Simulations_Per_Sec", "Sims/sec", False, "buffer_size"
             ),
             PlotDefinition("Loss/Policy", "Policy Loss", True, "global_step"),
             # Row 3
-            # --- CHANGED: x_axis_type to "game_step_index" for MCTS Visits ---
+            # --- REVERTED: MCTS Visits back to original position ---
             PlotDefinition("MCTS/Step_Visits", "MCTS Visits", False, "game_step_index"),
-            # --- END CHANGED ---
+            # --- END REVERTED ---
             PlotDefinition("Buffer/Size", "Buffer Size", False, "buffer_size"),
             PlotDefinition("Loss/Value", "Value Loss", True, "global_step"),
             # Row 4
-            # --- CHANGED: x_axis_type to "game_step_index" for MCTS Depth ---
             PlotDefinition("MCTS/Step_Depth", "MCTS Depth", False, "game_step_index"),
-            # --- END CHANGED ---
             PlotDefinition("Rate/Steps_Per_Sec", "Steps/sec", False, "global_step"),
             PlotDefinition("LearningRate", "Learn Rate", True, "global_step"),
         ]
@@ -9847,7 +10492,7 @@ This module provides utilities for collecting, storing, and visualizing time-ser
 ## Integration
 
 -   The `TrainingLoop` ([`muzerotriangle.training.loop`](../training/loop.py)) instantiates `StatsCollectorActor` and calls its remote `log` or `log_batch` methods, **passing `StepInfo` dictionaries**. It logs the `WEIGHT_UPDATE_METRIC_KEY` when worker weights are updated.
--   The `SelfPlayWorker` ([`muzerotriangle.rl.self_play.worker`](../rl/self_play/worker.py)) calls `log_batch` **passing `StepInfo` dictionaries containing `game_step_index` and `global_step` (of its current weights). It now logs `RL/Current_Score` in addition to `RL/Step_Reward`.**
+-   The `SelfPlayWorker` ([`muzerotriangle.rl.self_play.worker`](../rl/self_play/worker.py)) calls `log.remote` individually for each metric **passing `StepInfo` dictionaries containing `game_step_index` and `global_step` (of its current weights). It logs `RL/Current_Score` (Plot 0) in addition to `RL/Step_Reward` (Plot 3), `MCTS/Step_Visits` (Plot 6), and `MCTS/Step_Depth` (Plot 9).**
 -   The `DashboardRenderer` ([`muzerotriangle.visualization.core.dashboard_renderer`](../visualization/core/dashboard_renderer.py)) holds a handle to the `StatsCollectorActor` and calls `get_data.remote()` periodically to fetch data for plotting.
 -   The `DashboardRenderer` instantiates `Plotter` and calls `get_plot_surface` using the fetched stats data and the target plot area dimensions. It then blits the returned surface.
 -   The `DataManager` ([`muzerotriangle.data.data_manager`](../data/data_manager.py)) interacts with the `StatsCollectorActor` via `get_state.remote()` and `set_state.remote()` during checkpoint saving and loading.
@@ -12222,7 +12867,7 @@ File: muzerotriangle\utils\README.md
 
 ## Purpose and Architecture
 
-This module provides common utility functions and type definitions used across various parts of the AlphaTriangle project. Its goal is to avoid code duplication and provide central definitions for shared concepts.
+This module provides common utility functions and type definitions used across various parts of the MuZeroTriangle project. Its goal is to avoid code duplication and provide central definitions for shared concepts.
 
 -   **Helper Functions ([`helpers.py`](helpers.py)):** Contains miscellaneous helper functions like `get_device`, `set_random_seeds`, `format_eta`, `normalize_color_for_matplotlib`.
 -   **Type Definitions ([`types.py`](types.py)):** Defines common type aliases and `TypedDict`s used throughout the codebase. Key types include:
@@ -12638,7 +13283,7 @@ File: muzerotriangle\visualization\README.md
 
 ## Purpose and Architecture
 
-This module handles all visual aspects of the AlphaTriangle project, primarily using Pygame for rendering the game board, pieces, and training progress.
+This module handles all visual aspects of the MuZeroTriangle project, primarily using Pygame for rendering the game board, pieces, and training progress.
 
 -   **Core ([`core/README.md`](core/README.md)):** Contains the main rendering classes (`Visualizer`, `GameRenderer`, `DashboardRenderer`), layout logic (`layout.py`), color definitions (`colors.py`), font loading (`fonts.py`), and coordinate mapping utilities (`coord_mapper.py`).
     -   `Visualizer`: Manages the display for interactive modes (play, debug).
@@ -15694,7 +16339,7 @@ File: tests\mcts\conftest.py
 import pytest
 import torch
 
-from muzerotriangle.config import EnvConfig, MCTSConfig, ModelConfig
+from muzerotriangle.config import EnvConfig, ModelConfig
 from muzerotriangle.environment import GameState
 from muzerotriangle.mcts.core.node import Node
 from muzerotriangle.structs import Shape
@@ -15792,11 +16437,9 @@ class MockMuZeroNetwork:
     def predict(self, hidden_state):
         batch_size = hidden_state.shape[0]
         policy_logits = self._get_mock_logits(batch_size, self.action_dim)
-        # --- REVERTED: Return uniform value logits ---
         value_logits = self._get_mock_logits(
             batch_size, self.model_config.NUM_VALUE_ATOMS
         )
-        # --- END REVERTED ---
         return policy_logits, value_logits
 
     def forward(
@@ -15831,6 +16474,7 @@ def mock_muzero_network(
 
 @pytest.fixture
 def root_node_real_state(real_game_state: GameState) -> Node:
+    # Create root node with initial game state, but no hidden state yet
     return Node(initial_game_state=real_game_state)
 
 
@@ -15844,10 +16488,12 @@ def node_with_hidden_state(mock_model_config: ModelConfig) -> Node:
 def expanded_root_node(
     root_node_real_state: Node, mock_muzero_network: MockMuZeroNetwork
 ) -> Node:
+    """Expands the root node once using the mock network."""
     root = root_node_real_state
     game_state = root.initial_game_state
     assert game_state is not None
 
+    # Perform initial inference to get hidden state and policy
     mock_state: StateType = {
         "grid": torch.randn(
             1,
@@ -15867,7 +16513,13 @@ def expanded_root_node(
         mock_muzero_network.initial_inference(mock_state)
     )
 
+    # Assign hidden state and predicted value to root
     root.hidden_state = initial_hidden_state.squeeze(0)
+    root.predicted_value = mock_muzero_network._logits_to_scalar(
+        value_logits_init, mock_muzero_network.support
+    ).item()
+
+    # Expand children
     policy_probs = torch.softmax(policy_logits, dim=-1).squeeze(0).cpu().numpy()
     policy_map = {i: float(p) for i, p in enumerate(policy_probs)}
     valid_actions = game_state.valid_actions()
@@ -15894,50 +16546,48 @@ def expanded_root_node(
         )
         root.children[action] = child
 
-    root.visit_count = 1
-    root.value_sum = mock_muzero_network._logits_to_scalar(
-        value_logits_init, mock_muzero_network.support
-    ).item()
+    # NOTE: Visit counts and value sums are NOT set here, they start at 0
+    # The test calling run_mcts_simulations will handle the initial backprop if needed.
     return root
 
 
 @pytest.fixture
 def deep_expanded_node_mock_state(
-    expanded_root_node: Node,
-    mock_muzero_network: MockMuZeroNetwork,
-    mock_mcts_config: MCTSConfig,
+    expanded_root_node: Node, mock_muzero_network: MockMuZeroNetwork
 ) -> Node:
-    """Creates a tree of depth 2 for testing traversal."""
+    """
+    Creates a tree of depth 2 by expanding one child of the expanded_root_node.
+    Visit counts and value sums are NOT manually set here.
+    Slightly increases the prior of the expanded child to guide selection.
+    """
     root = expanded_root_node
     if not root.children:
         pytest.skip("Cannot create deep tree, root has no children.")
 
-    # --- Make selection deterministic: Boost one child's Q-value ---
+    # Select the first child to expand (arbitrarily) and slightly boost its prior
     child_to_expand = None
-    boost = 10000.0  # Significantly increased boost
-    first_child_action = next(iter(root.children.keys()), None)
-    if first_child_action is None:
-        pytest.skip("Cannot create deep tree, root has no children keys.")
-
-    for action, child in root.children.items():
-        # Give a large boost to the first child found
-        current_boost = boost if action == first_child_action else 0.0
-        child.value_sum += current_boost
-        child.visit_count += (
-            1  # Add a visit to avoid infinite exploration bonus initially
-        )
-        if current_boost > 0:
+    child_to_reduce = None
+    boost_amount = 0.01
+    found_first = False
+    for child in root.children.values():
+        if not found_first:
             child_to_expand = child
+            child.prior_probability += boost_amount  # Boost the first child
+            found_first = True
+        elif child_to_reduce is None:
+            child_to_reduce = child  # Find another child to reduce prior
+            child.prior_probability -= boost_amount
+            break  # Found both, exit loop
 
+    # Ensure we found a child to expand
     if child_to_expand is None or child_to_expand.hidden_state is None:
         pytest.skip("Cannot create deep tree, a valid child to expand is needed.")
-
-    # Update root visit count to reflect added visits
-    root.visit_count += len(root.children)
-    # --- End deterministic selection setup ---
+    # Ensure we found a child to reduce (if more than one child exists)
+    if len(root.children) > 1 and child_to_reduce is None:
+        pytest.skip("Could not find a second child to reduce prior for balancing.")
 
     # Predict for the child
-    policy_logits_child, value_logits_child = mock_muzero_network.predict(
+    policy_logits_child, _ = mock_muzero_network.predict(
         child_to_expand.hidden_state.unsqueeze(0)
     )
     policy_probs_child = (
@@ -15945,8 +16595,10 @@ def deep_expanded_node_mock_state(
     )
     policy_map_child = {i: float(p) for i, p in enumerate(policy_probs_child)}
 
-    valid_actions_child = [1, 2]  # Mock valid actions for grandchild level
+    # Mock valid actions for grandchild level (can be all actions for mock)
+    valid_actions_child = list(range(mock_muzero_network.action_dim))
 
+    # Expand the selected child
     for action in valid_actions_child:
         prior = policy_map_child.get(action, 0.0)
         hs_batch = child_to_expand.hidden_state.unsqueeze(0)
@@ -15965,19 +16617,7 @@ def deep_expanded_node_mock_state(
         )
         child_to_expand.children[action] = grandchild
 
-    # Update stats for the child node as if it was visited during expansion
-    # child_to_expand.visit_count = 1 # Already incremented above
-    child_to_expand.value_sum += mock_muzero_network._logits_to_scalar(
-        value_logits_child, mock_muzero_network.support
-    ).item()  # Add predicted value
-
-    # Update root stats to reflect the visit down this path (simplified backprop)
-    # root.visit_count += 1 # Already incremented above
-    root.value_sum += (
-        child_to_expand.reward
-        + mock_mcts_config.discount * child_to_expand.value_estimate  # Use estimate now
-    )
-
+    # NOTE: Visit counts and value sums remain 0 for child and grandchildren.
     return root
 
 
@@ -16175,6 +16815,151 @@ def expanded_node_mock_state_local(
     return root
 
 
+File: tests\mcts\test_backpropagation.py
+# File: tests/mcts/test_backpropagation.py
+import pytest
+import torch
+
+from muzerotriangle.mcts.core.node import Node
+from muzerotriangle.mcts.strategy import backpropagation
+
+
+@pytest.fixture
+def simple_tree() -> Node:
+    """Creates a simple 3-level tree for backpropagation testing."""
+    # Root (s0)
+    root = Node(hidden_state=torch.tensor([0.0]), reward=0.0)
+    # Child 1 (s1, reached via action a1, reward r1=0.1)
+    child1 = Node(
+        parent=root,
+        action_taken=1,
+        hidden_state=torch.tensor([1.0]),
+        reward=0.1,
+        prior=0.6,
+    )
+    # Child 2 (s2, reached via action a2, reward r2=0.2)
+    child2 = Node(
+        parent=root,
+        action_taken=2,
+        hidden_state=torch.tensor([2.0]),
+        reward=0.2,
+        prior=0.4,
+    )
+    # Grandchild (s3, reached from s1 via action a3, reward r3=0.3)
+    grandchild = Node(
+        parent=child1,
+        action_taken=3,
+        hidden_state=torch.tensor([3.0]),
+        reward=0.3,
+        prior=0.9,
+    )
+    root.children = {1: child1, 2: child2}
+    child1.children = {3: grandchild}
+    return root
+
+
+def test_backpropagate_from_leaf(simple_tree: Node):
+    """Test backpropagation from a leaf node (grandchild)."""
+    root = simple_tree
+    child1 = root.children[1]
+    grandchild = child1.children[3]
+    leaf_value = 0.8  # Value predicted at the leaf state s3
+    discount = 0.9
+
+    # Backpropagate from grandchild
+    depth = backpropagation.backpropagate_value(grandchild, leaf_value, discount)
+
+    # Check grandchild stats
+    assert grandchild.visit_count == 1
+    assert grandchild.value_sum == pytest.approx(leaf_value)
+    assert grandchild.value_estimate == pytest.approx(leaf_value)
+
+    # Check child1 stats
+    # Expected value at child1 = r3 + gamma * V(s3) = 0.3 + 0.9 * 0.8 = 0.3 + 0.72 = 1.02
+    assert child1.visit_count == 1
+    assert child1.value_sum == pytest.approx(1.02)
+    assert child1.value_estimate == pytest.approx(1.02)
+
+    # Check root stats
+    # Expected value at root = r1 + gamma * V(s1) = 0.1 + 0.9 * 1.02 = 0.1 + 0.918 = 1.018
+    assert root.visit_count == 1
+    assert root.value_sum == pytest.approx(1.018)
+    assert root.value_estimate == pytest.approx(1.018)
+
+    # Check depth
+    assert depth == 2  # Path: grandchild -> child1 -> root
+
+
+def test_backpropagate_from_intermediate(simple_tree: Node):
+    """Test backpropagation from an intermediate node (child2)."""
+    root = simple_tree
+    child2 = root.children[2]
+    leaf_value = 0.5  # Value predicted at state s2
+    discount = 0.9
+
+    # Backpropagate from child2
+    depth = backpropagation.backpropagate_value(child2, leaf_value, discount)
+
+    # Check child2 stats
+    assert child2.visit_count == 1
+    assert child2.value_sum == pytest.approx(leaf_value)
+    assert child2.value_estimate == pytest.approx(leaf_value)
+
+    # Check root stats
+    # Expected value at root = r2 + gamma * V(s2) = 0.2 + 0.9 * 0.5 = 0.2 + 0.45 = 0.65
+    assert root.visit_count == 1
+    assert root.value_sum == pytest.approx(0.65)
+    assert root.value_estimate == pytest.approx(0.65)
+
+    # Check depth
+    assert depth == 1  # Path: child2 -> root
+
+
+def test_backpropagate_multiple_visits(simple_tree: Node):
+    """Test backpropagation with multiple visits through the same nodes."""
+    root = simple_tree
+    child1 = root.children[1]
+    grandchild = child1.children[3]
+    discount = 0.9
+
+    # First backpropagation from grandchild
+    backpropagation.backpropagate_value(grandchild, 0.8, discount)
+    # Second backpropagation from grandchild (different leaf value)
+    backpropagation.backpropagate_value(grandchild, 0.6, discount)
+
+    # Check grandchild stats
+    assert grandchild.visit_count == 2
+    assert grandchild.value_sum == pytest.approx(0.8 + 0.6)
+    assert grandchild.value_estimate == pytest.approx((0.8 + 0.6) / 2)
+
+    # Check child1 stats
+    # Value 1 = 0.3 + 0.9 * 0.8 = 1.02
+    # Value 2 = 0.3 + 0.9 * 0.6 = 0.84
+    assert child1.visit_count == 2
+    assert child1.value_sum == pytest.approx(1.02 + 0.84)
+    assert child1.value_estimate == pytest.approx((1.02 + 0.84) / 2)
+
+    # Check root stats
+    # Value 1 = 0.1 + 0.9 * 1.02 = 1.018
+    # Value 2 = 0.1 + 0.9 * 0.84 = 0.856
+    assert root.visit_count == 2
+    assert root.value_sum == pytest.approx(1.018 + 0.856)
+    assert root.value_estimate == pytest.approx((1.018 + 0.856) / 2)
+
+    # Backpropagate from child2
+    backpropagation.backpropagate_value(root.children[2], 0.5, discount)
+
+    # Check child2 stats
+    assert root.children[2].visit_count == 1
+    assert root.children[2].value_sum == pytest.approx(0.5)
+
+    # Check root stats again
+    # Value 3 = 0.2 + 0.9 * 0.5 = 0.65
+    assert root.visit_count == 3
+    assert root.value_sum == pytest.approx(1.018 + 0.856 + 0.65)
+    assert root.value_estimate == pytest.approx((1.018 + 0.856 + 0.65) / 3)
+
+
 File: tests\mcts\test_expansion.py
 # File: tests/mcts/test_expansion.py
 from typing import Any  # Import Any
@@ -16283,7 +17068,8 @@ def test_run_mcts_simulations_basic(
         network=mock_muzero_network,
         valid_actions_from_state=valid_actions,
     )
-    assert root.visit_count >= test_config.num_simulations
+    # Visit count should be 1 (initial backprop) + num_simulations
+    assert root.visit_count == 1 + test_config.num_simulations
     assert root.is_expanded
     assert len(root.children) > 0
     assert max_depth >= 0
@@ -16338,19 +17124,97 @@ def test_run_mcts_simulations_no_valid_actions(
     assert root.visit_count == expected_visits, (
         f"Root visit count should be 1 + num_simulations ({expected_visits})"
     )
-    # --- ADJUSTED ASSERTION ---
-    # The root node's hidden_state and predicted_value are set during initial inference.
-    # expand_node is called, but should return early without adding children if valid_actions is empty.
     assert not root.children, "Root should have no children when no valid actions exist"
-    # is_expanded checks if self.children is non-empty.
     assert not root.is_expanded, "Root should not be expanded (no children added)"
-    # --- END ADJUSTED ASSERTION ---
     assert max_depth >= 0  # Depth reflects initial inference/backprop
+
+
+def test_run_mcts_simulations_visits_and_depth(
+    expanded_root_node: Node,
+    mock_mcts_config: MCTSConfig,
+    mock_muzero_network: Any,
+):
+    """Test visit counts and depth after running simulations on an expanded node."""
+    root = expanded_root_node
+    if root.initial_game_state is None:
+        pytest.skip("Root node needs game state")
+    valid_actions = root.initial_game_state.valid_actions()
+    if not valid_actions or not root.children:
+        pytest.skip("Expanded root node fixture invalid.")
+
+    # Root visit count starts at 0 in the simplified fixture
+    assert root.visit_count == 0
+
+    num_sims = 10
+    test_config = mock_mcts_config.model_copy(update={"num_simulations": num_sims})
+
+    max_depth = run_mcts_simulations(
+        root_node=root,
+        config=test_config,
+        network=mock_muzero_network,
+        valid_actions_from_state=valid_actions,
+    )
+
+    # Root visit count should be exactly num_sims (no initial backprop needed as it was expanded)
+    assert root.visit_count == num_sims, (
+        f"Expected root visits {num_sims}, got {root.visit_count}"
+    )
+    # Total visits across children should equal root visits
+    total_child_visits = sum(c.visit_count for c in root.children.values())
+    assert total_child_visits == root.visit_count, (
+        f"Sum of child visits ({total_child_visits}) != root visits ({root.visit_count})"
+    )
+    # Check that depth is at least 1 (since we selected children)
+    assert max_depth >= 1, f"Expected depth >= 1, got {max_depth}"
+
+
+def test_run_mcts_simulations_max_depth_limit(
+    deep_expanded_node_mock_state: Node,
+    mock_mcts_config: MCTSConfig,
+    mock_muzero_network: Any,
+):
+    """Test that MCTS respects the max_search_depth limit."""
+    root = deep_expanded_node_mock_state
+    if root.initial_game_state is None:
+        pytest.skip("Root node needs game state")
+    valid_actions = root.initial_game_state.valid_actions()
+
+    # Root visit count starts at 0 in the simplified fixture
+    assert root.visit_count == 0
+
+    # Set max depth to 1
+    num_sims = 10
+    test_config = mock_mcts_config.model_copy(
+        update={"num_simulations": num_sims, "max_search_depth": 1}
+    )
+
+    max_depth_reached = run_mcts_simulations(
+        root_node=root,
+        config=test_config,
+        network=mock_muzero_network,
+        valid_actions_from_state=valid_actions,
+    )
+
+    # The maximum depth reached during *traversal* should be 1
+    assert max_depth_reached == 1, (
+        f"Expected max depth reached to be 1, got {max_depth_reached}"
+    )
+    # Root visits should still be num_sims (as each sim starts from root and backprops)
+    assert root.visit_count == num_sims, (
+        f"Expected root visits {num_sims}, got {root.visit_count}"
+    )
+    # Check that grandchildren were NOT visited (because traversal stopped at depth 1)
+    for child in root.children.values():
+        if child.children:
+            for grandchild in child.children.values():
+                assert grandchild.visit_count == 0, (
+                    f"Grandchild {grandchild.action_taken} was visited, but max depth was 1."
+                )
 
 
 File: tests\mcts\test_selection.py
 # File: tests/mcts/test_selection.py
-# File: tests/mcts/test_selection.py
+import logging
 import math
 
 import pytest
@@ -16360,6 +17224,9 @@ import torch
 from muzerotriangle.config import MCTSConfig, ModelConfig
 from muzerotriangle.mcts.core.node import Node
 from muzerotriangle.mcts.strategy import selection
+
+# Get the logger for selection strategy to potentially increase level for this test
+selection_logger = logging.getLogger("muzerotriangle.mcts.strategy.selection")
 
 
 # --- Test PUCT Calculation ---
@@ -16381,6 +17248,7 @@ def test_puct_calculation_basic(
         parent, child, mock_mcts_config
     )
     assert q_value == pytest.approx(0.6)
+    # Use adjusted parent visits (max(1, 25) = 25)
     expected_exploration = (
         mock_mcts_config.puct_coefficient * 0.2 * (math.sqrt(25) / (1 + 5))
     )
@@ -16406,6 +17274,7 @@ def test_puct_calculation_unvisited_child(
         parent, child, mock_mcts_config
     )
     assert q_value == 0.0
+    # Parent visits adjusted to 10, child visits 0
     expected_exploration = (
         mock_mcts_config.puct_coefficient * 0.5 * (math.sqrt(10) / (1 + 0))
     )
@@ -16546,8 +17415,14 @@ def test_traverse_to_leaf_max_depth(
 
 # Use the corrected fixture name
 def test_traverse_to_leaf_deeper_muzero(
-    deep_expanded_node_mock_state: Node, mock_mcts_config: MCTSConfig
+    deep_expanded_node_mock_state: Node, mock_mcts_config: MCTSConfig, caplog
 ):
+    """Test traversal reaches depth 2."""
+    # Temporarily increase log level for this test
+    original_level = selection_logger.level
+    selection_logger.setLevel(logging.DEBUG)
+    caplog.set_level(logging.DEBUG, logger="muzerotriangle.mcts.strategy.selection")
+
     root = deep_expanded_node_mock_state
     config_copy = mock_mcts_config.model_copy(deep=True)
     config_copy.max_search_depth = 10  # Allow deep traversal
@@ -16560,19 +17435,34 @@ def test_traverse_to_leaf_deeper_muzero(
             break
     assert expanded_child is not None, "Fixture error: No expanded child found"
     assert expanded_child.children, "Fixture error: Expanded child has no children"
+    # Log the action of the child that should be selected
+    print(
+        f"\nExpecting selection to choose child: Action={expanded_child.action_taken}"
+    )
 
-    # Find an expected leaf (grandchild) - Removed as selection isn't guaranteed
-    # expected_leaf = next(iter(expanded_child.children.values()), None)
-    # assert expected_leaf is not None, "Fixture error: No grandchild found"
+    # Log state before traversal
+    print("\n--- Pre-Traversal State ---")
+    print(f"Root: {root}")
+    for action, child in root.children.items():
+        print(f"  Child {action}: {child}")
+        if child.children:
+            for gc_action, grandchild in child.children.items():
+                print(f"    Grandchild {gc_action}: {grandchild}")
+    print("--------------------------")
 
     # Traverse and check
     leaf, depth = selection.traverse_to_leaf(root, config_copy)
-    # --- FIXED ASSERTION ---
+
+    # Restore log level
+    selection_logger.setLevel(original_level)
+
+    # Assertions
     assert leaf in expanded_child.children.values(), (
-        "Returned leaf is not one of the expected grandchildren"
+        f"Returned leaf (Action={leaf.action_taken}) is not one of the expected grandchildren. "
+        f"Parent of leaf: Action={leaf.parent.action_taken if leaf.parent else 'None'}. "
+        f"Expanded child: Action={expanded_child.action_taken}"
     )
-    # --- END FIXED ASSERTION ---
-    assert depth == 2
+    assert depth == 2, f"Expected traversal depth 2, got {depth}"
 
 
 File: tests\mcts\__init__.py

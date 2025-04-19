@@ -2,7 +2,7 @@
 import pytest
 import torch
 
-from muzerotriangle.config import EnvConfig, MCTSConfig, ModelConfig
+from muzerotriangle.config import EnvConfig, ModelConfig
 from muzerotriangle.environment import GameState
 from muzerotriangle.mcts.core.node import Node
 from muzerotriangle.structs import Shape
@@ -100,11 +100,9 @@ class MockMuZeroNetwork:
     def predict(self, hidden_state):
         batch_size = hidden_state.shape[0]
         policy_logits = self._get_mock_logits(batch_size, self.action_dim)
-        # --- REVERTED: Return uniform value logits ---
         value_logits = self._get_mock_logits(
             batch_size, self.model_config.NUM_VALUE_ATOMS
         )
-        # --- END REVERTED ---
         return policy_logits, value_logits
 
     def forward(
@@ -139,6 +137,7 @@ def mock_muzero_network(
 
 @pytest.fixture
 def root_node_real_state(real_game_state: GameState) -> Node:
+    # Create root node with initial game state, but no hidden state yet
     return Node(initial_game_state=real_game_state)
 
 
@@ -152,10 +151,12 @@ def node_with_hidden_state(mock_model_config: ModelConfig) -> Node:
 def expanded_root_node(
     root_node_real_state: Node, mock_muzero_network: MockMuZeroNetwork
 ) -> Node:
+    """Expands the root node once using the mock network."""
     root = root_node_real_state
     game_state = root.initial_game_state
     assert game_state is not None
 
+    # Perform initial inference to get hidden state and policy
     mock_state: StateType = {
         "grid": torch.randn(
             1,
@@ -175,7 +176,13 @@ def expanded_root_node(
         mock_muzero_network.initial_inference(mock_state)
     )
 
+    # Assign hidden state and predicted value to root
     root.hidden_state = initial_hidden_state.squeeze(0)
+    root.predicted_value = mock_muzero_network._logits_to_scalar(
+        value_logits_init, mock_muzero_network.support
+    ).item()
+
+    # Expand children
     policy_probs = torch.softmax(policy_logits, dim=-1).squeeze(0).cpu().numpy()
     policy_map = {i: float(p) for i, p in enumerate(policy_probs)}
     valid_actions = game_state.valid_actions()
@@ -202,50 +209,48 @@ def expanded_root_node(
         )
         root.children[action] = child
 
-    root.visit_count = 1
-    root.value_sum = mock_muzero_network._logits_to_scalar(
-        value_logits_init, mock_muzero_network.support
-    ).item()
+    # NOTE: Visit counts and value sums are NOT set here, they start at 0
+    # The test calling run_mcts_simulations will handle the initial backprop if needed.
     return root
 
 
 @pytest.fixture
 def deep_expanded_node_mock_state(
-    expanded_root_node: Node,
-    mock_muzero_network: MockMuZeroNetwork,
-    mock_mcts_config: MCTSConfig,
+    expanded_root_node: Node, mock_muzero_network: MockMuZeroNetwork
 ) -> Node:
-    """Creates a tree of depth 2 for testing traversal."""
+    """
+    Creates a tree of depth 2 by expanding one child of the expanded_root_node.
+    Visit counts and value sums are NOT manually set here.
+    Slightly increases the prior of the expanded child to guide selection.
+    """
     root = expanded_root_node
     if not root.children:
         pytest.skip("Cannot create deep tree, root has no children.")
 
-    # --- Make selection deterministic: Boost one child's Q-value ---
+    # Select the first child to expand (arbitrarily) and slightly boost its prior
     child_to_expand = None
-    boost = 10000.0  # Significantly increased boost
-    first_child_action = next(iter(root.children.keys()), None)
-    if first_child_action is None:
-        pytest.skip("Cannot create deep tree, root has no children keys.")
-
-    for action, child in root.children.items():
-        # Give a large boost to the first child found
-        current_boost = boost if action == first_child_action else 0.0
-        child.value_sum += current_boost
-        child.visit_count += (
-            1  # Add a visit to avoid infinite exploration bonus initially
-        )
-        if current_boost > 0:
+    child_to_reduce = None
+    boost_amount = 0.01
+    found_first = False
+    for child in root.children.values():
+        if not found_first:
             child_to_expand = child
+            child.prior_probability += boost_amount  # Boost the first child
+            found_first = True
+        elif child_to_reduce is None:
+            child_to_reduce = child  # Find another child to reduce prior
+            child.prior_probability -= boost_amount
+            break  # Found both, exit loop
 
+    # Ensure we found a child to expand
     if child_to_expand is None or child_to_expand.hidden_state is None:
         pytest.skip("Cannot create deep tree, a valid child to expand is needed.")
-
-    # Update root visit count to reflect added visits
-    root.visit_count += len(root.children)
-    # --- End deterministic selection setup ---
+    # Ensure we found a child to reduce (if more than one child exists)
+    if len(root.children) > 1 and child_to_reduce is None:
+        pytest.skip("Could not find a second child to reduce prior for balancing.")
 
     # Predict for the child
-    policy_logits_child, value_logits_child = mock_muzero_network.predict(
+    policy_logits_child, _ = mock_muzero_network.predict(
         child_to_expand.hidden_state.unsqueeze(0)
     )
     policy_probs_child = (
@@ -253,8 +258,10 @@ def deep_expanded_node_mock_state(
     )
     policy_map_child = {i: float(p) for i, p in enumerate(policy_probs_child)}
 
-    valid_actions_child = [1, 2]  # Mock valid actions for grandchild level
+    # Mock valid actions for grandchild level (can be all actions for mock)
+    valid_actions_child = list(range(mock_muzero_network.action_dim))
 
+    # Expand the selected child
     for action in valid_actions_child:
         prior = policy_map_child.get(action, 0.0)
         hs_batch = child_to_expand.hidden_state.unsqueeze(0)
@@ -273,19 +280,7 @@ def deep_expanded_node_mock_state(
         )
         child_to_expand.children[action] = grandchild
 
-    # Update stats for the child node as if it was visited during expansion
-    # child_to_expand.visit_count = 1 # Already incremented above
-    child_to_expand.value_sum += mock_muzero_network._logits_to_scalar(
-        value_logits_child, mock_muzero_network.support
-    ).item()  # Add predicted value
-
-    # Update root stats to reflect the visit down this path (simplified backprop)
-    # root.visit_count += 1 # Already incremented above
-    root.value_sum += (
-        child_to_expand.reward
-        + mock_mcts_config.discount * child_to_expand.value_estimate  # Use estimate now
-    )
-
+    # NOTE: Visit counts and value sums remain 0 for child and grandchildren.
     return root
 
 

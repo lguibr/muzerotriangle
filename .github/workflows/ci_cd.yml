@@ -1,5 +1,5 @@
 # File: .github/workflows/ci_cd.yml
-name: AlphaTriangle CI/CD
+name: MuZeroTriangle CI/CD
 
 on:
   push:

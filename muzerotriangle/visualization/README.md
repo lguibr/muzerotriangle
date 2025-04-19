@@ -3,7 +3,7 @@
 
 ## Purpose and Architecture
 
-This module handles all visual aspects of the AlphaTriangle project, primarily using Pygame for rendering the game board, pieces, and training progress.
+This module handles all visual aspects of the MuZeroTriangle project, primarily using Pygame for rendering the game board, pieces, and training progress.
 
 -   **Core ([`core/README.md`](core/README.md)):** Contains the main rendering classes (`Visualizer`, `GameRenderer`, `DashboardRenderer`), layout logic (`layout.py`), color definitions (`colors.py`), font loading (`fonts.py`), and coordinate mapping utilities (`coord_mapper.py`).
     -   `Visualizer`: Manages the display for interactive modes (play, debug).

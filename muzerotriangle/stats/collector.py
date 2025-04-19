@@ -30,7 +30,9 @@ class StatsCollectorActor:
         self._last_state_update_time: dict[int, float] = {}
 
         # Ensure logger is configured for the actor process
-        log_level = logging.INFO
+        log_level = (
+            logging.INFO
+        )  # Keep default INFO unless debugging specific actor issues
         # Check if runtime_context is available before using it
         actor_id_str = "UnknownActor"
         try:
@@ -39,6 +41,7 @@ class StatsCollectorActor:
         except Exception:
             pass  # Ignore if context cannot be retrieved
         log_format = f"%(asctime)s [%(levelname)s] [StatsCollectorActor pid={actor_id_str}] %(name)s: %(message)s"
+        # Set force=True to ensure configuration applies even if root logger was configured
         logging.basicConfig(level=log_level, format=log_format, force=True)
         global logger  # Re-assign logger after config
         logger = logging.getLogger(__name__)
@@ -49,9 +52,13 @@ class StatsCollectorActor:
 
     def log(self, metric_name: str, value: float, step_info: StepInfo):
         """Logs a single metric value with its associated step information."""
-        logger.debug(
-            f"Attempting to log metric='{metric_name}', value={value}, step_info={step_info}"
-        )
+        # --- REMOVED Debugging for RL/Current_Score ---
+        # if metric_name == "RL/Current_Score":
+        #     logger.debug(
+        #         f"Received log for RL/Current_Score: value={value}, step_info={step_info}"
+        #     )
+        # --- END REMOVED ---
+
         if not isinstance(metric_name, str):
             logger.error(f"Invalid metric_name type: {type(metric_name)}")
             return
@@ -73,9 +80,14 @@ class StatsCollectorActor:
             value_float = float(value)
             # Store the StepInfo dict directly
             self._data[metric_name].append((step_info, value_float))
-            logger.debug(
-                f"Successfully logged metric='{metric_name}', value={value_float}, step_info={step_info}. Deque size: {len(self._data[metric_name])}"
-            )
+
+            # --- REMOVED Debugging for RL/Current_Score ---
+            # if metric_name == "RL/Current_Score":
+            #     logger.debug(
+            #         f"Successfully stored RL/Current_Score. Deque size: {len(self._data[metric_name])}"
+            #     )
+            # --- END REMOVED ---
+
         except (ValueError, TypeError) as e:
             logger.error(
                 f"Could not log metric '{metric_name}'. Invalid value conversion: {e}"

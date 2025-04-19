@@ -24,15 +24,15 @@ def refill_shape_slots(game_state: "GameState", rng: random.Random) -> None:
     Refills ALL empty shape slots in the GameState, but ONLY if ALL slots are currently empty.
     This implements batch refilling.
     """
-    # --- CHANGED: Check if ALL slots are None ---
+    # --- RESTORED: Check if ALL slots are None ---
     if all(shape is None for shape in game_state.shapes):
         logger.debug("All shape slots are empty. Refilling all slots.")
         for i in range(game_state.env_config.NUM_SHAPE_SLOTS):
             game_state.shapes[i] = generate_random_shape(rng)
             logger.debug(f"Refilled slot {i} with {game_state.shapes[i]}")
     else:
-        logger.debug("Not all shape slots are empty. Skipping refill.")
-    # --- END CHANGED ---
+        logger.debug("Not all shape slots are empty. Skipping batch refill.")
+    # --- END RESTORED ---
 
 
 def get_neighbors(r: int, c: int, is_up: bool) -> list[tuple[int, int]]:

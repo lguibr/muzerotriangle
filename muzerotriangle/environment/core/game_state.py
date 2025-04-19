@@ -1,3 +1,4 @@
+# File: muzerotriangle/environment/core/game_state.py
 import logging
 import random
 from typing import TYPE_CHECKING
@@ -51,7 +52,7 @@ class GameState:
         self.game_over = False
         self.current_step = 0
 
-        # Call refill_shape_slots with the updated signature (no index)
+        # Call batch refill - it will fill all slots because they are all None
         shapes.refill_shape_slots(self, self._rng)
 
         if not self.valid_actions():
@@ -74,9 +75,8 @@ class GameState:
         reward = execute_placement(self, shape_idx, r, c, self._rng)
         self.current_step += 1
 
-        if not self.game_over and not self.valid_actions():
-            self.game_over = True
-            logger.info(f"Game over detected after step {self.current_step}.")
+        # The game_over flag is now set correctly within execute_placement
+        # after the potential batch refill.
 
         return reward, self.game_over
 
@@ -92,9 +92,6 @@ class GameState:
         """Returns the terminal outcome value (e.g., final score). Used by MCTS."""
         if not self.is_over():
             logger.warning("get_outcome() called on a non-terminal state.")
-            # Consider returning a default value or raising an error?
-            # Returning current score might be misleading for MCTS if not terminal.
-            # Let's return 0.0 as a neutral value if not over.
             return 0.0
         return self.game_score
 

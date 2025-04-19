@@ -8,7 +8,7 @@ This submodule contains higher-level game logic that operates on the `GameState`
 -   **`actions.py`:**
     -   `get_valid_actions`: Determines all possible valid moves (shape placements) from the current `GameState` by iterating through available shapes and grid positions, checking placement validity using [`GridLogic.can_place`](../grid/logic.py). Returns a list of encoded `ActionType` integers.
 -   **`step.py`:**
-    -   `execute_placement`: Performs the core logic when a shape is placed. It updates the `GridData` (occupancy and color), checks for and clears completed lines using [`GridLogic.check_and_clear_lines`](../grid/logic.py), calculates the reward for the step using `calculate_reward`, updates the game score and step counters, and **triggers a batch refill of shape slots using [`ShapeLogic.refill_shape_slots`](../shapes/logic.py) only if all slots become empty after the placement.**
+    -   `execute_placement`: Performs the core logic when a shape is placed. It updates the `GridData` (occupancy and color), checks for and clears completed lines using [`GridLogic.check_and_clear_lines`](../grid/logic.py), calculates the reward for the step using `calculate_reward`, updates the game score and step counters. **It then checks if all shape slots are empty and triggers a batch refill using [`ShapeLogic.refill_shape_slots`](../shapes/logic.py) if they are. Finally, it checks if the game is over based on the potentially refilled shapes.**
     -   `calculate_reward`: Calculates the reward based on the number of triangles placed, triangles cleared, and whether the game ended.
 
 ## Exposed Interfaces
@@ -37,4 +37,4 @@ This submodule contains higher-level game logic that operates on the `GameState`
 
 ---
 
-**Note:** Please keep this README updated when changing the logic for determining valid actions, executing placements (including reward calculation and shape refilling), or modifying dependencies.
+**Note:** Please keep this README updated when changing the logic for determining valid actions, executing placements (including reward calculation, **batch shape refilling**, and game over check timing), or modifying dependencies.

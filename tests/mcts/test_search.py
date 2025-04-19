@@ -28,7 +28,8 @@ def test_run_mcts_simulations_basic(
         network=mock_muzero_network,
         valid_actions_from_state=valid_actions,
     )
-    assert root.visit_count >= test_config.num_simulations
+    # Visit count should be 1 (initial backprop) + num_simulations
+    assert root.visit_count == 1 + test_config.num_simulations
     assert root.is_expanded
     assert len(root.children) > 0
     assert max_depth >= 0
@@ -83,11 +84,89 @@ def test_run_mcts_simulations_no_valid_actions(
     assert root.visit_count == expected_visits, (
         f"Root visit count should be 1 + num_simulations ({expected_visits})"
     )
-    # --- ADJUSTED ASSERTION ---
-    # The root node's hidden_state and predicted_value are set during initial inference.
-    # expand_node is called, but should return early without adding children if valid_actions is empty.
     assert not root.children, "Root should have no children when no valid actions exist"
-    # is_expanded checks if self.children is non-empty.
     assert not root.is_expanded, "Root should not be expanded (no children added)"
-    # --- END ADJUSTED ASSERTION ---
     assert max_depth >= 0  # Depth reflects initial inference/backprop
+
+
+def test_run_mcts_simulations_visits_and_depth(
+    expanded_root_node: Node,
+    mock_mcts_config: MCTSConfig,
+    mock_muzero_network: Any,
+):
+    """Test visit counts and depth after running simulations on an expanded node."""
+    root = expanded_root_node
+    if root.initial_game_state is None:
+        pytest.skip("Root node needs game state")
+    valid_actions = root.initial_game_state.valid_actions()
+    if not valid_actions or not root.children:
+        pytest.skip("Expanded root node fixture invalid.")
+
+    # Root visit count starts at 0 in the simplified fixture
+    assert root.visit_count == 0
+
+    num_sims = 10
+    test_config = mock_mcts_config.model_copy(update={"num_simulations": num_sims})
+
+    max_depth = run_mcts_simulations(
+        root_node=root,
+        config=test_config,
+        network=mock_muzero_network,
+        valid_actions_from_state=valid_actions,
+    )
+
+    # Root visit count should be exactly num_sims (no initial backprop needed as it was expanded)
+    assert root.visit_count == num_sims, (
+        f"Expected root visits {num_sims}, got {root.visit_count}"
+    )
+    # Total visits across children should equal root visits
+    total_child_visits = sum(c.visit_count for c in root.children.values())
+    assert total_child_visits == root.visit_count, (
+        f"Sum of child visits ({total_child_visits}) != root visits ({root.visit_count})"
+    )
+    # Check that depth is at least 1 (since we selected children)
+    assert max_depth >= 1, f"Expected depth >= 1, got {max_depth}"
+
+
+def test_run_mcts_simulations_max_depth_limit(
+    deep_expanded_node_mock_state: Node,
+    mock_mcts_config: MCTSConfig,
+    mock_muzero_network: Any,
+):
+    """Test that MCTS respects the max_search_depth limit."""
+    root = deep_expanded_node_mock_state
+    if root.initial_game_state is None:
+        pytest.skip("Root node needs game state")
+    valid_actions = root.initial_game_state.valid_actions()
+
+    # Root visit count starts at 0 in the simplified fixture
+    assert root.visit_count == 0
+
+    # Set max depth to 1
+    num_sims = 10
+    test_config = mock_mcts_config.model_copy(
+        update={"num_simulations": num_sims, "max_search_depth": 1}
+    )
+
+    max_depth_reached = run_mcts_simulations(
+        root_node=root,
+        config=test_config,
+        network=mock_muzero_network,
+        valid_actions_from_state=valid_actions,
+    )
+
+    # The maximum depth reached during *traversal* should be 1
+    assert max_depth_reached == 1, (
+        f"Expected max depth reached to be 1, got {max_depth_reached}"
+    )
+    # Root visits should still be num_sims (as each sim starts from root and backprops)
+    assert root.visit_count == num_sims, (
+        f"Expected root visits {num_sims}, got {root.visit_count}"
+    )
+    # Check that grandchildren were NOT visited (because traversal stopped at depth 1)
+    for child in root.children.values():
+        if child.children:
+            for grandchild in child.children.values():
+                assert grandchild.visit_count == 0, (
+                    f"Grandchild {grandchild.action_taken} was visited, but max depth was 1."
+                )

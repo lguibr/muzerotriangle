@@ -123,7 +123,7 @@ def train(
     log_level: LogLevelOption = "INFO",
     seed: SeedOption = 42,
 ):
-    """Run the AlphaTriangle training pipeline."""
+    """Run the MuZeroTriangle training pipeline."""
     setup_logging(log_level)
     logger = logging.getLogger(__name__)
 

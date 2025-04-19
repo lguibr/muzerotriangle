@@ -7,6 +7,6 @@ from .model import MuZeroNet  # Changed from AlphaTriangleNet
 from .network import NeuralNetwork
 
 __all__ = [
-    "MuZeroNet",  # Changed from AlphaTriangleNet
+    "MuZeroNet",
     "NeuralNetwork",
 ]

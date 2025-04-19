@@ -10,7 +10,7 @@ This module centralizes all configuration parameters for the MuZeroTriangle proj
 -   **Validation Script:** The [`validation.py`](validation.py) script instantiates all configuration models, triggering Pydantic's validation, and prints a summary.
 -   **Dynamic Defaults:** Some configurations, like `RUN_NAME` in `TrainConfig`, use `default_factory` for dynamic defaults (e.g., timestamp).
 -   **Computed Fields:** Properties like `ACTION_DIM` in `EnvConfig` or `MLFLOW_TRACKING_URI` in `PersistenceConfig` are defined using `@computed_field` for clarity.
--   **Tuned Defaults:** The default values in `TrainConfig` and `ModelConfig` are now tuned for **more substantial learning runs** compared to the previous quick-testing defaults.
+-   **Tuned Defaults:** The default values in `TrainConfig` and `ModelConfig` are now tuned for **more substantial learning runs** compared to the previous quick-testing defaults. **Note:** `NUM_SELF_PLAY_WORKERS` defaults to 8 but is typically overridden by `setup.py` based on detected CPU cores.
 
 ## Exposed Interfaces
 

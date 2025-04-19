@@ -1,5 +1,5 @@
 # File: tests/mcts/test_selection.py
-# File: tests/mcts/test_selection.py
+import logging
 import math
 
 import pytest
@@ -9,6 +9,9 @@ import torch
 from muzerotriangle.config import MCTSConfig, ModelConfig
 from muzerotriangle.mcts.core.node import Node
 from muzerotriangle.mcts.strategy import selection
+
+# Get the logger for selection strategy to potentially increase level for this test
+selection_logger = logging.getLogger("muzerotriangle.mcts.strategy.selection")
 
 
 # --- Test PUCT Calculation ---
@@ -30,6 +33,7 @@ def test_puct_calculation_basic(
         parent, child, mock_mcts_config
     )
     assert q_value == pytest.approx(0.6)
+    # Use adjusted parent visits (max(1, 25) = 25)
     expected_exploration = (
         mock_mcts_config.puct_coefficient * 0.2 * (math.sqrt(25) / (1 + 5))
     )
@@ -55,6 +59,7 @@ def test_puct_calculation_unvisited_child(
         parent, child, mock_mcts_config
     )
     assert q_value == 0.0
+    # Parent visits adjusted to 10, child visits 0
     expected_exploration = (
         mock_mcts_config.puct_coefficient * 0.5 * (math.sqrt(10) / (1 + 0))
     )
@@ -195,8 +200,14 @@ def test_traverse_to_leaf_max_depth(
 
 # Use the corrected fixture name
 def test_traverse_to_leaf_deeper_muzero(
-    deep_expanded_node_mock_state: Node, mock_mcts_config: MCTSConfig
+    deep_expanded_node_mock_state: Node, mock_mcts_config: MCTSConfig, caplog
 ):
+    """Test traversal reaches depth 2."""
+    # Temporarily increase log level for this test
+    original_level = selection_logger.level
+    selection_logger.setLevel(logging.DEBUG)
+    caplog.set_level(logging.DEBUG, logger="muzerotriangle.mcts.strategy.selection")
+
     root = deep_expanded_node_mock_state
     config_copy = mock_mcts_config.model_copy(deep=True)
     config_copy.max_search_depth = 10  # Allow deep traversal
@@ -209,16 +220,31 @@ def test_traverse_to_leaf_deeper_muzero(
             break
     assert expanded_child is not None, "Fixture error: No expanded child found"
     assert expanded_child.children, "Fixture error: Expanded child has no children"
+    # Log the action of the child that should be selected
+    print(
+        f"\nExpecting selection to choose child: Action={expanded_child.action_taken}"
+    )
 
-    # Find an expected leaf (grandchild) - Removed as selection isn't guaranteed
-    # expected_leaf = next(iter(expanded_child.children.values()), None)
-    # assert expected_leaf is not None, "Fixture error: No grandchild found"
+    # Log state before traversal
+    print("\n--- Pre-Traversal State ---")
+    print(f"Root: {root}")
+    for action, child in root.children.items():
+        print(f"  Child {action}: {child}")
+        if child.children:
+            for gc_action, grandchild in child.children.items():
+                print(f"    Grandchild {gc_action}: {grandchild}")
+    print("--------------------------")
 
     # Traverse and check
     leaf, depth = selection.traverse_to_leaf(root, config_copy)
-    # --- FIXED ASSERTION ---
+
+    # Restore log level
+    selection_logger.setLevel(original_level)
+
+    # Assertions
     assert leaf in expanded_child.children.values(), (
-        "Returned leaf is not one of the expected grandchildren"
+        f"Returned leaf (Action={leaf.action_taken}) is not one of the expected grandchildren. "
+        f"Parent of leaf: Action={leaf.parent.action_taken if leaf.parent else 'None'}. "
+        f"Expanded child: Action={expanded_child.action_taken}"
     )
-    # --- END FIXED ASSERTION ---
-    assert depth == 2
+    assert depth == 2, f"Expected traversal depth 2, got {depth}"

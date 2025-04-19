@@ -18,7 +18,7 @@ This submodule focuses specifically on generating game episodes through self-pla
         -   Steps its local game environment (`GameState.step`).
         -   **After the episode concludes, it iterates backwards through the collected steps to calculate and store the N-step discounted reward target (`n_step_reward_target`) for each step.**
         -   Returns the completed `Trajectory` list, final score, episode length, and MCTS statistics via a `SelfPlayResult` object.
-        -   Asynchronously logs per-step statistics and reports its current `GameState` to the `StatsCollectorActor`.
+        -   Asynchronously logs per-step statistics (`MCTS/Step_Visits`, `MCTS/Step_Depth`, `RL/Step_Reward`, **`RL/Current_Score`**) and reports its current `GameState` to the `StatsCollectorActor`.
 
 ## Exposed Interfaces
 

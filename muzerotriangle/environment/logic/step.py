@@ -62,8 +62,8 @@ def execute_placement(
     game_state: "GameState", shape_idx: int, r: int, c: int, rng: random.Random
 ) -> float:
     """
-    Places a shape, clears lines, updates game state (NumPy arrays), and calculates reward.
-    Handles batch refilling of shapes.
+    Places a shape, clears lines, updates game state (NumPy arrays), potentially
+    triggers a batch refill, checks for game over, and calculates reward.
 
     Args:
         game_state: The current game state (will be modified).
@@ -83,42 +83,32 @@ def execute_placement(
     # Use the NumPy-based can_place from GridLogic
     if not GridLogic.can_place(game_state.grid_data, shape, r, c):
         logger.error(f"Invalid placement attempted: Shape {shape_idx} at ({r},{c})")
-        # It's possible this check fails even if valid_actions included it,
-        # especially if the state changed unexpectedly (e.g., in multi-threaded envs, though not the case here).
-        # Returning 0 reward is reasonable.
         return 0.0
 
     # --- Place the shape ---
     placed_coords: set[tuple[int, int]] = set()
     placed_count = 0
-    # Get color ID from the shape's color
     color_id = COLOR_TO_ID_MAP.get(shape.color, NO_COLOR_ID)
     if color_id == NO_COLOR_ID:
         logger.warning(f"Shape color {shape.color} not found in COLOR_TO_ID_MAP!")
-        # Assign a default color ID? Or handle as error? Let's use 0 for now.
         color_id = 0
 
     for dr, dc, _ in shape.triangles:
         tri_r, tri_c = r + dr, c + dc
-        # Check validity using GridData method (which checks bounds)
         if game_state.grid_data.valid(tri_r, tri_c):
-            # Check death and occupancy using NumPy arrays
             if (
                 not game_state.grid_data._death_np[tri_r, tri_c]
                 and not game_state.grid_data._occupied_np[tri_r, tri_c]
             ):
-                # Update NumPy arrays
                 game_state.grid_data._occupied_np[tri_r, tri_c] = True
                 game_state.grid_data._color_id_np[tri_r, tri_c] = color_id
                 placed_coords.add((tri_r, tri_c))
                 placed_count += 1
             else:
-                # This case should ideally not be reached if can_place passed. Log if it does.
                 logger.error(
                     f"Placement conflict at ({tri_r},{tri_c}) during execution, though can_place was true."
                 )
         else:
-            # This case should ideally not be reached if can_place passed. Log if it does.
             logger.error(
                 f"Invalid coordinates ({tri_r},{tri_c}) encountered during placement execution."
             )
@@ -127,7 +117,6 @@ def execute_placement(
     game_state.pieces_placed_this_episode += 1
 
     # --- Check and clear lines ---
-    # Use check_and_clear_lines from GridLogic
     lines_cleared_count, unique_coords_cleared, _ = GridLogic.check_and_clear_lines(
         game_state.grid_data, placed_coords
     )
@@ -136,24 +125,24 @@ def execute_placement(
     # --- Update Score (Optional tracking) ---
     game_state.game_score += placed_count + len(unique_coords_cleared) * 2
 
-    # --- Refill shapes if all slots are empty ---
+    # --- Refill shapes if all slots are empty (Batch Refill Logic) ---
     if all(s is None for s in game_state.shapes):
         logger.debug("All shape slots empty, triggering batch refill.")
-        ShapeLogic.refill_shape_slots(game_state, rng)
+        ShapeLogic.refill_shape_slots(game_state, rng)  # Call batch refill
 
-    # --- Check for game over AFTER placement and refill ---
-    # Game is over if no valid moves remain for the *new* state
+    # --- Check for game over AFTER placement and potential refill ---
+    # This ensures game over is only triggered if no moves are possible with the *current or newly refilled* shapes
     if not game_state.valid_actions():
         game_state.game_over = True
         logger.info(
             f"Game over detected after placing shape {shape_idx} and potential refill."
         )
 
-    # --- Calculate Reward based on the outcome of this step ---
+    # --- Calculate Reward based on the final outcome of this step ---
     step_reward = calculate_reward(
         placed_count=placed_count,
-        unique_coords_cleared=unique_coords_cleared,  # Pass the set of cleared coords
-        is_game_over=game_state.game_over,
+        unique_coords_cleared=unique_coords_cleared,
+        is_game_over=game_state.game_over,  # Use the potentially updated game_over status
         config=game_state.env_config,
     )
 
